@@ -1,0 +1,2 @@
+# Python dependencies for social media cross-posting
+requests>=2.32.0

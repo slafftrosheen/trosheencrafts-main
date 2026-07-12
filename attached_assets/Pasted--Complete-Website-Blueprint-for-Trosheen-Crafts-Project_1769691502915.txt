@@ -1,0 +1,1395 @@
+🏗️ Complete Website Blueprint for Trosheen.Crafts
+📁 Project Structure
+text
+trosheencrafts/
+├── package.json
+├── svelte.config.js
+├── vite.config.js
+├── tailwind.config.js
+├── postcss.config.js
+├── .env.example
+│
+├── static/
+│   ├── logo/
+│   │   └── Trosheen-Logo.png
+│   ├── fonts/
+│   ├── images/
+│   │   ├── hero/
+│   │   ├── workshop/
+│   │   ├── products/
+│   │   └── team/
+│   ├── videos/
+│   │   └── workshop-ambient.mp4
+│   └── favicon.png
+│
+├── src/
+│   ├── app.html
+│   ├── app.css
+│   ├── hooks.server.js
+│   │
+│   ├── lib/
+│   │   ├── config/
+│   │   │   ├── site.js           # Site metadata
+│   │   │   └── theme.js          # Design tokens
+│   │   │
+│   │   ├── stores/
+│   │   │   ├── cart.js           # Shopping cart state
+│   │   │   ├── scroll.js         # Scroll position tracking
+│   │   │   └── theme.js          # Theme switcher
+│   │   │
+│   │   ├── data/
+│   │   │   ├── story.js          # Story content sections
+│   │   │   ├── products.js       # Product catalog
+│   │   │   ├── social-stories.js # Social media stories
+│   │   │   └── team.js           # Team member profiles
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── animations.js     # GSAP animation helpers
+│   │   │   ├── scroll.js         # Scroll utilities
+│   │   │   ├── format.js         # Text/number formatting
+│   │   │   └── seo.js            # SEO utilities
+│   │   │
+│   │   ├── components/
+│   │   │   ├── layout/
+│   │   │   │   ├── Header.svelte
+│   │   │   │   ├── Footer.svelte
+│   │   │   │   ├── Navigation.svelte
+│   │   │   │   └── MobileMenu.svelte
+│   │   │   │
+│   │   │   ├── story/
+│   │   │   │   ├── HeroSection.svelte
+│   │   │   │   ├── HeritageSection.svelte
+│   │   │   │   ├── MakersSection.svelte
+│   │   │   │   ├── NextGenSection.svelte
+│   │   │   │   ├── PhilosophySection.svelte
+│   │   │   │   ├── CandleStorySection.svelte
+│   │   │   │   └── SocialStoriesSection.svelte
+│   │   │   │
+│   │   │   ├── shop/
+│   │   │   │   ├── ProductCard.svelte
+│   │   │   │   ├── ProductGrid.svelte
+│   │   │   │   ├── ProductFilter.svelte
+│   │   │   │   ├── ProductModal.svelte
+│   │   │   │   ├── CartDrawer.svelte
+│   │   │   │   └── CheckoutForm.svelte
+│   │   │   │
+│   │   │   ├── blog/
+│   │   │   │   ├── BlogCard.svelte
+│   │   │   │   ├── BlogGrid.svelte
+│   │   │   │   └── BlogPost.svelte
+│   │   │   │
+│   │   │   ├── effects/
+│   │   │   │   ├── ParallaxContainer.svelte
+│   │   │   │   ├── ScrollReveal.svelte
+│   │   │   │   ├── HaloEffect.svelte
+│   │   │   │   ├── ParticleField.svelte
+│   │   │   │   ├── CursorTrail.svelte
+│   │   │   │   └── ProductViewer3D.svelte
+│   │   │   │
+│   │   │   ├── ui/
+│   │   │   │   ├── Button.svelte
+│   │   │   │   ├── Card.svelte
+│   │   │   │   ├── Modal.svelte
+│   │   │   │   ├── Carousel.svelte
+│   │   │   │   ├── ScrollProgress.svelte
+│   │   │   │   └── Newsletter.svelte
+│   │   │   │
+│   │   │   └── shared/
+│   │   │       ├── Image.svelte          # Lazy loading image
+│   │   │       ├── Video.svelte
+│   │   │       ├── Icon.svelte
+│   │   │       └── SEO.svelte
+│   │   │
+│   │   └── styles/
+│   │       ├── animations.css
+│   │       ├── typography.css
+│   │       └── utilities.css
+│   │
+│   └── routes/
+│       ├── +layout.svelte
+│       ├── +layout.js
+│       ├── +page.svelte              # One-pager story home
+│       ├── +page.js
+│       │
+│       ├── shop/
+│       │   ├── +page.svelte          # Shop listing
+│       │   ├── +page.js
+│       │   ├── [slug]/
+│       │   │   ├── +page.svelte      # Product detail
+│       │   │   └── +page.js
+│       │   └── cart/
+│       │       └── +page.svelte      # Cart page
+│       │
+│       ├── blog/
+│       │   ├── +page.svelte          # Blog index
+│       │   ├── +page.js
+│       │   └── [slug]/
+│       │       ├── +page.svelte      # Blog post
+│       │       └── +page.js
+│       │
+│       ├── about/
+│       │   └── +page.svelte          # Detailed about page
+│       │
+│       ├── contact/
+│       │   └── +page.svelte          # Contact form
+│       │
+│       └── api/
+│           ├── newsletter/
+│           │   └── +server.js        # Newsletter signup
+│           ├── contact/
+│           │   └── +server.js        # Contact form handler
+│           └── checkout/
+│               └── +server.js        # Checkout processing
+📦 Package.json
+json
+{
+  "name": "trosheencrafts",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./jsconfig.json --watch",
+    "lint": "eslint .",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/kit": "^2.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "prettier": "^3.1.1",
+    "prettier-plugin-svelte": "^3.1.2",
+    "svelte": "^4.2.8",
+    "svelte-check": "^3.6.2",
+    "tailwindcss": "^3.4.0",
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "gsap": "^3.12.4",
+    "locomotive-scroll": "^4.1.4",
+    "three": "^0.160.0",
+    "@threlte/core": "^7.0.0",
+    "@threlte/extras": "^8.0.0",
+    "svelte-motion": "^0.12.0",
+    "clsx": "^2.1.0",
+    "nanoid": "^5.0.4",
+    "@stripe/stripe-js": "^2.4.0",
+    "zod": "^3.22.4"
+  },
+  "type": "module"
+}
+⚙️ Configuration Files
+svelte.config.js
+javascript
+import adapter from '@sveltejs/adapter-auto';
+import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+	preprocess: vitePreprocess(),
+	kit: {
+		adapter: adapter(),
+		alias: {
+			$components: 'src/lib/components',
+			$utils: 'src/lib/utils',
+			$stores: 'src/lib/stores',
+			$data: 'src/lib/data',
+			$config: 'src/lib/config'
+		}
+	}
+};
+
+export default config;
+vite.config.js
+javascript
+import { sveltekit } from '@sveltejs/kit/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+	plugins: [sveltekit()],
+	optimizeDeps: {
+		include: ['gsap', 'three']
+	},
+	server: {
+		fs: {
+			allow: ['static']
+		}
+	}
+});
+tailwind.config.js
+javascript
+/** @type {import('tailwindcss').Config} */
+export default {
+	content: ['./src/**/*.{html,js,svelte,ts}'],
+	theme: {
+		extend: {
+			colors: {
+				concrete: {
+					light: '#E8E4DF',
+					DEFAULT: '#B8B4AF',
+					dark: '#6B6761'
+				},
+				terracotta: '#D4735D',
+				gold: '#D4A574',
+				forest: '#5A6B5F',
+				tech: '#4A90B5',
+				electric: '#00D9FF',
+				earth: '#8B7355',
+				moss: '#7A956B'
+			},
+			fontFamily: {
+				serif: ['Playfair Display', 'Georgia', 'serif'],
+				sans: ['Inter', 'system-ui', 'sans-serif'],
+				handwriting: ['Dancing Script', 'cursive']
+			},
+			animation: {
+				'float': 'float 6s ease-in-out infinite',
+				'fade-in': 'fadeIn 1s ease-out forwards',
+				'slide-up': 'slideUp 0.8s ease-out forwards',
+				'scale-in': 'scaleIn 0.6s ease-out forwards',
+				'halo': 'halo 3s ease-in-out infinite'
+			},
+			keyframes: {
+				float: {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-20px)' }
+				},
+				fadeIn: {
+					'0%': { opacity: '0' },
+					'100%': { opacity: '1' }
+				},
+				slideUp: {
+					'0%': { transform: 'translateY(60px)', opacity: '0' },
+					'100%': { transform: 'translateY(0)', opacity: '1' }
+				},
+				scaleIn: {
+					'0%': { transform: 'scale(0.8)', opacity: '0' },
+					'100%': { transform: 'scale(1)', opacity: '1' }
+				},
+				halo: {
+					'0%, 100%': { boxShadow: '0 0 20px rgba(212, 165, 116, 0.3)' },
+					'50%': { boxShadow: '0 0 60px rgba(212, 165, 116, 0.6)' }
+				}
+			}
+		}
+	},
+	plugins: []
+};
+🎨 Design System & Theme Configuration
+src/lib/config/theme.js
+javascript
+export const theme = {
+	colors: {
+		primary: {
+			concrete: {
+				light: '#E8E4DF',
+				mid: '#B8B4AF',
+				dark: '#6B6761'
+			},
+			warmth: {
+				terracotta: '#D4735D',
+				gold: '#D4A574',
+				forest: '#5A6B5F'
+			},
+			tech: {
+				blue: '#4A90B5',
+				electric: '#00D9FF'
+			},
+			natural: {
+				earth: '#8B7355',
+				moss: '#7A956B'
+			}
+		}
+	},
+	
+	typography: {
+		fonts: {
+			heading: "'Playfair Display', Georgia, serif",
+			body: "'Inter', system-ui, sans-serif",
+			accent: "'Dancing Script', cursive"
+		},
+		sizes: {
+			hero: 'clamp(3rem, 8vw, 6rem)',
+			h1: 'clamp(2.5rem, 5vw, 4rem)',
+			h2: 'clamp(2rem, 4vw, 3rem)',
+			h3: 'clamp(1.5rem, 3vw, 2rem)',
+			body: 'clamp(1rem, 2vw, 1.125rem)',
+			small: '0.875rem'
+		}
+	},
+	
+	spacing: {
+		section: 'clamp(4rem, 10vw, 8rem)',
+		container: 'clamp(1rem, 5vw, 2rem)'
+	},
+	
+	animations: {
+		durations: {
+			fast: '300ms',
+			medium: '600ms',
+			slow: '1000ms'
+		},
+		easings: {
+			default: 'cubic-bezier(0.4, 0, 0.2, 1)',
+			inOut: 'cubic-bezier(0.65, 0, 0.35, 1)',
+			spring: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+		}
+	},
+	
+	breakpoints: {
+		sm: '640px',
+		md: '768px',
+		lg: '1024px',
+		xl: '1280px',
+		'2xl': '1536px'
+	}
+};
+📝 Content Data Structure
+src/lib/data/story.js
+javascript
+export const storyContent = {
+	hero: {
+		title: "Where Seasons Mark Time",
+		subtitle: "Handcrafted concrete art from the heart of Daugavpils, Latvia",
+		tagline: "The workshop where dust of industry meets the warmth of home",
+		backgroundVideo: "/videos/workshop-ambient.mp4",
+		cta: {
+			primary: { text: "Explore Our Story", href: "#heritage" },
+			secondary: { text: "Visit Shop", href: "/shop" }
+		}
+	},
+	
+	heritage: {
+		title: "A Family of Makers in Daugavpils",
+		intro: "In the heart of Daugavpils, Latvia, there is a workshop where the dust of industry meets the warmth of home. This is the home of Trosheen.Crafts.",
+		paragraphs: [
+			"Our story didn't start with a business plan; it started with a genetic trait passed down through generations. From grandparents to parents, and now to sons and grandchildren, our family has always spoken the language of craftsmanship.",
+			"Our roots are as mixed and sturdy as the materials we cast. With a heritage blending Russian, Polish, and Latvian ancestry, we represent the true spirit of this region—a melting pot of cultures united by a shared passion for creating beauty with our hands."
+		],
+		images: [
+			{ src: "/images/workshop/backyard-winter.jpg", alt: "Workshop in winter" },
+			{ src: "/images/workshop/tools-materials.jpg", alt: "Crafting materials" }
+		]
+	},
+	
+	makers: {
+		oleg: {
+			name: "Oleg",
+			role: "The Sculptor",
+			subtitle: "The soul of the operation",
+			description: "Oleg doesn't just pour concrete; he converses with it. Using traditional hand-building techniques, he creates our one-of-a-kind garden ornaments, fountains, and pots.",
+			quote: "When you see a hand-sculpted fountain in our collection, you are seeing my touch—no two pieces are ever identical because they are shaped by the mood and motion of my hands in that specific moment.",
+			images: [
+				"/images/team/oleg-sculpting.jpg",
+				"/images/team/oleg-hands.jpg"
+			],
+			specialties: ["Hand-sculpted fountains", "Garden ornaments", "Traditional techniques"]
+		},
+		slaff: {
+			name: "Slaff",
+			role: "The Innovator",
+			subtitle: "The modern edge",
+			description: "With a background in web and technology, Slaff introduced a specialized architectural concrete originally designed for 3D printing. This innovation allows us to achieve incredible detail and durability.",
+			quote: "Together with my father, we bridge the gap between the rustic and the refined. It's a duet of dust and data.",
+			images: [
+				"/images/team/slaff-tech.jpg",
+				"/images/team/slaff-concrete.jpg"
+			],
+			specialties: ["3D printing concrete", "Material innovation", "Digital design"]
+		},
+		collaboration: "A partnership of old-world intuition and new-world precision"
+	},
+	
+	nextGen: {
+		title: "The Next Generation: Alisija and Nikolass",
+		subtitle: "The heartbeat of our future",
+		description: "Trosheen.Crafts is not a factory; it is a living room. The rhythm of our production is set by family life.",
+		children: [
+			{
+				name: "Alisija",
+				age: "Quality Inspector",
+				quote: "It has to be pretty enough for my room!",
+				image: "/images/team/alisija.jpg"
+			},
+			{
+				name: "Nikolass",
+				age: "Strength Tester",
+				quote: "Strong enough for my dinosaurs!",
+				image: "/images/team/nikolass.jpg"
+			}
+		],
+		familyMoments: [
+			"Watching grandfather sculpt",
+			"Helping with packing for markets",
+			"Testing if candles sit straight",
+			"Placing golden flakes in gel candles"
+		]
+	},
+	
+	philosophy: {
+		title: "Concrete with a Conscience",
+		tagline: "The most eco-friendly product is the one you never have to throw away",
+		principles: [
+			{
+				icon: "🌍",
+				title: "Built to Last Decades",
+				description: "High-performance concrete that withstands harsh Northern winters. Unlike cheap plastics that degrade and pollute, our pieces are heirlooms."
+			},
+			{
+				icon: "♻️",
+				title: "Zero Waste Philosophy",
+				description: "Every piece is designed for a second life. Nothing becomes trash; everything transforms."
+			},
+			{
+				icon: "🏔️",
+				title: "Tested in Real Conditions",
+				description: "Every design is tested in our own Daugavpils garden. Rain, snow, +30°C summer days—if it survives here, it's ready for your space."
+			},
+			{
+				icon: "🚫",
+				title: "No Mass Production",
+				description: "We reject the 'throwaway culture' of modern manufacturing in favor of pieces that age gracefully."
+			}
+		]
+	},
+	
+	candleStory: {
+		title: "The Candle's Second Life",
+		subtitle: "A light that leaves nothing behind but beauty",
+		process: [
+			{
+				stage: "First Life",
+				title: "Pure Natural Wax",
+				description: "Only natural wax and gel wax, infused with authentic scents derived from nature—no harsh synthetics.",
+				image: "/images/products/candle-lit.jpg"
+			},
+			{
+				stage: "Transformation",
+				title: "The Flame Goes Out",
+				description: "But the story doesn't end. The vessel was designed as an architectural piece first, container second.",
+				image: "/images/products/candle-empty.jpg"
+			},
+			{
+				stage: "Second Life",
+				title: "Forever Design Object",
+				description: "Pencil holder, succulent pot, jewelry cup, or keepsake bowl. The concrete vessel lives on.",
+				image: "/images/products/candle-repurposed.jpg"
+			}
+		],
+		quote: "We don't make trash; we make permanent design objects that happen to start their life as candles."
+	}
+};
+src/lib/data/products.js
+javascript
+export const productCategories = [
+	{ id: 'candles', name: 'Candles', slug: 'candles' },
+	{ id: 'planters', name: 'Planters & Pots', slug: 'planters' },
+	{ id: 'garden', name: 'Garden Décor', slug: 'garden-decor' },
+	{ id: 'fountains', name: 'Fountains', slug: 'fountains' }
+];
+
+export const products = [
+	{
+		id: 'cupped-hands-candle',
+		name: 'Cupped Hands Heart Candle',
+		slug: 'cupped-hands-heart-candle',
+		category: 'candles',
+		price: 24.99,
+		currency: 'EUR',
+		description: 'Hand-sculpted concrete vessel shaped like protective hands holding a heart. After the natural wax candle burns, use as a jewelry holder or keepsake bowl.',
+		features: [
+			'Hand-sculpted details',
+			'Natural wax with forest scent',
+			'Reusable concrete vessel',
+			'Indoor/outdoor rated'
+		],
+		dimensions: { width: 12, height: 8, depth: 10, unit: 'cm' },
+		weight: 450,
+		images: [
+			'/images/products/cupped-hands-1.jpg',
+			'/images/products/cupped-hands-2.jpg',
+			'/images/products/cupped-hands-detail.jpg',
+			'/images/products/cupped-hands-repurposed.jpg'
+		],
+		stock: 15,
+		handmade: true,
+		maker: 'Oleg',
+		madeIn: 'Daugavpils, Latvia'
+	},
+	{
+		id: 'heart-tealight-stand',
+		name: 'Heart Tea Light Stand',
+		slug: 'heart-tealight-stand',
+		category: 'candles',
+		price: 18.99,
+		currency: 'EUR',
+		description: 'Elegant concrete heart-shaped tea light holder with braided rim detail. Perfect for creating ambient lighting.',
+		features: [
+			'Intricate braided texture',
+			'Fits standard tea lights',
+			'Durable concrete construction',
+			'Unique hand-finished surface'
+		],
+		dimensions: { width: 10, height: 3, depth: 10, unit: 'cm' },
+		weight: 280,
+		images: [
+			'/images/products/heart-stand-1.jpg',
+			'/images/products/heart-stand-lit.jpg'
+		],
+		stock: 22,
+		handmade: true,
+		maker: 'Slaff',
+		madeIn: 'Daugavpils, Latvia'
+	},
+	{
+		id: 'tree-trunk-planter',
+		name: 'Tree Trunk Planter',
+		slug: 'tree-trunk-planter',
+		category: 'planters',
+		price: 34.99,
+		currency: 'EUR',
+		description: 'Realistic tree trunk texture planter that brings natural woodland aesthetic to your garden or balcony.',
+		features: [
+			'Hand-textured bark appearance',
+			'Drainage hole included',
+			'Winter-resistant concrete',
+			'Fits standard 15cm nursery pots'
+		],
+		dimensions: { diameter: 18, height: 16, unit: 'cm' },
+		weight: 1200,
+		images: [
+			'/images/products/trunk-planter-1.jpg',
+			'/images/products/trunk-planter-planted.jpg'
+		],
+		stock: 8,
+		handmade: true,
+		maker: 'Oleg',
+		madeIn: 'Daugavpils, Latvia'
+	}
+	// Add more products...
+];
+src/lib/data/social-stories.js
+javascript
+export const socialStories = [
+	{
+		id: 1,
+		title: "The Father's Hands",
+		image: "/images/social/oleg-hands.jpg",
+		text: "Meet Oleg. 🛠️ If you look closely at our garden fountains, you can almost see his fingerprints. He doesn't believe in mass production; he believes in the moment.",
+		hashtags: ["#TrosheenCrafts", "#MeetTheMaker", "#HandmadeLatvia"]
+	},
+	{
+		id: 2,
+		title: "The Modern Twist",
+		image: "/images/social/slaff-tech.jpg",
+		text: "Slaff didn't just want to make pots; he wanted to innovate them. 💡 By using high-tech concrete designed for 3D printing, we get impossibly sharp details.",
+		hashtags: ["#ConcreteDesign", "#3DPrinting", "#Innovation"]
+	},
+	{
+		id: 3,
+		title: "Quality Control",
+		image: "/images/social/kids-workshop.jpg",
+		text: "Quality control looks a little different around here. 😉 With Alisija and Nikolass running around, we're reminded we're building a legacy.",
+		hashtags: ["#FamilyBusiness", "#Generations", "#Daugavpils"]
+	},
+	{
+		id: 4,
+		title: "Don't Throw It Away",
+		image: "/images/social/candle-second-life.jpg",
+		text: "The candle is finished. Now the story begins. 🌿 Our vessels are designed for a second life. Sustainable, stylish, and smart.",
+		hashtags: ["#ZeroWaste", "#Upcycle", "#EcoHome"]
+	}
+	// Add Stories 5-14...
+];
+🎭 Core Component Examples
+src/routes/+page.svelte (Main One-Pager)
+text
+<script>
+	import HeroSection from '$components/story/HeroSection.svelte';
+	import HeritageSection from '$components/story/HeritageSection.svelte';
+	import MakersSection from '$components/story/MakersSection.svelte';
+	import NextGenSection from '$components/story/NextGenSection.svelte';
+	import PhilosophySection from '$components/story/PhilosophySection.svelte';
+	import CandleStorySection from '$components/story/CandleStorySection.svelte';
+	import SocialStoriesSection from '$components/story/SocialStoriesSection.svelte';
+	import ScrollProgress from '$components/ui/ScrollProgress.svelte';
+	import CursorTrail from '$components/effects/CursorTrail.svelte';
+	import SEO from '$components/shared/SEO.svelte';
+	
+	import { onMount } from 'svelte';
+	import { initScrollAnimations } from '$utils/scroll';
+	
+	onMount(() => {
+		initScrollAnimations();
+	});
+</script>
+
+<SEO 
+	title="Trosheen.Crafts - Handmade Concrete Art from Daugavpils"
+	description="Family-crafted concrete candles, planters, and garden décor. Built to last generations."
+	image="/images/og-image.jpg"
+/>
+
+<CursorTrail />
+<ScrollProgress />
+
+<main class="overflow-x-hidden">
+	<HeroSection />
+	<HeritageSection />
+	<MakersSection />
+	<NextGenSection />
+	<PhilosophySection />
+	<CandleStorySection />
+	<SocialStoriesSection />
+</main>
+
+<style>
+	main {
+		background: linear-gradient(180deg, #E8E4DF 0%, #B8B4AF 100%);
+	}
+</style>
+src/lib/components/story/HeroSection.svelte
+text
+<script>
+	import { onMount } from 'svelte';
+	import { storyContent } from '$data/story';
+	import ParallaxContainer from '$components/effects/ParallaxContainer.svelte';
+	import HaloEffect from '$components/effects/HaloEffect.svelte';
+	import ParticleField from '$components/effects/ParticleField.svelte';
+	import gsap from 'gsap';
+	
+	const { hero } = storyContent;
+	
+	let heroSection;
+	let titleWords = [];
+	
+	onMount(() => {
+		// Animate title words
+		gsap.from('.hero-word', {
+			y: 100,
+			opacity: 0,
+			stagger: 0.15,
+			duration: 1,
+			ease: 'power4.out'
+		});
+		
+		// Animate subtitle
+		gsap.from('.hero-subtitle', {
+			y: 50,
+			opacity: 0,
+			delay: 0.8,
+			duration: 1,
+			ease: 'power3.out'
+		});
+		
+		// Animate CTAs
+		gsap.from('.hero-cta', {
+			scale: 0.8,
+			opacity: 0,
+			stagger: 0.2,
+			delay: 1.5,
+			duration: 0.8,
+			ease: 'back.out(1.7)'
+		});
+	});
+	
+	$: titleWords = hero.title.split(' ');
+</script>
+
+<section 
+	bind:this={heroSection}
+	class="relative min-h-screen flex items-center justify-center overflow-hidden"
+>
+	<!-- Background Video -->
+	<div class="absolute inset-0 z-0">
+		<video 
+			autoplay 
+			muted 
+			loop 
+			playsinline 
+			class="w-full h-full object-cover opacity-20"
+		>
+			<source src={hero.backgroundVideo} type="video/mp4" />
+		</video>
+		<div class="absolute inset-0 bg-gradient-to-b from-concrete-dark/50 to-concrete/70"></div>
+	</div>
+	
+	<!-- Particle Effect -->
+	<ParticleField density={50} />
+	
+	<!-- Content -->
+	<ParallaxContainer speed={0.5}>
+		<div class="relative z-10 text-center px-6 max-w-5xl mx-auto">
+			<!-- Logo with Halo -->
+			<div class="mb-12 flex justify-center">
+				<HaloEffect color="gold" intensity={0.6}>
+					<img 
+						src="/logo/Trosheen-Logo.png" 
+						alt="Trosheen.Crafts Logo" 
+						class="w-32 h-32 md:w-48 md:h-48"
+					/>
+				</HaloEffect>
+			</div>
+			
+			<!-- Title -->
+			<h1 class="font-serif mb-6">
+				{#each titleWords as word, i}
+					<span class="hero-word inline-block text-6xl md:text-8xl font-bold text-concrete-dark">
+						{word}&nbsp;
+					</span>
+				{/each}
+			</h1>
+			
+			<!-- Subtitle -->
+			<p class="hero-subtitle text-xl md:text-3xl text-concrete-dark/80 mb-4 font-handwriting">
+				{hero.subtitle}
+			</p>
+			
+			<!-- Tagline -->
+			<p class="hero-subtitle text-lg md:text-xl text-concrete-dark/60 mb-12 max-w-2xl mx-auto">
+				{hero.tagline}
+			</p>
+			
+			<!-- CTAs -->
+			<div class="flex flex-col sm:flex-row gap-4 justify-center">
+				<a 
+					href={hero.cta.primary.href}
+					class="hero-cta px-8 py-4 bg-terracotta text-white rounded-full font-semibold 
+					       hover:bg-terracotta/90 transition-all duration-300 hover:scale-105
+					       shadow-lg hover:shadow-xl"
+				>
+					{hero.cta.primary.text}
+				</a>
+				<a 
+					href={hero.cta.secondary.href}
+					class="hero-cta px-8 py-4 bg-white/20 backdrop-blur-sm text-concrete-dark 
+					       rounded-full font-semibold border-2 border-concrete-dark/20
+					       hover:bg-white/30 transition-all duration-300 hover:scale-105"
+				>
+					{hero.cta.secondary.text}
+				</a>
+			</div>
+		</div>
+	</ParallaxContainer>
+	
+	<!-- Scroll Indicator -->
+	<div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+		<svg class="w-8 h-12 text-concrete-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+		</svg>
+	</div>
+</section>
+
+<style>
+	.hero-word {
+		overflow: hidden;
+	}
+</style>
+src/lib/components/story/MakersSection.svelte
+text
+<script>
+	import { onMount } from 'svelte';
+	import { storyContent } from '$data/story';
+	import ScrollReveal from '$components/effects/ScrollReveal.svelte';
+	import ParallaxContainer from '$components/effects/ParallaxContainer.svelte';
+	import gsap from 'gsap';
+	import ScrollTrigger from 'gsap/ScrollTrigger';
+	
+	const { makers } = storyContent;
+	
+	let section;
+	let splitActive = false;
+	
+	onMount(() => {
+		gsap.registerPlugin(ScrollTrigger);
+		
+		// Split screen animation
+		ScrollTrigger.create({
+			trigger: section,
+			start: 'top center',
+			end: 'bottom center',
+			onEnter: () => splitActive = true,
+			onLeaveBack: () => splitActive = false
+		});
+		
+		// Merge effect at center
+		gsap.to('.maker-side', {
+			scrollTrigger: {
+				trigger: section,
+				start: 'center center',
+				end: 'bottom top',
+				scrub: 1
+			},
+			scale: 1.05,
+			opacity: 0.95
+		});
+	});
+</script>
+
+<section bind:this={section} class="relative min-h-screen py-20">
+	<div class="max-w-7xl mx-auto px-6">
+		<ScrollReveal>
+			<h2 class="text-5xl md:text-6xl font-serif text-center mb-4 text-concrete-dark">
+				The Makers
+			</h2>
+			<p class="text-xl text-center text-concrete-dark/70 mb-16 font-handwriting">
+				{makers.collaboration}
+			</p>
+		</ScrollReveal>
+		
+		<!-- Split Screen Layout -->
+		<div class="grid md:grid-cols-2 gap-8 md:gap-0">
+			<!-- Oleg Side (Left) -->
+			<ScrollReveal delay={200}>
+				<div class="maker-side bg-gradient-to-br from-earth/20 to-terracotta/20 p-8 md:p-12 rounded-3xl md:rounded-r-none">
+					<div class="mb-6">
+						<img 
+							src={makers.oleg.images[0]} 
+							alt={makers.oleg.name}
+							class="w-full h-80 object-cover rounded-2xl shadow-2xl"
+						/>
+					</div>
+					
+					<h3 class="text-4xl font-serif mb-2 text-concrete-dark">{makers.oleg.name}</h3>
+					<p class="text-2xl text-terracotta mb-4 font-handwriting">{makers.oleg.role}</p>
+					<p class="text-lg text-concrete-dark/80 mb-6 leading-relaxed">
+						{makers.oleg.description}
+					</p>
+					
+					<blockquote class="border-l-4 border-terracotta pl-4 italic text-concrete-dark/70 mb-6">
+						"{makers.oleg.quote}"
+					</blockquote>
+					
+					<div class="flex flex-wrap gap-2">
+						{#each makers.oleg.specialties as specialty}
+							<span class="px-4 py-2 bg-earth/30 rounded-full text-sm text-concrete-dark">
+								{specialty}
+							</span>
+						{/each}
+					</div>
+				</div>
+			</ScrollReveal>
+			
+			<!-- Slaff Side (Right) -->
+			<ScrollReveal delay={400}>
+				<div class="maker-side bg-gradient-to-bl from-tech/20 to-electric/20 p-8 md:p-12 rounded-3xl md:rounded-l-none">
+					<div class="mb-6">
+						<img 
+							src={makers.slaff.images[0]} 
+							alt={makers.slaff.name}
+							class="w-full h-80 object-cover rounded-2xl shadow-2xl"
+						/>
+					</div>
+					
+					<h3 class="text-4xl font-serif mb-2 text-concrete-dark">{makers.slaff.name}</h3>
+					<p class="text-2xl text-tech mb-4 font-handwriting">{makers.slaff.role}</p>
+					<p class="text-lg text-concrete-dark/80 mb-6 leading-relaxed">
+						{makers.slaff.description}
+					</p>
+					
+					<blockquote class="border-l-4 border-tech pl-4 italic text-concrete-dark/70 mb-6">
+						"{makers.slaff.quote}"
+					</blockquote>
+					
+					<div class="flex flex-wrap gap-2">
+						{#each makers.slaff.specialties as specialty}
+							<span class="px-4 py-2 bg-tech/30 rounded-full text-sm text-concrete-dark">
+								{specialty}
+							</span>
+						{/each}
+					</div>
+				</div>
+			</ScrollReveal>
+		</div>
+		
+		<!-- Center Merge Indicator -->
+		<div class="flex justify-center mt-12">
+			<div class="px-8 py-4 bg-gold/20 rounded-full backdrop-blur-sm border-2 border-gold/30">
+				<p class="text-concrete-dark font-semibold">🤝 Dust & Data, United</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.maker-side {
+		transition: transform 0.3s ease, opacity 0.3s ease;
+	}
+</style>
+🛒 Shop Components
+src/lib/components/shop/ProductCard.svelte
+text
+<script>
+	import { cart } from '$stores/cart';
+	import HaloEffect from '$components/effects/HaloEffect.svelte';
+	
+	export let product;
+	
+	let isHovered = false;
+	let imageIndex = 0;
+	
+	function addToCart() {
+		cart.add(product);
+	}
+	
+	function cycleImage() {
+		imageIndex = (imageIndex + 1) % product.images.length;
+	}
+</script>
+
+<div 
+	class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500"
+	on:mouseenter={() => isHovered = true}
+	on:mouseleave={() => { isHovered = false; imageIndex = 0; }}
+>
+	<!-- Product Image -->
+	<a href="/shop/{product.slug}" class="block relative overflow-hidden">
+		<img 
+			src={product.images[imageIndex]} 
+			alt={product.name}
+			class="w-full h-80 object-cover group-hover:scale-110 transition-transform duration-700"
+			on:click={cycleImage}
+		/>
+		
+		{#if product.handmade}
+			<div class="absolute top-4 left-4 px-3 py-1 bg-terracotta text-white text-sm rounded-full">
+				✋ Handmade
+			</div>
+		{/if}
+		
+		{#if product.stock < 5}
+			<div class="absolute top-4 right-4 px-3 py-1 bg-gold text-white text-sm rounded-full">
+				Only {product.stock} left
+			</div>
+		{/if}
+		
+		<!-- Image Counter -->
+		{#if product.images.length > 1}
+			<div class="absolute bottom-4 right-4 flex gap-1">
+				{#each product.images as _, i}
+					<div class="w-2 h-2 rounded-full {i === imageIndex ? 'bg-white' : 'bg-white/50'}"></div>
+				{/each}
+			</div>
+		{/if}
+	</a>
+	
+	<!-- Product Info -->
+	<div class="p-6">
+		<p class="text-sm text-concrete-dark/60 mb-2">{product.category}</p>
+		<h3 class="text-xl font-serif mb-2 text-concrete-dark">
+			<a href="/shop/{product.slug}" class="hover:text-terracotta transition-colors">
+				{product.name}
+			</a>
+		</h3>
+		<p class="text-concrete-dark/70 text-sm mb-4 line-clamp-2">
+			{product.description}
+		</p>
+		
+		<!-- Price & CTA -->
+		<div class="flex items-center justify-between">
+			<div>
+				<span class="text-2xl font-bold text-concrete-dark">
+					€{product.price.toFixed(2)}
+				</span>
+				{#if product.maker}
+					<p class="text-xs text-concrete-dark/60 mt-1">by {product.maker}</p>
+				{/if}
+			</div>
+			
+			<button
+				on:click={addToCart}
+				class="px-6 py-3 bg-terracotta text-white rounded-full font-semibold
+				       hover:bg-terracotta/90 transition-all duration-300 hover:scale-105
+				       shadow-md hover:shadow-lg"
+			>
+				Add to Cart
+			</button>
+		</div>
+	</div>
+	
+	<!-- Hover Halo Effect -->
+	{#if isHovered}
+		<div class="absolute inset-0 pointer-events-none">
+			<HaloEffect color="gold" intensity={0.3} />
+		</div>
+	{/if}
+</div>
+
+<style>
+	.line-clamp-2 {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+</style>
+✨ Effects Components
+src/lib/components/effects/ParallaxContainer.svelte
+text
+<script>
+	import { onMount, onDestroy } from 'svelte';
+	
+	export let speed = 0.5; // Parallax speed multiplier
+	export let direction = 'vertical'; // 'vertical' | 'horizontal'
+	
+	let container;
+	let translateY = 0;
+	let translateX = 0;
+	
+	function handleScroll() {
+		if (!container) return;
+		
+		const rect = container.getBoundingClientRect();
+		const scrollProgress = -rect.top / (rect.height + window.innerHeight);
+		
+		if (direction === 'vertical') {
+			translateY = scrollProgress * 100 * speed;
+		} else {
+			translateX = scrollProgress * 100 * speed;
+		}
+	}
+	
+	onMount(() => {
+		window.addEventListener('scroll', handleScroll, { passive: true });
+		handleScroll();
+	});
+	
+	onDestroy(() => {
+		window.removeEventListener('scroll', handleScroll);
+	});
+</script>
+
+<div 
+	bind:this={container}
+	class="parallax-container"
+	style="transform: translate3d({translateX}px, {translateY}px, 0);"
+>
+	<slot />
+</div>
+
+<style>
+	.parallax-container {
+		will-change: transform;
+	}
+</style>
+src/lib/components/effects/ScrollReveal.svelte
+text
+<script>
+	import { onMount } from 'svelte';
+	import { fade, fly } from 'svelte/transition';
+	
+	export let delay = 0;
+	export let duration = 800;
+	export let threshold = 0.2;
+	export let animation = 'fade-up'; // 'fade-up' | 'fade-in' | 'scale-in'
+	
+	let isVisible = false;
+	let element;
+	
+	onMount(() => {
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					setTimeout(() => {
+						isVisible = true;
+					}, delay);
+					observer.disconnect();
+				}
+			},
+			{ threshold }
+		);
+		
+		if (element) {
+			observer.observe(element);
+		}
+		
+		return () => observer.disconnect();
+	});
+	
+	function getTransition() {
+		switch(animation) {
+			case 'fade-up':
+				return { y: 60, duration, delay: 0 };
+			case 'scale-in':
+				return { scale: 0.8, duration, delay: 0 };
+			default:
+				return { duration, delay: 0 };
+		}
+	}
+</script>
+
+<div bind:this={element}>
+	{#if isVisible}
+		<div in:fly={getTransition()}>
+			<slot />
+		</div>
+	{:else}
+		<div style="opacity: 0;">
+			<slot />
+		</div>
+	{/if}
+</div>
+src/lib/components/effects/HaloEffect.svelte
+text
+<script>
+	export let color = 'gold';
+	export let intensity = 0.5;
+	export let animate = true;
+	
+	const colors = {
+		gold: 'rgba(212, 165, 116',
+		terracotta: 'rgba(212, 115, 93',
+		tech: 'rgba(74, 144, 181',
+		electric: 'rgba(0, 217, 255'
+	};
+	
+	$: rgbaColor = colors[color] || colors.gold;
+	$: glowStyle = `
+		box-shadow: 
+			0 0 ${20 * intensity}px ${rgbaColor}, ${intensity * 0.3}),
+			0 0 ${40 * intensity}px ${rgbaColor}, ${intensity * 0.2}),
+			0 0 ${60 * intensity}px ${rgbaColor}, ${intensity * 0.1});
+	`;
+</script>
+
+<div class="halo-wrapper {animate ? 'animate-halo' : ''}" style={glowStyle}>
+	<slot />
+</div>
+
+<style>
+	.halo-wrapper {
+		display: inline-block;
+		border-radius: inherit;
+	}
+	
+	@keyframes halo-pulse {
+		0%, 100% { filter: brightness(1); }
+		50% { filter: brightness(1.2); }
+	}
+	
+	.animate-halo {
+		animation: halo-pulse 3s ease-in-out infinite;
+	}
+</style>
+src/lib/components/effects/CursorTrail.svelte
+text
+<script>
+	import { onMount, onDestroy } from 'svelte';
+	
+	let particles = [];
+	let mouseX = 0;
+	let mouseY = 0;
+	let particleId = 0;
+	
+	function addParticle(x, y) {
+		const id = particleId++;
+		particles = [
+			...particles,
+			{
+				id,
+				x,
+				y,
+				life: 1
+			}
+		];
+		
+		setTimeout(() => {
+			particles = particles.filter(p => p.id !== id);
+		}, 1000);
+	}
+	
+	function handleMouseMove(e) {
+		mouseX = e.clientX;
+		mouseY = e.clientY;
+		
+		if (Math.random() > 0.7) {
+			addParticle(e.clientX, e.clientY);
+		}
+	}
+	
+	onMount(() => {
+		window.addEventListener('mousemove', handleMouseMove);
+	});
+	
+	onDestroy(() => {
+		window.removeEventListener('mousemove', handleMouseMove);
+	});
+</script>
+
+<div class="cursor-trail-container pointer-events-none fixed inset-0 z-50">
+	{#each particles as particle (particle.id)}
+		<div
+			class="particle"
+			style="
+				left: {particle.x}px;
+				top: {particle.y}px;
+			"
+		/>
+	{/each}
+</div>
+
+<style>
+	.particle {
+		position: absolute;
+		width: 4px;
+		height: 4px;
+		background: radial-gradient(circle, rgba(212, 165, 116, 0.6) 0%, transparent 70%);
+		border-radius: 50%;
+		pointer-events: none;
+		animation: particle-fade 1s ease-out forwards;
+	}
+	
+	@keyframes particle-fade {
+		0% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		100% {
+			opacity: 0;
+			transform: scale(0.3);
+		}
+	}
+</style>
+🎯 Utilities & Stores
+src/lib/stores/cart.js
+javascript
+import { writable } from 'svelte/store';
+import { nanoid } from 'nanoid';
+
+function createCart() {
+	const { subscribe, set, update } = writable({
+		items: [],
+		total: 0
+	});
+	
+	return {
+		subscribe,
+		add: (product, quantity = 1) => {
+			update(cart => {
+				const existingItem = cart.items.find(item => item.id === product.id);
+				
+				if (existingItem) {
+					existingItem.quantity += quantity;
+				} else {
+					cart.items.push({
+						...product,
+						cartId: nanoid(),
+						quantity
+					});
+				}
+				
+				cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+				return cart;
+			});
+		},
+		remove: (cartId) => {
+			update(cart => {
+				cart.items = cart.items.filter(item => item.cartId !== cartId);
+				cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+				return cart;
+			});
+		},
+		updateQuantity: (cartId, quantity) => {
+			update(cart => {
+				const item = cart.items.find(item => item.cartId === cartId);
+				if (item) {
+					item.quantity = Math.max(0, quantity);
+					if (item.quantity === 0) {
+						cart.items = cart.items.filter(i => i.cartId !== cartId);
+					}
+				}
+				cart.total = cart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+				return cart;
+			});
+		},
+		clear: () => set({ items: [], total: 0 })
+	};
+}
+
+export const cart = createCart();
+src/lib/utils/animations.js
+javascript
+import gsap from 'gsap';
+import ScrollTrigger from 'gsap/ScrollTrigger';
+
+export function initScrollAnimations() {
+	gsap.registerPlugin(ScrollTrigger);
+	
+	// Generic scroll reveal
+	gsap.utils.toArray('.scroll-reveal').forEach(element => {
+		gsap.from(element, {
+			scrollTrigger: {
+				trigger: element,
+				start: 'top 80%',
+				end: 'top 20%',
+				toggleActions: 'play none none reverse'
+			},
+			y: 60,
+			opacity: 0,
+			duration: 1,
+			ease: 'power3.out'
+		});
+	});
+}
+
+export function parallaxScroll(element, speed = 0.5) {
+	gsap.to(element, {
+		scrollTrigger: {
+			trigger: element,
+			scrub: true
+		},
+		y: (i, target) => -ScrollTrigger.maxScroll(window) * speed,
+		ease: 'none'
+	});
+}
+
+export function fadeInStagger(selector, staggerAmount = 0.15) {
+	return gsap.from(selector, {
+		opacity: 0,
+		y: 50,
+		stagger: staggerAmount,
+		duration: 0.8,
+		ease: 'power2.out'
+	});
+}
+📱 Responsive Layout Component
+src/routes/+layout.svelte
+text
+<script>
+	import '../app.css';
+	import Header from '$components/layout/Header.svelte';
+	import Footer from '$components/layout/Footer.svelte';
+	import { onMount } from 'svelte';
+	
+	onMount(() => {
+		// Smooth scroll polyfill
+		document.documentElement.style.scrollBehavior = 'smooth';
+	});
+</script>
+
+<div class="app min-h-screen flex flex-col bg-concrete-light">
+	<Header />
+	
+	<main class="flex-1">
+		<slot />
+	</main>
+	
+	<Footer />
+</div>
+
+<style>
+	:global(body) {
+		margin: 0;
+		font-family: 'Inter', system-ui, sans-serif;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+	
+	:global(h1, h2, h3, h4, h5, h6) {
+		font-family: 'Playfair Display', Georgia, serif;
+	}
+</style>

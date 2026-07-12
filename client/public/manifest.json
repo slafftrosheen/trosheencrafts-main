@@ -1,0 +1,98 @@
+{
+  "name": "Trosheen.Crafts - Handmade Concrete Art",
+  "short_name": "Trosheen",
+  "description": "Family workshop in Daugavpils crafting mixed-media concrete art, candles, and garden pieces. Three generations, one craft.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fafaf9",
+  "theme_color": "#8B7355",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-72x72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-96x96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-128x128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-152x152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["shopping", "lifestyle", "art"],
+  "screenshots": [
+    {
+      "src": "/screenshots/home.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    },
+    {
+      "src": "/screenshots/shop.png",
+      "sizes": "750x1334",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Shop",
+      "short_name": "Shop",
+      "description": "View all handmade pieces",
+      "url": "/shop",
+      "icons": [{ "src": "/shop-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Workshop Stories",
+      "short_name": "Blog",
+      "description": "Read behind-the-scenes stories",
+      "url": "/blog",
+      "icons": [{ "src": "/blog-96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Inspiration Boards",
+      "short_name": "Boards",
+      "description": "View saved favorites",
+      "url": "/inspiration",
+      "icons": [{ "src": "/heart-96.png", "sizes": "96x96" }]
+    }
+  ]
+}

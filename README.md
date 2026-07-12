@@ -1,0 +1,263 @@
+The Story of Trosheen.Crafts
+Location: Daugavpils, Latvia Tone: Narrative, Warm, Personal, Eco-Conscious, Multi-Generational
+A Family of Makers in Daugavpils
+In the heart of Daugavpils, Latvia, there is a workshop where the dust of industry meets the warmth of home. This is the home of Trosheen.Crafts. Our story didn't start with a business plan; it started with a genetic trait passed down through generations. From grandparents to parents, and now to sons and grandchildren, our family has always spoken the language of craftsmanship.
+Our roots are as mixed and sturdy as the materials we cast. With a heritage blending Russian, Polish, and Latvian ancestry, we represent the true spirit of this region—a melting pot of cultures united by a shared passion for creating beauty with our hands.
+Oleg and Slaff: The Sculptor and The Innovator
+The heartbeat of Trosheen.Crafts is a partnership between father and son—a collaboration of old-world intuition and new-world precision.
+Oleg is the soul of the operation. He is the sculptor. He doesn't just pour concrete; he converses with it. Using traditional hand-building techniques, Oleg creates our one-of-a-kind garden ornaments, fountains, and pots. When you see a hand-sculpted fountain in our collection, you are seeing Oleg’s touch—no two pieces are ever identical because they are shaped by the mood and motion of his hands in that specific moment.
+Then there is Slaff, the son. Slaff brings the modern edge to Oleg’s traditional foundation. With a background in web and technology, Slaff introduced a specialized architectural concrete originally designed for 3D printing. This innovation allows us to achieve incredible detail and durability that standard cement simply cannot offer.
+Together, Oleg and Slaff bridge the gap between the rustic and the refined. It is a duet of dust and data, resulting in art that feels both timeless and cutting-edge.
+The Next Generation: Alisija and Nikolass
+Trosheen.Crafts is not a factory; it is a living room. The rhythm of our production is set by family life. It is not uncommon to see the grandkids, Alisija and Nikolass, weaving through the workshop. Whether they are watching their grandfather sculpt or helping with the smaller tasks suited for little hands, they are the heartbeat of our future.
+When we pack for a market or prepare a shipment, it is often a full family affair. Cousins help with logistics, and the kids bring an energy that reminds us why we do this: to build something lasting for the generations to come.
+Concrete with a Conscience
+We believe the most eco-friendly product is the one you never have to throw away. We have moved beyond the perception of concrete as cold and industrial. In our hands, it becomes warm, textured, and deeply sustainable.
+Our commitment to the earth is built into our chemistry. We use a high-performance concrete mix that withstands the harsh Northern winters. Unlike cheap plastics that degrade and pollute, our garden décor and pots are built to last decades. We reject the "throwaway culture" of modern manufacturing in favor of heirlooms that age gracefully in your garden.
+The Candle’s Second Life
+Our philosophy of "Zero Waste" is best told through our candles. We wanted to create a light that leaves nothing behind but beauty.
+We use only pure natural wax and gel wax, infused with authentic scents derived from nature—no harsh synthetics, just the honest aroma of the earth. But the true magic happens when the flame goes out.
+We design every concrete candle vessel as an architectural piece first and a container second. Once the wax is gone, the pot remains. It becomes a pencil holder for an artist, a pot for a succulent, or a jewelry cup for a bedside table. We don't make trash; we make permanent design objects that happen to start their life as candles.
+Social Media Stories (Personal & Warm)
+Story 1: The Father’s Hands "Meet Oleg. 🛠️ If you look closely at our garden fountains, you can almost see his fingerprints. He doesn't believe in mass production; he believes in the moment. Every curve is hand-sculpted right here in Daugavpils. When you buy a piece from Trosheen.Crafts, you're taking home a piece of Oleg’s artistry. #TrosheenCrafts #MeetTheMaker #HandmadeLatvia"
+Story 2: The Modern Twist "Slaff didn't just want to make pots; he wanted to innovate them. 💡 By using high-tech concrete designed for 3D printing, we get details that are impossibly sharp and durability that lasts a lifetime. It’s where family tradition meets modern tech. #ConcreteDesign #3DPrinting #Innovation"
+Story 3: Alisija & Nikolass Approved "Quality control looks a little different around here. 😉 With Alisija and Nikolass running around the workshop, we are constantly reminded that we are building a legacy. Trosheen.Crafts is a family affair, from the first pour to the final package. #FamilyBusiness #Generations #Daugavpils"
+Story 4: Don't Throw It Away "The candle is finished. Now the story begins. 🌿 At Trosheen.Crafts, our vessels are designed for a second life. Clean out the natural wax and you have a forever-pot for your succulents or treasures. Sustainable, stylish, and smart. #ZeroWaste #Upcycle #EcoHome"
+
+### A Family of Makers in Daugavpils
+
+In Daugavpils, Latvia, there is a backyard where the seasons mark time better than any calendar. Snow piles against fences in winter, lilacs bloom in spring, and in the middle of it all stands a small workshop where bags of cement sit next to flowerpots, molds, and brushes. This is where Trosheen.Crafts lives.
+
+Our story was never about “starting a business.” It was about not being able to sit still when there is material to be shaped.
+
+In our family, hands are never idle. Grandparents bent wire, repaired furniture, grew gardens. Parents built, fixed, painted, and made the house more beautiful with whatever they had. That instinct to create—using what is at hand and making it better—was passed down like eye color or a surname.
+
+Our roots are as layered as our concrete. Russian, Polish, Latvian influences all live under one roof—languages mixing at the dinner table, traditions blending at holidays, and aesthetics crossing over in the work we do. A bit of Slavic ornament, a touch of Baltic restraint, a Polish sense of practicality. Trosheen.Crafts is what happens when all of that is poured into molds and shaped by hand.
+
+### Oleg and Slaff: The Sculptor and the Innovator
+
+At the center of the story are two people: Oleg and his son, Slaff.
+
+Oleg works mostly outdoors, close to the elements his creations will live with. If you walk into the garden, you’ll see his work before you see him: leaf-shaped concrete stepping stones catching the rain, tree-trunk planters holding bright geraniums, small decorative borders circling evergreen shrubs. His pieces don’t try to dominate nature—they settle into it, like they’ve always been there.
+
+Oleg is the sculptor who prefers the language of gesture over the language of PowerPoint. He knows how concrete behaves in different temperatures, how long he can work a surface before it refuses to be touched again, how much pressure his fingers should apply to create just the right fold, curve, or bark texture.
+
+When he makes a piece like the cupped hands holding small hearts or a heart-shaped candle stand, he doesn’t rush. The lines in the fingers, the slight asymmetry, the texture of “woven” baskets or carved wooden tubs—it all comes from his memory of real objects and his own life in gardens and workshops.
+
+Then there is Slaff—Vjaceslav—who grew up watching this, but took a different path first. While Oleg was perfecting molds and textures, Slaff was wiring microcontrollers, writing JavaScript, and building web platforms. His world was code, sensors, AI agents, and startups.
+
+But eventually, those worlds collided. Slaff began looking at his father’s work through the lens of modern materials and design thinking. Why not use high-performance, fiber-reinforced concrete normally reserved for architecture and 3D printing? Why not push for thinner walls, sharper details, and lighter pieces that still survive Baltic winters?
+
+He experimented, tested, adjusted the chemistry. The result is a mix that behaves like an artist’s medium, not just a construction material—fine-surfaced candle holders, delicate heart trays, and intricate garden décor that still shrug off frost, snow, and heat.
+
+Oleg brings intuition and sculptural instinct.
+Slaff brings digital precision, material science, and a modern brand vision—logo, photography, online presence, and product systems.
+
+Together they are Trosheen.Crafts: a duet of hand and algorithm, of backyard experiments and tech‑driven refinement.
+
+### The Next Generation: Alisija and Nikolass
+
+Trosheen.Crafts doesn’t run on shifts; it runs on family timing.
+
+Sometimes the workshop is quiet at sunrise, with just Oleg starting a new batch of concrete. By evening, it might be full of the small footsteps and curious questions of Alisija and Nikolass.
+
+They know the workshop not as a workplace, but as a playground of textures and colors. They watch molds being filled, help pick out dried leaves for impressions, and carefully place golden flakes into gel candles. They learn that things take time—that a planter or a candle holder isn’t just “there,” it goes through stages: idea, sketch, casting, drying, sanding, painting, sealing.
+
+When markets and fairs come around, packing becomes a family ritual. Finished pieces line the table: heart‑shaped tea light holders in bright red and gold, little figurines on heart bases, rustic baskets for potted flowers, stepping stones that look like slices of ancient tree trunks. Boxes are assembled, labels are written, logo stickers with the little paintbrush hand go onto packaging. Alisija and Nikolass often test everything first:
+
+“Will this candle sit straight?”
+“Does this planter need more moss around it?”
+
+This isn’t just about selling products. It’s about showing the children that making things with your hands still matters in a digital world—that a life can be built around creativity, not just consumption.
+
+### Concrete with a Conscience
+
+We like to say: the most eco‑friendly product is the one you never need to throw away.
+
+Concrete has the reputation of being cold and industrial, but in our hands it becomes something else: warm to the eye, textured like bark or woven rope, shaped into hearts, leaves, and baskets that belong next to flowers and candlelight.
+
+We use high-performance concrete designed to last. The same winter that cracks cheap plastic pots simply becomes another season in the life of a Trosheen.Crafts planter. Pieces are sealed, tested outdoors in our own garden in Daugavpils, and left to endure rain, snow, and sun. If we don’t trust it in our soil, we don’t offer it to anyone else.
+
+We also design with purpose:
+- Planters that fit standard nursery pots, so you don’t have to throw anything away when you repot.
+- Stepping stones that blend into gravel and grass rather than fight against it.
+- Borders and decorative elements that can be rearranged, reused, and re‑imagined as the garden changes.
+
+We’re not perfect, but every decision bends toward longevity and re‑use. We’d rather you buy fewer pieces that stay with you for years than many that end up in landfill.
+
+### The Candle’s Second Life
+
+Our candles are where our philosophy becomes most obvious.
+
+We start with natural wax and gel wax, chosen for a clean burn and the ability to hold delicate botanicals—dried flowers, tiny leaves, or golden flakes that catch the light. Scents are inspired by real places and memories: a walk through a pine forest, a warm kitchen with citrus peels and spices, a summer evening in the garden.
+
+But the candle is only the first chapter.
+
+The vessel itself is sculpted like any other object we make. A heart-shaped form with a braided rim, a rustic “wooden” cup bound with metal “bands,” a little figurine girl holding a bouquet—these pieces are designed as standalone decor items. The wax just happens to be their first use.
+
+When the candle is finished, nothing is wasted. The vessel becomes a home for a small succulent, a place to keep rings, keys, paper clips, or paintbrushes. Some customers use the cupped hands bowl as a ritual space—placing handwritten wishes, crystals, or keepsakes in the palms.
+
+We don’t design “containers.” We design small architectural objects that start their life as candles and continue as companions on your desk, shelf, or windowsill.
+
+***
+
+## Extra Social Media Snippets (Narrative, Warm, Personal)
+
+You can mix these between posts, Stories, Reels captions, or “About” sections.
+
+***
+
+### Story 5: From Backyard to Balcony
+“Most of our designs are tested in one place first—our own backyard in Daugavpils. 🌿
+If a planter can handle our rain, snow, and +30°C summer days, we know it’s ready for your balcony or garden too. We don’t design in theory; we design in real soil, with real plants and real weather.
+#TrosheenCrafts #TestedInLatvia #RealGardenLife”
+
+***
+
+### Story 6: Dust, Data & Coffee
+“Morning at Trosheen.Crafts usually looks like this:
+☕ Oleg mixing concrete in the yard
+💻 Slaff tweaking a 3D model or uploading new photos
+🎨 Freshly painted pieces drying on every flat surface
+
+One foot in tradition, one foot in technology—and a lot of coffee in between.
+#FamilyWorkshop #DustAndData #HandmadeWithHeart”
+
+***
+
+### Story 7: The Hands That Hold Your Heart
+“The cupped hands bowl wasn’t designed on paper. It started as a feeling. 👐❤️
+Oleg wanted to sculpt something that felt like protection—a place where you could put a candle, a piece of jewelry, or a wish, and know it was ‘held.’
+Every tiny crease and curve is shaped by hand, right here in Daugavpils. When you light a candle in these hands, you’re lighting it in a story that began in our family.
+#CuppedHands #MeaningfulDecor #LatvianMakers”
+
+***
+
+### Story 8: Little Quality Inspectors
+“Our most honest critics are under 10 years old. 😂
+If a candle holder isn’t ‘pretty enough for my room’ (Alisija’s standards) or ‘strong enough for my dinosaurs’ (Nikolass’s test), it goes back to the workshop.
+Designing for family means designing for real life.
+#MadeForRealHomes #FamilyApproved #WorkshopKids”
+
+***
+
+### Story 9: Concrete, Not Plastic
+“Why concrete and not plastic? Because gardens deserve better.
+Our pieces are made to stay outside—from spring rain to winter frost—without fading, cracking, or becoming landfill. Every planter and stepping stone is cast, colored, and sealed by hand in small batches.
+No mass production. No shortcuts. Just durable beauty.
+#ConcreteArt #EcoFriendlyDecor #SlowDesign”
+
+***
+
+### Story 10: The Candle That Stays
+“When the flame goes out, the story doesn’t. 🕯️
+Our candle vessels are made from the same high‑performance concrete we use for outdoor decor. That means once the wax is gone, you’re left with a permanent piece:
+🌱 for a tiny plant
+💍 for your jewelry
+🖊️ for your pens and brushes
+
+A candle that doesn’t end—it transforms.
+#SecondLifeDesign #ZeroWasteHome #ConcreteCandles”
+
+***
+
+### Story 11: Multilingual, Multigenerational
+“At the dinner table you’ll hear three languages in our family: Latvian, Russian, and Polish names of dishes and stories about gardens and tools.
+Those cultures show up in our work too—from Slavic floral motifs to Baltic simplicity. Trosheen.Crafts is what happens when generations and cultures share the same table and the same workshop.
+#LatviaMade #CulturalBlend #FamilyHeritage”
+
+***
+
+### Story 12: Behind the Logo
+“The Trosheen logo shows a hand holding a brush—and that’s exactly how most pieces start. 🎨
+Before concrete, there is always a drawing, a test pattern, a layer of paint. The logo is our reminder: even when we use high‑tech materials and modern tools, the heart of our brand will always be handmade.
+#BrandStory #Trosheen #HandPaintedDetails”
+
+***
+
+### Story 13: Market Mornings in Daugavpils
+“Market mornings start before sunrise. Boxes packed, thermos filled, car loaded with hearts, baskets, planters, and candles.
+We love watching people pick up a piece, turn it in their hands, and say, ‘This feels heavy. Real. Solid.’
+That’s exactly the point.
+#DaugavpilsMarket #MeetTheMakers #SupportLocal”
+
+***
+
+### Story 14: For People Who Love Their Gardens
+“We don’t make decor for display homes. We make pieces for real people who wipe soil off their hands, who know the names of their plants, who watch every new leaf appear. 🌱
+Our concrete baskets, leaf stones, and trunk planters are built to live in your garden—not just in photos.
+#GardenLovers #OutdoorArt #LatviaGardens”
+
+---
+
+## Technical Stack & Features
+
+This project has been modernized with a robust, secure, and scalable architecture:
+
+- **Frontend:** React 18, Vite, TypeScript, Tailwind CSS, Framer Motion.
+- **Backend:** Node.js (Express), PostgreSQL (Drizzle ORM), Redis (Session store).
+- **Storage:** **Cloudflare R2** for high-performance, low-cost asset storage (images & 3D models).
+- **Security:** **Cloudflare Tunnel** (Zero Trust) exposes the application without opening public ports.
+- **Internationalization:** Full support for 5 languages: **English, Latvian, Russian, Polish, and Ukrainian**.
+- **3D Gallery:** Integrated 3D model viewer (GLB/GLTF) using `@react-three/fiber` and `@react-three/drei`.
+- **Admin Panel:** Comprehensive dashboard for managing products, gallery items (with drag-and-drop R2 uploads), blog posts, and orders.
+
+---
+
+## Technical Documentation
+
+For detailed information on deployment, operations, and setup, please refer to the following guides in the [docs/](./docs/) directory:
+
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Raspberry Pi Deployment](./docs/RASPBERRY_PI_DEPLOYMENT.md)
+- [Domain & Cloudflare Setup](./docs/DOMAIN_SETUP_INSTRUCTIONS.md)
+- [Operations Manual](./docs/OPERATIONS_MANUAL.md)
+
+---
+
+## Environment Variables
+
+The application requires the following environment variables. Copy `.env.example` to `.env` and configure:
+
+### Required Variables
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `SESSION_SECRET` | **REQUIRED** Secure random string for session encryption (min 32 chars) | Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"` |
+| `ADMIN_PASSWORD` | **REQUIRED** Password for initial admin user (min 8 chars) | Use a strong password |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/dbname` |
+
+### Email Configuration
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `EMAIL_HOST` | SMTP server hostname | `smtp.gmail.com` |
+| `EMAIL_PORT` | SMTP server port | `587` |
+| `EMAIL_USER` | SMTP authentication username | `your-email@gmail.com` |
+| `EMAIL_PASSWORD` | SMTP authentication password | App password for Gmail |
+| `EMAIL_FROM` | Default sender address | `"Trosheen Crafts" <noreply@trosheen.shop>` |
+| `ADMIN_EMAIL` | Admin notification email | `admin@trosheen.shop` |
+
+### Stripe Integration
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `STRIPE_SECRET_KEY` | Stripe secret API key | `sk_live_xxx` or `sk_test_xxx` |
+| `STRIPE_WEBHOOK_SECRET` | Webhook signature verification | `whsec_xxx` |
+
+### Application URLs
+
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `FRONTEND_URL` | Frontend application URL | `https://trosheen.shop` |
+| `PORT` | Server port | `5000` |
+| `NODE_ENV` | Environment mode | `production` or `development` |
+
+### Optional: Analytics
+
+| Variable | Description |
+|----------|-------------|
+| `VITE_GA_ID` | Google Analytics ID |
+| `VITE_PLAUSIBLE_DOMAIN` | Plausible Analytics domain |
+
+⚠️ **Security Note**: Never commit `.env` files to version control. The `.env.example` file contains placeholder values only.
