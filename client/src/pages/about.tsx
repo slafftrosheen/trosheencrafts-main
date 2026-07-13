@@ -253,6 +253,19 @@ export default function AboutPage() {
               </motion.div>
             ))}
           </div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mt-12 text-center"
+          >
+            <Link href="/guide">
+              <Button size="lg" variant="secondary" className="rounded-full px-8 hover-elevate">
+                {t("guide_care_eyebrow")} <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </motion.div>
         </div>
       </section>
 

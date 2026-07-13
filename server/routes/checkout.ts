@@ -80,17 +80,38 @@ checkoutRouter.post(
         email: string;
       };
 
-      const productIds = items.map((item) => item.productId);
-      const foundProducts = await db
+      const productIds = items.filter(i => typeof i.productId === 'number').map((item) => item.productId as number);
+      // If we have custom items, we skip DB lookup for them but parse their variant for price
+      const foundProducts = productIds.length > 0 ? await db
         .select()
         .from(products)
-        .where(inArray(products.id, productIds));
+        .where(inArray(products.id, productIds)) : [];
 
       if (foundProducts.length !== productIds.length) {
         return res.status(400).json({ message: 'Some artefacts were not found' });
       }
 
       const totalAmountCents = items.reduce((sum, item) => {
+        if (typeof item.productId === 'string' && item.productId.startsWith('custom-')) {
+          // Calculate custom candle price based on variant string from the constructor
+          let customPrice = 0;
+          const v = item.variant || "";
+          if (v.includes('Heart Vessel')) customPrice += 15;
+          else if (v.includes('Minimalist Sphere')) customPrice += 18;
+          else customPrice += 12; // Cylinder base
+
+          if (v.includes('Marble Effect')) customPrice += 5;
+          if (v.includes('Painted Bronze')) customPrice += 8;
+          if (v.includes('Gold Leaf Detail')) customPrice += 10;
+
+          if (v.includes('Clear Gel Wax')) customPrice += 3;
+          if (v.includes('Natural Beeswax')) customPrice += 5;
+
+          if (!v.includes('Unscented')) customPrice += 2; // All aromas are +2
+
+          return sum + Math.round(customPrice * 100) * item.quantity;
+        }
+
         const product = foundProducts.find((p) => p.id === item.productId);
         return sum + Math.round(parseFloat(product!.price) * 100) * item.quantity;
       }, 0);
@@ -105,12 +126,55 @@ checkoutRouter.post(
         })
         .returning();
 
+      let customProductId: number | null = null;
+      const customItems = items.filter(i => typeof i.productId === 'string' && i.productId.startsWith('custom-'));
+      
+      if (customItems.length > 0) {
+        // Find or create "Custom Candle" product
+        const [existingCustom] = await db.select().from(products).where(eq(products.slug, 'custom-candle-builder'));
+        if (existingCustom) {
+          customProductId = existingCustom.id;
+        } else {
+          const [newCustom] = await db.insert(products).values({
+            name: 'Custom Crafted Candle',
+            slug: 'custom-candle-builder',
+            description: 'A custom configured candle built by you.',
+            price: '15.00',
+            category: 'Custom',
+            published: false,
+          }).returning();
+          customProductId = newCustom.id;
+        }
+      }
+
       await db.insert(orderItems).values(
         items.map((item) => {
+          if (typeof item.productId === 'string' && item.productId.startsWith('custom-')) {
+            // Re-calculate price for order items
+            let customPrice = 0;
+            const v = item.variant || "";
+            if (v.includes('Heart Vessel')) customPrice += 15;
+            else if (v.includes('Minimalist Sphere')) customPrice += 18;
+            else customPrice += 12;
+            if (v.includes('Marble Effect')) customPrice += 5;
+            if (v.includes('Painted Bronze')) customPrice += 8;
+            if (v.includes('Gold Leaf Detail')) customPrice += 10;
+            if (v.includes('Clear Gel Wax')) customPrice += 3;
+            if (v.includes('Natural Beeswax')) customPrice += 5;
+            if (!v.includes('Unscented')) customPrice += 2;
+
+            return {
+              orderId: order.id,
+              productId: customProductId as number,
+              quantity: item.quantity,
+              price: customPrice.toString(),
+            };
+          }
+
           const product = foundProducts.find((p) => p.id === item.productId);
           return {
             orderId: order.id,
-            productId: item.productId,
+            productId: item.productId as number,
             quantity: item.quantity,
             price: product!.price,
           };
@@ -119,6 +183,31 @@ checkoutRouter.post(
 
       const session = await createCheckoutSession({
         lineItems: items.map((item) => {
+          if (typeof item.productId === 'string' && item.productId.startsWith('custom-')) {
+            let customPrice = 0;
+            const v = item.variant || "";
+            if (v.includes('Heart Vessel')) customPrice += 15;
+            else if (v.includes('Minimalist Sphere')) customPrice += 18;
+            else customPrice += 12;
+            if (v.includes('Marble Effect')) customPrice += 5;
+            if (v.includes('Painted Bronze')) customPrice += 8;
+            if (v.includes('Gold Leaf Detail')) customPrice += 10;
+            if (v.includes('Clear Gel Wax')) customPrice += 3;
+            if (v.includes('Natural Beeswax')) customPrice += 5;
+            if (!v.includes('Unscented')) customPrice += 2;
+
+            return {
+              price_data: {
+                currency: 'eur',
+                product_data: {
+                  name: `Custom Candle: ${v}`,
+                },
+                unit_amount: Math.round(customPrice * 100),
+              },
+              quantity: item.quantity,
+            };
+          }
+
           const product = foundProducts.find((p) => p.id === item.productId);
           return {
             price_data: {

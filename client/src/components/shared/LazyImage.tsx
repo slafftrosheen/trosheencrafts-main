@@ -23,7 +23,7 @@ export function LazyImage({
   const imgRef = useRef<HTMLImageElement>(null);
 
   // If src is obviously a placeholder string or empty, default to error state
-  const isPlaceholder = !src || src === '/placeholder.jpg' || src.includes('placehold.co');
+  const isPlaceholder = !src || src === '/placeholder.webp' || src.includes('placehold.co');
 
   useEffect(() => {
     if (isPlaceholder) {

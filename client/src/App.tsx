@@ -25,6 +25,7 @@ const GalleryDetail = lazy(() => import("@/pages/galleryDetail"));
 const Privacy = lazy(() => import("@/pages/privacy"));
 const Terms = lazy(() => import("@/pages/terms"));
 const Cookies = lazy(() => import("@/pages/cookies"));
+const Guide = lazy(() => import("@/pages/guide"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
 // Admin Pages
@@ -137,6 +138,9 @@ function Router() {
         </Route>
         <Route path="/about">
           <Layout><About /></Layout>
+        </Route>
+        <Route path="/guide">
+          <Layout><Guide /></Layout>
         </Route>
         <Route path="/privacy">
           <Layout><Privacy /></Layout>

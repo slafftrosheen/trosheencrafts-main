@@ -12,8 +12,9 @@ const createOrderSchema = z.object({
   body: z.object({
     items: z.array(
       z.object({
-        productId: z.number().positive(),
+        productId: z.union([z.number().positive(), z.string()]),
         quantity: z.number().positive().min(1),
+        variant: z.string().optional()
       })
     ).min(1),
     shippingAddress: z.object({

@@ -73,7 +73,7 @@ export function AdvancedSearch() {
           name: p.nameTranslations?.[language] || p.name,
           description: typeof p.description === 'object' ? p.description?.[language] || '' : p.description || '',
           price: typeof p.price === 'string' ? parseFloat(p.price) : p.price,
-          image: p.image || '/placeholder.jpg',
+          image: p.image || '/placeholder.webp',
           category: p.category || '',
         }))
     : [];

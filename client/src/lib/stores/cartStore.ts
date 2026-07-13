@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface CartItem {
-  id: number;
+  id: number | string;
   name: string;
   price: number;
   quantity: number;
@@ -13,8 +13,8 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   addItem: (item: Omit<CartItem, 'quantity'>) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (id: number | string, variant?: string) => void;
+  updateQuantity: (id: number | string, quantity: number, variant?: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
@@ -27,12 +27,14 @@ export const useCartStore = create<CartState>()(
 
       addItem: (item) => {
         set((state) => {
-          const existingItem = state.items.find((i) => i.id === item.id);
+          const existingItem = state.items.find(
+            (i) => i.id === item.id && i.variant === item.variant
+          );
           
           if (existingItem) {
             return {
               items: state.items.map((i) =>
-                i.id === item.id
+                i.id === item.id && i.variant === item.variant
                   ? { ...i, quantity: i.quantity + 1 }
                   : i
               ),
@@ -45,21 +47,23 @@ export const useCartStore = create<CartState>()(
         });
       },
 
-      removeItem: (id) => {
+      removeItem: (id, variant) => {
         set((state) => ({
-          items: state.items.filter((item) => item.id !== id),
+          items: state.items.filter(
+            (item) => !(item.id === id && item.variant === variant)
+          ),
         }));
       },
 
-      updateQuantity: (id, quantity) => {
+      updateQuantity: (id, quantity, variant) => {
         if (quantity <= 0) {
-          get().removeItem(id);
+          get().removeItem(id, variant);
           return;
         }
 
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === id ? { ...item, quantity } : item
+            item.id === id && item.variant === variant ? { ...item, quantity } : item
           ),
         }));
       },

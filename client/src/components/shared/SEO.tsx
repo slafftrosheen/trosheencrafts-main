@@ -10,7 +10,7 @@ interface SEOProps {
 
 export function SEO({ title, description, keywords, image, url }: SEOProps) {
   const siteUrl = url || typeof window !== 'undefined' ? window.location.href : '';
-  const defaultImage = '/og-image.jpg';
+  const defaultImage = '/og-image.webp';
 
   return (
     <Helmet>

@@ -6,35 +6,35 @@
  */
 
 // CANDLE PRODUCTS
-import handsHoldingHeartCandle from '@/assets/Hands holding heart candle.jpeg';
-import heartShapedMugCandle from '@/assets/heart shaped mug candle.jpeg';
-import handsVaseShapeCandle from '@/assets/hands in vase shape candle.jpeg';
-import seaShellCandle from '@/assets/sea shell shaped candle.jpeg';
-import seaStarGelCandle from '@/assets/sea star shaped gel candle.jpeg';
-import womanFaceCandle from '@/assets/woman face shaped candle.jpeg';
-import latvianMotiffCandle from '@/assets/Latvian Motiff candle.png';
-import valentineSelection from '@/assets/valentine candle selection.jpeg';
-import valentineSelection2 from '@/assets/valentine candle selection 2.jpeg';
+import handsHoldingHeartCandle from '@/assets/Hands holding heart candle.webp';
+import heartShapedMugCandle from '@/assets/heart shaped mug candle.webp';
+import handsVaseShapeCandle from '@/assets/hands in vase shape candle.webp';
+import seaShellCandle from '@/assets/sea shell shaped candle.webp';
+import seaStarGelCandle from '@/assets/sea star shaped gel candle.webp';
+import womanFaceCandle from '@/assets/woman face shaped candle.webp';
+import latvianMotiffCandle from '@/assets/Latvian Motiff candle.webp';
+import valentineSelection from '@/assets/valentine candle selection.webp';
+import valentineSelection2 from '@/assets/valentine candle selection 2.webp';
 
 // WORKSHOP & PROCESS
-import alisijaFillingCandle from '@/assets/alisija filling star candle.png';
-import nikPaintingCandle from '@/assets/nik painting bronze candle.png';
-import castingProcess from '@/assets/concrete casting process.png';
+import alisijaFillingCandle from '@/assets/alisija filling star candle.webp';
+import nikPaintingCandle from '@/assets/nik painting bronze candle.webp';
+import castingProcess from '@/assets/concrete casting process.webp';
 
 // GARDEN & DECORATIVE
-import leafSteppingStone from '@/assets/Leaf Stepping stone.jpeg';
-import handsShapedTray from '@/assets/hands shaped store tray.jpeg';
+import leafSteppingStone from '@/assets/Leaf Stepping stone.webp';
+import handsShapedTray from '@/assets/hands shaped store tray.webp';
 
 // HERO & STORY
-import heroPhoto from '@/assets/hero photo.png';
-import storyPhoto from '@/assets/story photo.png';
-import storyPhoto2 from '@/assets/story photo2.png';
-import storyPhoto3 from '@/assets/story photo3.png';
-import heroWorkshop from '@/assets/images/hero-workshop.png';
+import heroPhoto from '@/assets/hero photo.webp';
+import storyPhoto from '@/assets/story photo.webp';
+import storyPhoto2 from '@/assets/story photo2.webp';
+import storyPhoto3 from '@/assets/story photo3.webp';
+import heroWorkshop from '@/assets/images/hero-workshop.webp';
 
 // UI ASSETS
-import logoImg from '@/assets/images/trosheen-logo.png';
-import teamPortraitImg from '@/assets/images/team-portrait.png';
+import logoImg from '@/assets/images/trosheen-logo.webp';
+import teamPortraitImg from '@/assets/images/team-portrait.webp';
 
 // Product photos - exclusively for product display
 export const ProductPhotos = {

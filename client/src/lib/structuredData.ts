@@ -3,7 +3,7 @@ export const organizationSchema = {
   '@type': 'Organization',
   name: 'Trosheen.Crafts',
   url: 'https://trosheen.shop',
-  logo: 'https://trosheen.shop/logo.png',
+  logo: 'https://trosheen.shop/logo.webp',
   description: 'Handcrafted concrete art and home decor from Latvia',
   address: {
     '@type': 'PostalAddress',
@@ -79,7 +79,7 @@ export function blogPostSchema(post: {
       name: 'Trosheen.Crafts',
       logo: {
         '@type': 'ImageObject',
-        url: 'https://trosheen.shop/logo.png',
+        url: 'https://trosheen.shop/logo.webp',
       },
     },
   };

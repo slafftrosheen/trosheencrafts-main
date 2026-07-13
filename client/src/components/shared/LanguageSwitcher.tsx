@@ -23,8 +23,9 @@ export function LanguageSwitcher({ className }: { className?: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className={cn("rounded-full w-10 h-10 text-xl", className)}>
-          {currentLang.flag}
+        <Button variant="ghost" className={cn("rounded-full h-10 px-3 font-bold text-base flex items-center gap-2", className)}>
+          <span className="text-xl hidden sm:inline-block">{currentLang.flag}</span>
+          <span>{currentLang.code.toUpperCase()}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[150px] rounded-xl">

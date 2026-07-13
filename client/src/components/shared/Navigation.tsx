@@ -17,7 +17,7 @@ export function Navigation() {
   const cartItemsCount = useCartStore((state) => state.getTotalItems());
 
   return (
-    <nav className="fixed top-0 w-full z-40 border-b border-border/40 bg-background/60 backdrop-blur-md hidden lg:block">
+    <nav className="fixed top-0 w-full z-40 border-b border-border/40 bg-background/60 backdrop-blur-md hidden md:block">
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/" className="group flex items-center">
           <motion.div 
@@ -43,6 +43,10 @@ export function Navigation() {
           </Link>
           <Link href="/blog" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
             {t("nav_blog")}
+            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
+          </Link>
+          <Link href="/guide" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
+            {t("guide_care_eyebrow")}
             <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
           </Link>
           <Link href="/gallery" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">

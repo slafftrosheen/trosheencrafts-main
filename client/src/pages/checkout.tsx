@@ -39,7 +39,7 @@ export default function CheckoutPage() {
     try {
       setLoading(true);
       const response: any = await apiClient.post('/checkout/create-session', {
-        items: items.map((i) => ({ productId: i.id, quantity: i.quantity })),
+        items: items.map((i) => ({ productId: i.id, quantity: i.quantity, variant: i.variant })),
         shippingAddress: data,
         email: data.email,
       });

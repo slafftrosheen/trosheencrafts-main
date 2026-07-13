@@ -44,7 +44,7 @@ async function seed() {
         description: 'A hand-sculpted concrete vessel holding a high-quality scented candle. The vessel can be reused as a planter or decorative object.',
         price: '48.00',
         category: 'Candles',
-        images: ['/assets/Hands holding heart candle-CqdhwrTV.jpeg'],
+        images: ['/assets/Hands holding heart candle-CqdhwrTV.webp'],
         stock: 15,
         featured: true,
       },
@@ -54,7 +54,7 @@ async function seed() {
         description: 'Large architectural concrete stepping stone with a detailed natural leaf impression. Perfect for garden paths.',
         price: '38.00',
         category: 'Garden',
-        images: ['/assets/Leaf Stepping stone-y8E5m1G_.jpeg'],
+        images: ['/assets/Leaf Stepping stone-y8E5m1G_.webp'],
         stock: 8,
         featured: true,
       },
@@ -64,7 +64,7 @@ async function seed() {
         description: 'Delicate sea star shaped gel candle, hand-cast with Baltic sea inspiration.',
         price: '24.00',
         category: 'Candles',
-        images: ['/assets/sea star shaped gel candle-DgZcMKLl.jpeg'],
+        images: ['/assets/sea star shaped gel candle-DgZcMKLl.webp'],
         stock: 20,
         featured: false,
       }
@@ -82,7 +82,7 @@ async function seed() {
         content: 'Our process starts with raw minerals and ends with something that feels alive. We believe in the slow rhythm of the workshop, where every bubble and texture tells a story of patience...',
         excerpt: 'Why we choose to make things by hand in a world of mass production.',
         author: 'Oleg Trosheen',
-        image: '/assets/concrete casting process-DHsS8MbC.png',
+        image: '/assets/concrete casting process-DHsS8MbC.webp',
         publishedAt: new Date(),
       },
       {
@@ -91,7 +91,7 @@ async function seed() {
         content: 'When the Baltic frost settles on the windows, the workshop transforms. The concrete cures differently, the pigments take on a new depth, and the quiet moments between the casts become longer...',
         excerpt: 'How the seasons influence our crafting process.',
         author: 'Oleg Trosheen',
-        image: '/assets/story photo-Dner3Ksw.png',
+        image: '/assets/story photo-Dner3Ksw.webp',
         publishedAt: new Date(),
       }
     ];

@@ -1,17 +1,17 @@
 /// <reference types="vite/client" />
 
 // Allow importing image files with spaces in filenames
-declare module '*.jpeg' {
+declare module '*.webp' {
   const value: string;
   export default value;
 }
 
-declare module '*.jpg' {
+declare module '*.webp' {
   const value: string;
   export default value;
 }
 
-declare module '*.png' {
+declare module '*.webp' {
   const value: string;
   export default value;
 }

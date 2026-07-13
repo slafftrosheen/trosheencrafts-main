@@ -24,7 +24,7 @@ export function MobileNavigation() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-md lg:hidden">
+      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/60 backdrop-blur-md md:hidden">
         <div className="flex items-center justify-between px-4 h-16">
           <Link href="/" className="group flex items-center">
             <div className="w-16 h-16 flex items-center justify-center">
@@ -71,6 +71,12 @@ export function MobileNavigation() {
                   )}>
                     {t("nav_blog")}
                   </Link>
+                  <Link href="/guide" className={cn(
+                    "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-lg",
+                    location === "/guide" ? "bg-primary text-white" : "hover:bg-accent"
+                  )}>
+                    {t("guide_care_eyebrow")}
+                  </Link>
                   <Link href="/gallery" className={cn(
                     "flex items-center gap-4 px-6 py-4 rounded-2xl transition-all font-bold text-lg",
                     location === "/gallery" ? "bg-primary text-white" : "hover:bg-accent"
@@ -98,7 +104,7 @@ export function MobileNavigation() {
         </div>
       </header>
 
-      <div className="lg:hidden h-16" />
+      <div className="md:hidden h-16" />
     </>
   );
 }

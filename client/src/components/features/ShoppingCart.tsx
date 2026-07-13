@@ -51,7 +51,7 @@ export function ShoppingCartComponent() {
               <div key={item.id} className="flex items-center gap-6 group">
                 <div className="w-20 h-20 rounded-2xl bg-muted overflow-hidden border-2 border-border/40 shrink-0">
                   <img
-                    src={item.image || '/placeholder.jpg'}
+                    src={item.image || '/placeholder.webp'}
                     alt={item.name}
                     className="w-full h-full object-cover transition-transform group-hover:scale-110"
                   />
@@ -67,7 +67,7 @@ export function ShoppingCartComponent() {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 rounded-md"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
@@ -76,7 +76,7 @@ export function ShoppingCartComponent() {
                         variant="ghost"
                         size="icon"
                         className="h-6 w-6 rounded-md"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant)}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
@@ -85,7 +85,7 @@ export function ShoppingCartComponent() {
                       variant="ghost"
                       size="icon"
                       className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeItem(item.id, item.variant)}
                     >
                       <X className="h-4 w-4" />
                     </Button>
