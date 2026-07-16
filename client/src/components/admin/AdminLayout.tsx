@@ -44,6 +44,7 @@ const navigationItems = [
     items: [
       { name: 'admin.orders', href: '/admin/orders', icon: ShoppingCart },
       { name: 'admin.products', href: '/admin/products', icon: Package },
+      { name: 'admin.constructor', href: '/admin/constructor', icon: Palette },
       { name: 'admin.category', href: '/admin/categories', icon: Tag },
     ]
   },
@@ -51,18 +52,15 @@ const navigationItems = [
     label: 'admin.blog',
     items: [
       { name: 'admin.blog', href: '/admin/blog', icon: FileText },
-      { name: 'Promotions', href: '/admin/promotions', icon: TrendingUp },
+      { name: 'admin.promotions', href: '/admin/promotions', icon: TrendingUp },
       { name: 'admin.gallery.title', href: '/admin/gallery', icon: ImageIcon },
-      { name: 'admin.image', href: '/admin/media', icon: ImageIcon },
-      { name: 'admin.view_store', href: '/admin/pages', icon: Palette },
     ]
   },
   {
     label: 'admin.messages',
     items: [
-      { name: 'admin.customer', href: '/admin/customers', icon: Users },
       { name: 'footer.newsletter_title', href: '/admin/subscribers', icon: Mail },
-      { name: 'admin.messages', href: '/admin/emails', icon: Mail },
+      { name: 'admin.messages', href: '/admin/messages', icon: Mail },
       { name: 'nav.settings', href: '/admin/settings', icon: Settings },
     ]
   }

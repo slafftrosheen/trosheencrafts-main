@@ -15,6 +15,7 @@ import { inventoryRouter } from './inventory';
 import siteConfigRouter from './siteConfig';
 import newsletterRouter from './newsletter';
 import promotionsRouter from './promotions';
+import { constructorRouter } from './constructor';
 
 export const createApiRouter = (): Router => {
   const router = Router();
@@ -31,6 +32,7 @@ export const createApiRouter = (): Router => {
   router.use('/checkout', checkoutRouter);
   router.use('/categories', categoriesRouter);
   router.use('/site-config', siteConfigRouter);
+  router.use('/constructor-options', constructorRouter);
 
   // Admin routes
   router.use('/admin', adminRouter);

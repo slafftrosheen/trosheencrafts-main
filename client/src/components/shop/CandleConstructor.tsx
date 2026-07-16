@@ -1,248 +1,374 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useCartStore } from '@/lib/stores/cartStore';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Check, ChevronRight, ChevronLeft, ShoppingBag } from 'lucide-react';
+import { Check, ShoppingBag, Info, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { OptimizedImage } from '@/components/shared/OptimizedImage';
+import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
+import { apiClient } from '@/lib/apiClient';
 
-// Configuration Options
-const SHAPES = [
-  { id: 'heart', name: 'Heart Vessel', price: 15, image: '/assets/heart shaped mug candle.webp' },
-  { id: 'cylinder', name: 'Classic Cylinder', price: 12, image: '/assets/sea shell shaped candle.webp' },
-  { id: 'sphere', name: 'Minimalist Sphere', price: 18, image: '/assets/Latvian Motiff candle.webp' },
-];
-
-const FINISHES = [
-  { id: 'concrete', name: 'Raw Concrete', price: 0, color: '#9CA3AF' },
-  { id: 'marble', name: 'Marble Effect', price: 5, color: '#E5E7EB' },
-  { id: 'bronze', name: 'Painted Bronze', price: 8, color: '#b08d57' },
-  { id: 'gold', name: 'Gold Leaf Detail', price: 10, color: '#D4AF37' },
-];
-
-const WAX_TYPES = [
-  { id: 'soy', name: 'Soy Wax (Eco)', price: 0 },
-  { id: 'gel', name: 'Clear Gel Wax', price: 3 },
-  { id: 'beeswax', name: 'Natural Beeswax', price: 5 },
-];
-
-const AROMAS = [
-  { id: 'none', name: 'Unscented', price: 0 },
-  { id: 'lavender', name: 'Lavender Breeze', price: 2 },
-  { id: 'vanilla', name: 'Warm Vanilla', price: 2 },
-  { id: 'pine', name: 'Baltic Pine', price: 2 },
-  { id: 'citrus', name: 'Citrus Zest', price: 2 },
-];
+interface ConstructorOption {
+  id: number;
+  type: string;
+  key: string;
+  nameTranslations: Record<string, string>;
+  descTranslations: Record<string, string>;
+  price: string;
+  color: string | null;
+  border: string | null;
+  imageUrl?: string | null;
+}
 
 export function CandleConstructor() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const addItem = useCartStore((state) => state.addItem);
 
-  const [step, setStep] = useState(1);
-  const [shape, setShape] = useState(SHAPES[0]);
-  const [finish, setFinish] = useState(FINISHES[0]);
-  const [wax, setWax] = useState(WAX_TYPES[0]);
-  const [aroma, setAroma] = useState(AROMAS[0]);
+  const { data: optionsData, isLoading } = useQuery<Record<string, ConstructorOption[]>>({
+    queryKey: ['constructorOptions'],
+    queryFn: () => apiClient.get('/constructor-options'),
+  });
 
-  const totalPrice = shape.price + finish.price + wax.price + aroma.price;
+  const [shape, setShape] = useState<ConstructorOption | null>(null);
+  const [finish, setFinish] = useState<ConstructorOption | null>(null);
+  const [wax, setWax] = useState<ConstructorOption | null>(null);
+  const [aroma, setAroma] = useState<ConstructorOption | null>(null);
+  const [customDescription, setCustomDescription] = useState('');
+
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (optionsData) {
+      if (optionsData.vessel?.length > 0 && !shape) setShape(optionsData.vessel[0]);
+      if (optionsData.finish?.length > 0 && !finish) setFinish(optionsData.finish[0]);
+      if (optionsData.wax?.length > 0 && !wax) setWax(optionsData.wax[0]);
+      if (optionsData.aroma?.length > 0 && !aroma) setAroma(optionsData.aroma[0]);
+    }
+  }, [optionsData, shape, finish, wax, aroma]);
+
+  if (!mounted || isLoading || !shape || !finish || !wax || !aroma) {
+    return (
+      <div className="w-full bg-background min-h-[500px] flex flex-col items-center justify-center rounded-[2.5rem] border border-border/40 shadow-2xl concrete-shadow">
+        <Loader2 className="w-12 h-12 animate-spin text-primary opacity-50 mb-4" />
+        <p className="text-muted-foreground font-serif text-lg">{t('constructor.loading')}</p>
+      </div>
+    );
+  }
+
+  const getTranslatedName = (opt: ConstructorOption) => opt.nameTranslations[language] || opt.nameTranslations.en;
+  const getTranslatedDesc = (opt: ConstructorOption) => opt.descTranslations?.[language] || opt.descTranslations?.en || '';
+
+  const shapePrice = parseFloat(shape.price || '0');
+  const finishPrice = parseFloat(finish.price || '0');
+  const waxPrice = parseFloat(wax.price || '0');
+  const aromaPrice = parseFloat(aroma.price || '0');
+  const totalPrice = shapePrice + finishPrice + waxPrice + aromaPrice;
 
   const handleAddToCart = () => {
-    // We use a pseudo-random ID for custom items
     const customId = `custom-${Date.now()}`;
-    const variantStr = `${shape.name} / ${finish.name} / ${wax.name} / ${aroma.name}`;
+    const finishName = getTranslatedName(finish);
+    const shapeName = getTranslatedName(shape);
+    const finishStr = finish.key === 'custom' && customDescription 
+      ? `${finishName} (${customDescription})`
+      : finishName;
+    const variantStr = `${shapeName} / ${finishStr} / ${getTranslatedName(wax)} / ${getTranslatedName(aroma)}`;
 
     addItem({
       id: customId,
       name: 'Custom Crafted Candle',
       price: totalPrice,
-      image: shape.image,
+      image: shape.imageUrl || '',
       variant: variantStr,
     });
     
-    toast.success("Custom candle added to cart!");
-    setStep(1); // Reset
+    toast.success(t('constructor.step_ready'));
+    setCustomDescription('');
   };
 
-  const nextStep = () => setStep(s => Math.min(s + 1, 5));
-  const prevStep = () => setStep(s => Math.max(s - 1, 1));
-
   return (
-    <div className="max-w-4xl mx-auto py-12 px-4 sm:px-6">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-5xl font-serif font-bold text-primary mb-4">Build Your Candle</h2>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          Mix and match materials to create a unique piece that fits your home perfectly.
-        </p>
-      </div>
-
-      {/* Progress Bar */}
-      <div className="flex items-center justify-between mb-8 relative">
-        <div className="absolute left-0 right-0 top-1/2 h-1 bg-muted -z-10" />
-        <div 
-          className="absolute left-0 top-1/2 h-1 bg-primary transition-all duration-300 -z-10"
-          style={{ width: `${((step - 1) / 4) * 100}%` }}
-        />
-        {[1, 2, 3, 4, 5].map((s) => (
-          <div 
-            key={s} 
-            className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition-colors border-4 border-background ${step >= s ? 'bg-primary text-white' : 'bg-muted text-muted-foreground'}`}
-          >
-            {s}
-          </div>
-        ))}
-      </div>
-
-      <Card className="border-border/40 shadow-2xl overflow-hidden rounded-[2rem]">
-        <div className="flex flex-col md:flex-row">
-          
-          {/* Visualizer Panel */}
-          <div className="md:w-1/2 bg-muted/30 p-8 flex flex-col items-center justify-center min-h-[300px] md:min-h-[500px] relative border-b md:border-b-0 md:border-r border-border/40">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={shape.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.1 }}
-                transition={{ duration: 0.4 }}
-                className="w-full max-w-[280px] aspect-square rounded-[2rem] overflow-hidden shadow-2xl"
-              >
-                <OptimizedImage
-                  src={shape.image}
-                  alt={shape.name}
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-            </AnimatePresence>
-            
-            <div className="mt-8 w-full max-w-[280px] space-y-2 text-sm text-center">
-              <p className="font-bold text-lg">{t('common.total') || 'Total'}: €{totalPrice.toFixed(2)}</p>
-              <div className="text-muted-foreground space-y-1">
-                <p>Vessel: {shape.name}</p>
-                {step > 1 && <p>Finish: {finish.name}</p>}
-                {step > 2 && <p>Wax: {wax.name}</p>}
-                {step > 3 && <p>Aroma: {aroma.name}</p>}
-              </div>
-            </div>
-          </div>
-
-          {/* Options Panel */}
-          <div className="md:w-1/2 p-8 flex flex-col">
-            <div className="flex-1">
-              <AnimatePresence mode="wait">
-                {step === 1 && (
-                  <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                    <h3 className="text-2xl font-serif font-bold mb-6">1. Choose Vessel Shape</h3>
-                    <div className="grid gap-4">
-                      {SHAPES.map(s => (
-                        <div 
-                          key={s.id}
-                          onClick={() => setShape(s)}
-                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex justify-between items-center ${shape.id === s.id ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
-                        >
-                          <span className="font-medium text-lg">{s.name}</span>
-                          <span className="text-muted-foreground">+€{s.price}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-                
-                {step === 2 && (
-                  <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                    <h3 className="text-2xl font-serif font-bold mb-6">2. Choose Finish</h3>
-                    <div className="grid gap-4">
-                      {FINISHES.map(f => (
-                        <div 
-                          key={f.id}
-                          onClick={() => setFinish(f)}
-                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex items-center gap-4 ${finish.id === f.id ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
-                        >
-                          <div className="w-8 h-8 rounded-full border shadow-inner" style={{ backgroundColor: f.color }} />
-                          <span className="font-medium text-lg flex-1">{f.name}</span>
-                          <span className="text-muted-foreground">+{f.price > 0 ? `€${f.price}` : 'Free'}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === 3 && (
-                  <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                    <h3 className="text-2xl font-serif font-bold mb-6">3. Choose Wax</h3>
-                    <div className="grid gap-4">
-                      {WAX_TYPES.map(w => (
-                        <div 
-                          key={w.id}
-                          onClick={() => setWax(w)}
-                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex justify-between items-center ${wax.id === w.id ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
-                        >
-                          <span className="font-medium text-lg">{w.name}</span>
-                          <span className="text-muted-foreground">+{w.price > 0 ? `€${w.price}` : 'Free'}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === 4 && (
-                  <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-                    <h3 className="text-2xl font-serif font-bold mb-6">4. Choose Aroma</h3>
-                    <div className="grid gap-4">
-                      {AROMAS.map(a => (
-                        <div 
-                          key={a.id}
-                          onClick={() => setAroma(a)}
-                          className={`p-4 rounded-xl border-2 cursor-pointer transition-all flex justify-between items-center ${aroma.id === a.id ? 'border-primary bg-primary/5' : 'border-border/40 hover:border-primary/50'}`}
-                        >
-                          <span className="font-medium text-lg">{a.name}</span>
-                          <span className="text-muted-foreground">+{a.price > 0 ? `€${a.price}` : 'Free'}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-
-                {step === 5 && (
-                  <motion.div key="step5" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="h-full flex flex-col justify-center items-center text-center">
-                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                      <Check className="w-10 h-10 text-primary" />
-                    </div>
-                    <h3 className="text-3xl font-serif font-bold mb-4">Masterpiece Ready!</h3>
-                    <p className="text-muted-foreground text-lg mb-8">
-                      Your custom candle configuration is complete. We will hand-pour it specifically for you in our Daugavpils workshop.
-                    </p>
-                    <Button size="lg" className="rounded-full w-full py-6 text-lg font-bold shadow-xl shadow-primary/20" onClick={handleAddToCart}>
-                      <ShoppingBag className="mr-2 w-5 h-5" /> Add to Cart — €{totalPrice.toFixed(2)}
-                    </Button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            {/* Navigation Buttons */}
-            {step < 5 && (
-              <div className="flex justify-between mt-12 pt-6 border-t border-border/40">
-                <Button 
-                  variant="ghost" 
-                  onClick={prevStep} 
-                  disabled={step === 1}
-                  className="rounded-xl px-6"
-                >
-                  <ChevronLeft className="mr-2 w-4 h-4" /> Back
-                </Button>
-                <Button 
-                  onClick={nextStep}
-                  className="rounded-xl px-8 shadow-md"
-                >
-                  Next Step <ChevronRight className="ml-2 w-4 h-4" />
-                </Button>
-              </div>
-            )}
-          </div>
+    <div className="w-full bg-background min-h-screen relative flex flex-col md:flex-row rounded-[2.5rem] overflow-hidden border border-border/40 shadow-2xl concrete-shadow">
+      
+      {/* LEFT: Sticky Immersive Visualizer */}
+      <div className="md:w-1/2 md:sticky md:top-0 md:h-[calc(100vh-8rem)] min-h-[450px] relative bg-muted/30 overflow-hidden flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-border/40">
+        <div className="absolute inset-0 noise opacity-30 pointer-events-none" />
+        
+        {/* Soft radial background glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-3/4 h-3/4 bg-primary/5 rounded-full blur-[100px]" />
         </div>
-      </Card>
+
+        <motion.div 
+          className="relative z-10 w-full max-w-[350px] aspect-square flex items-center justify-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={shape.id}
+              initial={{ opacity: 0, y: 20, rotate: -5 }}
+              animate={{ opacity: 1, y: 0, rotate: 0 }}
+              exit={{ opacity: 0, y: -20, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="w-full h-full drop-shadow-2xl hover:scale-105 transition-transform duration-700 cursor-grab active:cursor-grabbing"
+            >
+              {shape.imageUrl && (
+                <OptimizedImage
+                  src={shape.imageUrl}
+                  alt={getTranslatedName(shape)}
+                  className="w-full h-full object-contain filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)]"
+                />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </motion.div>
+
+        {/* Live Summary Floating Pill */}
+        <motion.div 
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 glass px-6 py-4 rounded-3xl border border-white/10 shadow-lg flex flex-col items-center w-[90%] max-w-sm"
+        >
+          <div className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-2">{t('constructor.review_design')}</div>
+          <div className="w-full space-y-1.5 text-sm font-medium">
+            <div className="flex justify-between"><span>Vessel</span> <span className="text-foreground">{getTranslatedName(shape)}</span></div>
+            <div className="flex justify-between"><span>Finish</span> <span className="text-foreground">{getTranslatedName(finish)}</span></div>
+            <div className="flex justify-between"><span>Material</span> <span className="text-foreground">{getTranslatedName(wax)} & {getTranslatedName(aroma)}</span></div>
+          </div>
+          <div className="w-full h-px bg-border/50 my-3" />
+          <div className="w-full flex justify-between items-center text-lg font-serif">
+            <span className="text-muted-foreground">Total</span>
+            <span className="text-primary font-bold">€{totalPrice.toFixed(2)}</span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* RIGHT: Scrollable Configurator Options */}
+      <div className="md:w-1/2 relative bg-background/50 h-[600px] md:h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar pb-32">
+        <div className="max-w-2xl mx-auto p-6 md:p-12 space-y-16">
+          
+          {/* Section 1: Vessel */}
+          <section>
+            <div className="mb-6">
+              <h3 className="text-2xl font-serif font-bold text-foreground">{t('constructor.step1')}</h3>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {(optionsData.vessel || []).map((s) => {
+                const isActive = shape.id === s.id;
+                const sPrice = parseFloat(s.price);
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => setShape(s)}
+                    className={cn(
+                      "relative group p-4 rounded-3xl border transition-all duration-300 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                      isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeShape"
+                        className="absolute inset-0 rounded-3xl border-2 border-primary bg-primary/5 -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <div className="w-20 h-20 mb-3 relative flex items-center justify-center transition-transform duration-500 group-hover:scale-110">
+                      {s.imageUrl && (
+                        <OptimizedImage src={s.imageUrl} alt={getTranslatedName(s)} className="w-full h-full object-contain filter drop-shadow-sm" />
+                      )}
+                    </div>
+                    <span className="font-medium text-sm leading-tight text-foreground">{getTranslatedName(s)}</span>
+                    <span className="text-muted-foreground text-xs mt-1 font-bold">
+                      {sPrice > 0 ? `+€${sPrice.toFixed(2)}` : 'Included'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Section 2: Finish */}
+          <section>
+            <div className="mb-6">
+              <h3 className="text-2xl font-serif font-bold text-foreground">{t('constructor.step2')}</h3>
+            </div>
+            
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {(optionsData.finish || []).map((f) => {
+                const isActive = finish.id === f.id;
+                const fPrice = parseFloat(f.price);
+                return (
+                  <button
+                    key={f.id}
+                    onClick={() => setFinish(f)}
+                    className={cn(
+                      "relative group p-4 rounded-3xl border transition-all duration-300 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                      isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeFinish"
+                        className="absolute inset-0 rounded-3xl border-2 border-primary bg-primary/5 -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    
+                    {/* Material Swatch */}
+                    <div 
+                      className="w-14 h-14 rounded-full mb-3 shadow-inner transition-transform duration-500 group-hover:scale-110 relative overflow-hidden"
+                      style={{ 
+                        background: f.color || '#ccc',
+                        boxShadow: `inset 0 4px 10px rgba(0,0,0,0.1), inset 0 0 0 1px ${f.border || '#ccc'}` 
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-white/40 mix-blend-overlay" />
+                    </div>
+                    
+                    <span className="font-medium text-sm leading-tight text-foreground">{getTranslatedName(f)}</span>
+                    <span className="text-muted-foreground text-xs mt-1 font-bold">
+                      {fPrice > 0 ? `+€${fPrice.toFixed(2)}` : 'Included'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <AnimatePresence>
+              {finish.key === 'custom' && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0, y: -10 }} 
+                  animate={{ opacity: 1, height: 'auto', y: 0 }}
+                  exit={{ opacity: 0, height: 0, y: -10 }}
+                  className="overflow-hidden mt-4"
+                >
+                  <div className="bg-primary/5 p-5 rounded-2xl border border-primary/20 relative">
+                    <Info className="w-5 h-5 text-primary absolute top-5 right-5 opacity-50" />
+                    <label className="text-sm font-bold text-primary block mb-2">Your Custom Request:</label>
+                    <Textarea 
+                      placeholder="e.g., Deep emerald green with copper speckles..."
+                      value={customDescription}
+                      onChange={(e) => setCustomDescription(e.target.value)}
+                      className="resize-none bg-background/80 focus-visible:ring-primary/50 border-border/50 h-24"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </section>
+
+          {/* Section 3: Wax */}
+          <section>
+            <div className="mb-6">
+              <h3 className="text-2xl font-serif font-bold text-foreground">{t('constructor.step3')}</h3>
+            </div>
+            <div className="space-y-3">
+              {(optionsData.wax || []).map((w) => {
+                const isActive = wax.id === w.id;
+                const wPrice = parseFloat(w.price);
+                return (
+                  <button
+                    key={w.id}
+                    onClick={() => setWax(w)}
+                    className={cn(
+                      "w-full relative group p-5 rounded-2xl border transition-all duration-300 flex justify-between items-center text-left outline-none",
+                      isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeWax"
+                        className="absolute inset-0 rounded-2xl border-2 border-primary bg-primary/5 -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <div>
+                      <div className="font-bold text-foreground flex items-center gap-2">
+                        {getTranslatedName(w)}
+                        {isActive && <Check className="w-4 h-4 text-primary" />}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">{getTranslatedDesc(w)}</div>
+                    </div>
+                    <span className="font-bold text-sm bg-background px-3 py-1 rounded-full border border-border/50">
+                      {wPrice > 0 ? `+€${wPrice.toFixed(2)}` : 'Free'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+          {/* Section 4: Aroma */}
+          <section>
+            <div className="mb-6">
+              <h3 className="text-2xl font-serif font-bold text-foreground">{t('constructor.step4')}</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              {(optionsData.aroma || []).map((a) => {
+                const isActive = aroma.id === a.id;
+                const aPrice = parseFloat(a.price);
+                return (
+                  <button
+                    key={a.id}
+                    onClick={() => setAroma(a)}
+                    className={cn(
+                      "relative group p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center text-left outline-none gap-2",
+                      isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
+                    )}
+                  >
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeAroma"
+                        className="absolute inset-0 rounded-2xl border-2 border-primary bg-primary/5 -z-10"
+                        transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                      />
+                    )}
+                    <span className="font-bold text-sm flex items-center gap-2">
+                      {getTranslatedName(a)}
+                    </span>
+                    <span className="text-xs font-bold text-muted-foreground">
+                      {aPrice > 0 ? `+€${aPrice.toFixed(2)}` : 'Free'}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+
+        </div>
+      </div>
+
+      {/* Floating Checkout Bar (Mobile & Desktop) */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 pointer-events-none z-20 flex justify-end">
+        <motion.div 
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, type: 'spring' }}
+          className="pointer-events-auto"
+        >
+          <Button 
+            size="lg" 
+            className="rounded-full h-14 px-8 shadow-[0_10px_40px_-10px_rgba(var(--primary),0.5)] hover:shadow-[0_15px_50px_-10px_rgba(var(--primary),0.6)] transition-all hover:scale-105 active:scale-95 group" 
+            onClick={handleAddToCart}
+          >
+            <span className="flex items-center gap-3 text-lg font-bold">
+              {t('constructor.add_to_cart')}
+              <span className="w-1 h-1 rounded-full bg-primary-foreground/30" /> 
+              €{totalPrice.toFixed(2)}
+            </span>
+            <div className="ml-4 bg-primary-foreground/20 p-2 rounded-full group-hover:bg-primary-foreground/30 transition-colors">
+              <ShoppingBag className="w-5 h-5" />
+            </div>
+          </Button>
+        </motion.div>
+      </div>
+
     </div>
   );
 }

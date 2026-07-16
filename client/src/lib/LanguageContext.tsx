@@ -200,6 +200,12 @@ export const translations: Translations = {
     uk: "Кожен виріб розповідає історію—від свічок, що стають посудинами, до садової плитки, відлитої з балтійського листя. Кожен створений з бетону, гіпсу, мінерального акрилу або натуральних смол."
   },
   shop_view_all: { en: "See All Pieces", lv: "Redzēt visus darbus", ru: "Смотреть все работы", pl: "Zobacz Wszystkie Prace", uk: "Дивитися Всі Роботи" },
+  shop_custom_builder: { en: "Custom Workshop", lv: "Pielāgota Darbnīca", ru: "Индивидуальная Мастерская", pl: "Warsztat Niestandardowy", uk: "Індивідуальна Майстерня" },
+  shop_empty_title: { en: "The shelves are resting", lv: "Plaukti atpūšas", ru: "Полки отдыхают", pl: "Półki odpoczywają", uk: "Полиці відпочивають" },
+  shop_empty_desc: { en: "We are currently crafting new collections. In the meantime, visit the Custom Workshop to build your own unique piece.", lv: "Mēs pašlaik veidojam jaunas kolekcijas. Tikmēr apmeklējiet Pielāgoto darbnīcu, lai izveidotu savu unikālo gabalu.", ru: "В настоящее время мы создаем новые коллекции. Тем временем посетите Индивидуальную мастерскую, чтобы создать свое уникальное изделие.", pl: "Obecnie tworzymy nowe kolekcje. W międzyczasie odwiedź Warsztat Niestandardowy, aby stworzyć własny unikalny kawałek.", uk: "Наразі ми створюємо нові колекції. Тим часом відвідайте Індивідуальну майстерню, щоб створити свій унікальний виріб." },
+  shop_enter_workshop: { en: "Enter Workshop", lv: "Ieiet Darbnīcā", ru: "Войти в мастерскую", pl: "Wejdź do warsztatu", uk: "Увійти в майстерню" },
+  product_handmade_badge: { en: "Handmade by Oleg", lv: "Oļega roku darbs", ru: "Ручная работа Олега", pl: "Ręczna praca Olega", uk: "Ручна робота Олега" },
+  product_view_piece: { en: "View Piece", lv: "Skatīt Darbu", ru: "Смотреть Изделие", pl: "Zobacz Dzieło", uk: "Дивитися Виріб" },
 
   // Featured Products
   featured_prod1_name: { en: "Heart Vessel Candle", lv: "Sirds Trauka Svece", ru: "Свеча-сердце", pl: "Świeca Serce", uk: "Свічка-Серце" },
@@ -660,6 +666,35 @@ export const translations: Translations = {
   "guide_care_planters_title": { en: "Planters and Garden Fountains", lv: "Puķu podi un dārza strūklakas", ru: "Кашпо и Садовые Фонтаны", pl: "Planters and Garden Fountains", uk: "Planters and Garden Fountains" },
   "guide_care_planters_planting": { en: "Planting: Our planters are moisture-resistant. You can use them as cover pots for plastic nursery pots or plant directly into the stone planter (in this case, add a drainage layer at the bottom).", lv: "Stādīšana: Mūsu puķu podi nebaidās no mitruma. Jūs varat stādīt augus gan tehniskajos plastmasas podiņos, gan tieši akmens podā (šajā gadījumā apakšā izveidojiet drenāžas slāni).", ru: "Высадка растений: Наши кашпо не боятся влаги. Вы можете сажать растения как в технических пластиковых горшочках, так и напрямую в каменное кашпо (в этом случае используйте дренажный слой на дне).", pl: "Planting: Our planters are moisture-resistant. You can use them as cover pots for plastic nursery pots or plant directly into the stone planter (in this case, add a drainage layer at the bottom).", uk: "Planting: Our planters are moisture-resistant. You can use them as cover pots for plastic nursery pots or plant directly into the stone planter (in this case, add a drainage layer at the bottom)." },
   "guide_care_planters_winter": { en: "Winterizing Fountains: The stone withstands temperature changes, but to prevent damage to the pump and pipes, be sure to drain all water from the fountains before winter freezes begin.", lv: "Strūklaku ieziemošana: Akmens iztur temperatūras svārstības, bet, lai izvairītos no sūkņa un cauruļu bojājumiem, pirms ziemas sala iestāšanās noteikti izlejiet ūdeni no strūklakām.", ru: "Зимовка фонтанов: Камень выдерживает перепады температур, но чтобы избежать повреждения насоса и труб, обязательно сливайте воду из фонтанов перед наступлением зимних заморозков.", pl: "Winterizing Fountains: The stone withstands temperature changes, but to prevent damage to the pump and pipes, be sure to drain all water from the fountains before winter freezes begin.", uk: "Winterizing Fountains: The stone withstands temperature changes, but to prevent damage to the pump and pipes, be sure to drain all water from the fountains before winter freezes begin." },
+
+  // Constructor
+  "constructor.title": { en: "The Workshop", lv: "Darbnīca", ru: "Мастерская", pl: "Warsztat", uk: "Майстерня" },
+  "constructor.subtitle": { en: "Design your perfect piece", lv: "Dizainē savu ideālo darbu", ru: "Создайте свое идеальное изделие", pl: "Zaprojektuj swój idealny wyrób", uk: "Створіть свій ідеальний виріб" },
+  "constructor.step1": { en: "1. Shape Your Vision", lv: "1. Veidojiet Savu Vīziju", ru: "1. Выберите Форму", pl: "1. Wybierz Kształt", uk: "1. Виберіть Форму" },
+  "constructor.step2": { en: "2. The Finish", lv: "2. Apdare", ru: "2. Отделка", pl: "2. Wykończenie", uk: "2. Обробка" },
+  "constructor.step3": { en: "3. Wax & Wick", lv: "3. Vasks un Dakts", ru: "3. Воск и Фитиль", pl: "3. Wosk i Knot", uk: "3. Віск і Гніт" },
+  "constructor.step4": { en: "4. The Essence", lv: "4. Būtība", ru: "4. Эссенция", pl: "4. Esencja", uk: "4. Есенція" },
+  "constructor.step_ready": { en: "Masterpiece Ready!", lv: "Meistardarbs Gatavs!", ru: "Шедевр Готов!", pl: "Arcydzieło Gotowe!", uk: "Шедевр Готовий!" },
+  "constructor.base_price": { en: "Base Price", lv: "Pamatcena", ru: "Базовая цена", pl: "Cena podstawowa", uk: "Базова ціна" },
+  "constructor.add_to_cart": { en: "Bring It To Life", lv: "Atdzīvināt To", ru: "Воплотить в жизнь", pl: "Ożyw to", uk: "Втілити в життя" },
+  "constructor.review_design": { en: "Review Your Design", lv: "Pārskatiet Savu Dizainu", ru: "Проверьте Свой Дизайн", pl: "Przejrzyj Swój Projekt", uk: "Перевірте Свій Дизайн" },
+  "constructor.loading": { en: "Loading workshop...", lv: "Ielādē darbnīcu...", ru: "Загрузка мастерской...", pl: "Ładowanie warsztatu...", uk: "Завантаження майстерні..." },
+  // Admin
+  "admin.dashboard": { en: "Dashboard", lv: "Informācijas panelis", ru: "Панель управления", pl: "Pulpit nawigacyjny", uk: "Панель управління" },
+  "admin.analytics_title": { en: "Analytics", lv: "Analītika", ru: "Аналитика", pl: "Analityka", uk: "Аналітика" },
+  "admin.orders": { en: "Orders", lv: "Pasūtījumi", ru: "Заказы", pl: "Zamówienia", uk: "Замовлення" },
+  "admin.products": { en: "Products", lv: "Produkti", ru: "Продукты", pl: "Produkty", uk: "Продукти" },
+  "admin.constructor": { en: "Constructor", lv: "Konstruktors", ru: "Конструктор", pl: "Konstruktor", uk: "Конструктор" },
+  "admin.category": { en: "Categories", lv: "Kategorijas", ru: "Категории", pl: "Kategorie", uk: "Категорії" },
+  "admin.blog": { en: "Blog", lv: "Emuārs", ru: "Блог", pl: "Blog", uk: "Блог" },
+  "admin.promotions": { en: "Promotions", lv: "Akcijas", ru: "Акции", pl: "Promocje", uk: "Акції" },
+  "admin.gallery.title": { en: "Gallery", lv: "Galerija", ru: "Галерея", pl: "Galeria", uk: "Галерея" },
+  "admin.messages": { en: "Messages", lv: "Ziņas", ru: "Сообщения", pl: "Wiadomości", uk: "Повідомлення" },
+  "admin.customer": { en: "Customers", lv: "Klienti", ru: "Клиенты", pl: "Klienci", uk: "Клієнти" },
+  "footer.newsletter_title": { en: "Subscribers", lv: "Abonenti", ru: "Подписчики", pl: "Subskrybenci", uk: "Підписники" },
+  "admin.logout": { en: "Logout", lv: "Izrakstīties", ru: "Выйти", pl: "Wyloguj", uk: "Вийти" },
+  "admin.login_title": { en: "Admin Portal", lv: "Administratora portāls", ru: "Портал администратора", pl: "Portal administratora", uk: "Портал адміністратора" },
+
 };
 
 interface LanguageContextType {

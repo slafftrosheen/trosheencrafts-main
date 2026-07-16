@@ -42,6 +42,7 @@ const AdminCategories = lazy(() => import("@/pages/admin/Categories"));
 const AdminGallery = lazy(() => import("@/pages/admin/Gallery"));
 const AdminPromotions = lazy(() => import("@/pages/admin/Promotions"));
 const AdminNewsletterSubscribers = lazy(() => import("@/pages/admin/NewsletterSubscribers"));
+const AdminConstructor = lazy(() => import("@/pages/admin/ConstructorConfig"));
 
 function Router() {
   return (
@@ -61,6 +62,9 @@ function Router() {
         </Route>
         <Route path="/admin/products">
           <AdminLayout><AdminProducts /></AdminLayout>
+        </Route>
+        <Route path="/admin/constructor">
+          <AdminLayout><AdminConstructor /></AdminLayout>
         </Route>
         <Route path="/admin/orders">
           <AdminLayout><AdminOrders /></AdminLayout>
@@ -86,18 +90,7 @@ function Router() {
         <Route path="/admin/categories">
           <AdminLayout><AdminCategories /></AdminLayout>
         </Route>
-        <Route path="/admin/media">
-          <AdminLayout><div className="p-20 text-center"><h2 className="text-3xl font-serif font-bold">Media Management <span className="text-primary italic">Coming Soon</span></h2></div></AdminLayout>
-        </Route>
-        <Route path="/admin/pages">
-          <AdminLayout><div className="p-20 text-center"><h2 className="text-3xl font-serif font-bold">Store Pages <span className="text-primary italic">Coming Soon</span></h2></div></AdminLayout>
-        </Route>
-        <Route path="/admin/customers">
-          <AdminLayout><div className="p-20 text-center"><h2 className="text-3xl font-serif font-bold">Customer Management <span className="text-primary italic">Coming Soon</span></h2></div></AdminLayout>
-        </Route>
-        <Route path="/admin/emails">
-          <AdminLayout><div className="p-20 text-center"><h2 className="text-3xl font-serif font-bold">Email Communications <span className="text-primary italic">Coming Soon</span></h2></div></AdminLayout>
-        </Route>
+
 
         {/* Public Routes */}
         <Route path="/">

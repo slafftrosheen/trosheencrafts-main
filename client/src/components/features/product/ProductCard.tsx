@@ -4,6 +4,7 @@ import { Link } from 'wouter';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useLanguage } from '@/lib/LanguageContext';
 
 interface ProductCardProps {
   id: number;
@@ -16,6 +17,7 @@ interface ProductCardProps {
 
 export function ProductCard({ id, name, price, image, category, isHandmade }: ProductCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <Link href={`/shop/${id}`}>
@@ -35,6 +37,8 @@ export function ProductCard({ id, name, price, image, category, isHandmade }: Pr
               src={image}
               alt={name}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
               animate={{
                 scale: isHovered ? 1.08 : 1,
               }}
@@ -51,7 +55,7 @@ export function ProductCard({ id, name, price, image, category, isHandmade }: Pr
           <div className="absolute top-4 left-4 z-20 flex flex-col gap-2">
             {isHandmade && (
               <Badge variant="secondary" className="bg-background/80 backdrop-blur-md text-foreground shadow-sm font-medium tracking-wide">
-                Handmade by Oleg
+                {t("product_handmade_badge")}
               </Badge>
             )}
           </div>
@@ -63,7 +67,7 @@ export function ProductCard({ id, name, price, image, category, isHandmade }: Pr
              {/* Note: In a real implementation this might be a stopPropagation button to add to cart directly */}
              <div className="translate-y-4 group-hover:translate-y-0 transition-all duration-300">
                <span className="bg-primary text-primary-foreground px-6 py-3 rounded-full font-bold flex items-center gap-2 shadow-xl shadow-black/20">
-                 View Piece
+                 {t("product_view_piece")}
                </span>
              </div>
           </motion.div>

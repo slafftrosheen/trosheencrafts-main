@@ -205,3 +205,37 @@ export const promotions = pgTable('promotions', {
   activeIdx: index('promotions_active_idx').on(table.active),
   sortOrderIdx: index('promotions_sort_order_idx').on(table.sortOrder),
 }));
+
+// Constructor Config Options (Finishes, Waxes, Aromas)
+export const constructorOptions = pgTable('constructor_options', {
+  id: serial('id').primaryKey(),
+  type: text('type').notNull(), // 'finish', 'wax', 'aroma'
+  key: text('key').notNull().unique(), // e.g., 'white-stone', 'soy', 'lavender'
+  nameTranslations: jsonb('name_translations').notNull().$type<{
+    en: string;
+    lv?: string;
+    ru?: string;
+    pl?: string;
+    uk?: string;
+  }>(),
+  price: decimal('price', { precision: 10, scale: 2 }).notNull().default('0'),
+  color: text('color'), // for finish swatches (hex or gradient)
+  border: text('border'), // for finish swatch borders
+  imageUrl: text('image_url'), // for vessel images
+  descTranslations: jsonb('desc_translations').$type<{
+    en?: string;
+    lv?: string;
+    ru?: string;
+    pl?: string;
+    uk?: string;
+  }>(),
+  active: boolean('active').default(true),
+  sortOrder: integer('sort_order').default(0),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
+}, (table) => ({
+  typeIdx: index('constructor_options_type_idx').on(table.type),
+  keyIdx: uniqueIndex('constructor_options_key_idx').on(table.key),
+  activeIdx: index('constructor_options_active_idx').on(table.active),
+  sortOrderIdx: index('constructor_options_sort_order_idx').on(table.sortOrder),
+}));
