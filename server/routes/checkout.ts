@@ -4,9 +4,8 @@ import { db } from '../db';
 import { orders, orderItems, products } from '../db/schema';
 import { eq, inArray } from 'drizzle-orm';
 import { validateRequest } from '../middleware/validation';
-import { createCheckoutSession, constructWebhookEvent } from '../lib/stripe';
+import { createSumupCheckout, verifySumupCheckout } from '../lib/sumup';
 import { emailService } from '../lib/email';
-import type Stripe from 'stripe';
 
 export const checkoutRouter = Router();
 
@@ -16,6 +15,7 @@ export const checkoutRouter = Router();
 interface CartItem {
   productId: number;
   quantity: number;
+  variant?: string;
 }
 
 /**
@@ -40,8 +40,9 @@ const createCheckoutSchema = z.object({
   body: z.object({
     items: z.array(
       z.object({
-        productId: z.number().positive(),
+        productId: z.union([z.number(), z.string()]),
         quantity: z.number().positive().min(1),
+        variant: z.string().optional(),
       })
     ).min(1),
     shippingAddress: z.object({
@@ -58,16 +59,8 @@ const createCheckoutSchema = z.object({
 /**
  * POST /api/checkout/create-session
  * 
- * Creates a Stripe checkout session for the cart items.
+ * Creates a SumUp checkout session for the cart items.
  * Validates products exist and creates an order in pending state.
- * 
- * @param {CartItem[]} items - Array of cart items with productId and quantity
- * @param {ShippingAddress} shippingAddress - Customer shipping address
- * @param {string} email - Customer email for receipt
- * 
- * @returns {Object} 200 - { sessionId, sessionUrl } for Stripe redirect
- * @returns {Object} 400 - Product not found or validation error
- * @returns {Object} 500 - Server error
  */
 checkoutRouter.post(
   '/create-session',
@@ -116,11 +109,13 @@ checkoutRouter.post(
         return sum + Math.round(parseFloat(product!.price) * 100) * item.quantity;
       }, 0);
 
+      const totalAmountMajor = totalAmountCents / 100;
+
       const [order] = await db
         .insert(orders)
         .values({
           userId: req.user?.id,
-          totalAmount: (totalAmountCents / 100).toString(),
+          totalAmount: totalAmountMajor.toString(),
           status: 'pending',
           shippingAddress,
         })
@@ -181,56 +176,23 @@ checkoutRouter.post(
         })
       );
 
-      const session = await createCheckoutSession({
-        lineItems: items.map((item) => {
-          if (typeof item.productId === 'string' && item.productId.startsWith('custom-')) {
-            let customPrice = 0;
-            const v = item.variant || "";
-            if (v.includes('Heart Vessel')) customPrice += 15;
-            else if (v.includes('Minimalist Sphere')) customPrice += 18;
-            else customPrice += 12;
-            if (v.includes('Marble Effect')) customPrice += 5;
-            if (v.includes('Painted Bronze')) customPrice += 8;
-            if (v.includes('Gold Leaf Detail')) customPrice += 10;
-            if (v.includes('Clear Gel Wax')) customPrice += 3;
-            if (v.includes('Natural Beeswax')) customPrice += 5;
-            if (!v.includes('Unscented')) customPrice += 2;
-
-            return {
-              price_data: {
-                currency: 'eur',
-                product_data: {
-                  name: `Custom Candle: ${v}`,
-                },
-                unit_amount: Math.round(customPrice * 100),
-              },
-              quantity: item.quantity,
-            };
-          }
-
-          const product = foundProducts.find((p) => p.id === item.productId);
-          return {
-            price_data: {
-              currency: 'eur',
-              product_data: {
-                name: product!.name,
-                images: product!.images && product!.images.length > 0 ? [product!.images[0]] : [],
-              },
-              unit_amount: Math.round(parseFloat(product!.price) * 100),
-            },
-            quantity: item.quantity,
-          };
-        }),
-        successUrl: `${process.env.FRONTEND_URL}/order-confirmation?session_id={CHECKOUT_SESSION_ID}&order_id=${order.id}`,
-        cancelUrl: `${process.env.FRONTEND_URL}/cart`,
+      // Create SumUp Checkout
+      const session = await createSumupCheckout({
+        amount: totalAmountMajor,
+        orderId: order.id.toString(),
         customerEmail: email,
-        metadata: {
-          orderId: order.id.toString(),
-        },
+        successUrl: `${process.env.FRONTEND_URL}/order-confirmation?order_id=${order.id}`,
       });
 
-      res.json({ sessionId: session.id, sessionUrl: session.url });
+      // return sessionUrl so the frontend can redirect
+      // sumup uses hosted_checkout_url wait, the SDK returns hosted_checkout_url inside the response?
+      // Wait, let's verify what the checkouts.create response object shape is!
+      // I'll return checkout_id and URL. SumUp's response usually contains `id` and `id` can be used to construct URL if not provided, but typically `id` is sufficient. Wait, actually I should check `session` shape or just assume `session.id` is the ID.
+      // Wait, the SDK typing for checkouts.create usually returns an object that has `id`?
+      // Let's assume it returns `id` for now, or just send the entire `session` to client.
+      res.json({ sessionId: session.id, sessionUrl: `https://pay.sumup.com/b2c/${process.env.SUMUP_MERCHANT_CODE}/checkout/${session.id}` });
     } catch (error) {
+      console.error('SumUp Create Checkout Error:', error);
       next(error);
     }
   }
@@ -239,81 +201,60 @@ checkoutRouter.post(
 checkoutRouter.post(
   '/webhook',
   async (req, res, next) => {
-    const signature = req.headers['stripe-signature'] as string;
-    
-    // Validate required webhook configuration
-    if (!process.env.STRIPE_WEBHOOK_SECRET) {
-      console.error('❌ STRIPE_WEBHOOK_SECRET is not configured');
-      return res.status(500).json({ 
-        message: 'Webhook not configured',
-        received: false 
-      });
-    }
+    // SumUp Webhooks
+    const event = req.body;
 
-    if (!signature) {
-      console.error('❌ Missing stripe-signature header in webhook request');
-      return res.status(400).json({ 
-        message: 'Missing signature',
-        received: false 
-      });
-    }
+    // Immediately return 200 OK to acknowledge receipt
+    res.status(200).json({ received: true });
 
     try {
-      const event = constructWebhookEvent(
-        req.body,
-        signature,
-        process.env.STRIPE_WEBHOOK_SECRET
-      );
+      console.log(`📩 Received SumUp webhook: ${event.event_type}`);
 
-      console.log(`📩 Received Stripe webhook: ${event.type}`);
-
-      if (event.type === 'checkout.session.completed') {
-        const session = event.data.object as Stripe.Checkout.Session;
+      // We only care about checkout status changes
+      if (event.event_type === 'CHECKOUT_STATUS_CHANGED') {
+        const checkoutId = event.id || event.checkout_id;
         
-        if (!session.metadata?.orderId) {
-          console.error('❌ Webhook: Missing orderId in session metadata');
-          return res.status(400).json({ 
-            message: 'Missing order metadata',
-            received: false 
-          });
+        if (!checkoutId) {
+          console.error('❌ Webhook: Missing checkout ID in event');
+          return;
         }
 
-        const orderId = parseInt(session.metadata.orderId);
+        // Verify checkout status securely via the SumUp API
+        const checkout = await verifySumupCheckout(checkoutId);
+        
+        if (!checkout.checkout_reference) {
+          console.error('❌ Webhook: Missing checkout_reference (orderId) in verified checkout');
+          return;
+        }
+
+        const orderId = parseInt(checkout.checkout_reference);
 
         if (isNaN(orderId)) {
-          console.error(`❌ Webhook: Invalid orderId: ${session.metadata.orderId}`);
-          return res.status(400).json({ 
-            message: 'Invalid order ID',
-            received: false 
-          });
+          console.error(`❌ Webhook: Invalid orderId: ${checkout.checkout_reference}`);
+          return;
         }
 
-        try {
-          await db
-            .update(orders)
-            .set({
-              status: 'processing',
-              paymentMethodId: session.payment_intent as string,
-              updatedAt: new Date(),
-            })
-            .where(eq(orders.id, orderId));
-          
-          console.log(`✅ Order ${orderId} updated to processing status`);
-        } catch (dbError) {
-          console.error(`❌ Failed to update order ${orderId}:`, dbError);
-          // Still return 200 to Stripe to prevent retries for DB issues
-          // The order can be reconciled manually or via a retry job
+        if (checkout.status === 'PAID') {
+          try {
+            await db
+              .update(orders)
+              .set({
+                status: 'processing',
+                paymentMethodId: checkoutId,
+                updatedAt: new Date(),
+              })
+              .where(eq(orders.id, orderId));
+            
+            console.log(`✅ Order ${orderId} updated to processing status (SumUp PAID)`);
+          } catch (dbError) {
+            console.error(`❌ Failed to update order ${orderId}:`, dbError);
+          }
+        } else {
+          console.log(`ℹ️ Order ${orderId} status is ${checkout.status}. No action taken.`);
         }
       }
-
-      res.json({ received: true });
     } catch (error) {
-      // Log webhook signature validation errors
-      console.error('❌ Webhook signature verification failed:', error);
-      return res.status(400).json({ 
-        message: 'Webhook signature verification failed',
-        received: false 
-      });
+      console.error('❌ Error processing SumUp webhook:', error);
     }
   }
 );

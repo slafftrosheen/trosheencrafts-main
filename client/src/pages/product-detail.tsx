@@ -8,6 +8,9 @@ import { ShoppingCart, ArrowLeft, Check, Package } from 'lucide-react';
 import { Link } from 'wouter';
 import { useLanguage } from '@/lib/LanguageContext';
 import { OptimizedImage } from '@/components/shared/OptimizedImage';
+import { useColor } from 'color-thief-react';
+import { motion } from 'framer-motion';
+import { MagneticButton } from '@/components/shared/MagneticButton';
 
 export default function ProductDetail() {
   const [, params] = useRoute('/shop/:id');
@@ -20,6 +23,9 @@ export default function ProductDetail() {
     queryFn: () => apiClient.get<any>(`/products/${id}`),
     enabled: !!id,
   });
+
+  const mainImage = product?.images?.[0] || product?.image || '';
+  const { data: dominantColor } = useColor(mainImage, 'hex', { crossOrigin: 'anonymous' });
 
   if (isLoading) return <PageLoader />;
   
@@ -53,14 +59,21 @@ export default function ProductDetail() {
       id: product.id,
       name: name,
       price: price,
-      image: product.images?.[0] || product.image,
+      image: mainImage,
     });
     toast.success(t("product.added_to_cart"));
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      {/* Dynamic Ambient Background Glow */}
+      <motion.div 
+        className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-20 pointer-events-none mix-blend-screen"
+        animate={{ backgroundColor: dominantColor || 'hsl(var(--primary))' }}
+        transition={{ duration: 1.5 }}
+      />
+      
+      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
         <Link href="/shop">
           <Button variant="ghost" className="mb-8 rounded-full font-bold">
             <ArrowLeft className="mr-2 h-4 w-4" />
@@ -132,15 +145,17 @@ export default function ProductDetail() {
               </p>
             </div>
 
-            <Button
-              size="lg"
-              onClick={handleAddToCart}
-              disabled={product.inStock === false}
-              className="w-full h-20 rounded-3xl font-bold text-2xl shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02]"
-            >
-              <ShoppingCart className="mr-3 h-7 w-7" />
-              {t("product.add_to_cart")}
-            </Button>
+            <MagneticButton strength={15}>
+              <Button
+                size="lg"
+                onClick={handleAddToCart}
+                disabled={product.inStock === false}
+                className="w-full h-20 rounded-3xl font-bold text-2xl shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02]"
+              >
+                <ShoppingCart className="mr-3 h-7 w-7" />
+                {t("product.add_to_cart")}
+              </Button>
+            </MagneticButton>
 
             {product.metadata && Object.keys(product.metadata).length > 0 && (
               <div className="pt-8 border-t-2 border-border/40">

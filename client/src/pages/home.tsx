@@ -10,6 +10,7 @@ import { haptics } from '@/lib/haptics';
 
 import { NewsletterSubscribe } from '@/components/NewsletterSubscribe';
 import { PromotionalGallery } from '@/components/PromotionalGallery';
+import { MagneticButton } from '@/components/shared/MagneticButton';
 
 const chapters = [
   {
@@ -71,10 +72,19 @@ export default function HomePage() {
   const [active, setActive] = useState<typeof chapters[number]["id"]>("heritage");
   const reduceMotion = useReducedMotion();
   const heroRef = useRef(null);
+  const targetRef = useRef(null);
+  
   const { scrollYProgress } = useScroll();
   const scale = useTransform(scrollYProgress, [0, 0.2], [1, 1.1]);
   const y = useTransform(scrollYProgress, [0, 0.5], [0, 200]);
   const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+
+  const { scrollYProgress: storyScrollProgress } = useScroll({
+    target: targetRef,
+  });
+  // Transform scroll progress into horizontal movement
+  // Move x from 0% to a negative percentage calculated based on the number of cards
+  const storyX = useTransform(storyScrollProgress, [0, 1], ["0%", "-60%"]);
 
   const activeChapter = useMemo(
     () => chapters.find((c) => c.id === active) ?? chapters[0],
@@ -182,12 +192,14 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 1 }}
               className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 justify-center md:justify-start"
             >
-              <Button size="lg" particles particleCount={20} className="rounded-full px-8 sm:px-12 text-base sm:text-lg h-14 sm:h-16 shadow-2xl shadow-primary/30 group/hero-btn w-full sm:w-auto" asChild>
-                <a href="#story">
-                  {t("hero_cta_primary")}
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover/hero-btn:translate-x-1" />
-                </a>
-              </Button>
+              <MagneticButton strength={40}>
+                <Button size="lg" particles particleCount={20} className="rounded-full px-8 sm:px-12 text-base sm:text-lg h-14 sm:h-16 shadow-2xl shadow-primary/30 group/hero-btn w-full sm:w-auto" asChild>
+                  <a href="#story">
+                    {t("hero_cta_primary")}
+                    <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 transition-transform group-hover/hero-btn:translate-x-1" />
+                  </a>
+                </Button>
+              </MagneticButton>
               <Button size="lg" variant="outline" particles particleCount={15} className="rounded-full px-8 sm:px-12 text-base sm:text-lg h-14 sm:h-16 bg-background/20 backdrop-blur-xl border-white/20 hover:bg-white/10 transition-all w-full sm:w-auto" asChild>
                 <Link href="/shop">{t("hero_cta_secondary")}</Link>
               </Button>
@@ -357,113 +369,52 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* DESKTOP: Two-column layout (hidden on mobile) */}
-        <div className="hidden lg:grid lg:grid-cols-2 gap-24 xl:gap-32 items-start">
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            className="sticky top-32"
-          >
-            {/* Desktop Chapter Navigation */}
-            <div className="grid gap-3">
-              {chapters.map((chapter) => (
-                <button
+        {/* DESKTOP: Horizontal Scroll Timeline (hidden on mobile) */}
+        <div className="hidden lg:block h-[300vh] relative" ref={targetRef}>
+          <div className="sticky top-0 h-screen flex items-center overflow-hidden bg-background">
+            <motion.div style={{ x: storyX }} className="flex gap-16 px-[10vw]">
+              {chapters.map((chapter, index) => (
+                <div 
                   key={chapter.id}
-                  onClick={() => setActive(chapter.id)}
-                  className={cn(
-                    "group text-left p-6 rounded-[2rem] transition-all duration-500 border-2 relative overflow-hidden",
-                    active === chapter.id 
-                      ? "bg-card border-primary/30 concrete-shadow scale-[1.02]" 
-                      : "border-transparent opacity-60 hover:opacity-100 hover:bg-card/40"
-                  )}
+                  className="w-[60vw] max-w-4xl shrink-0 flex items-center gap-16"
                 >
-                  {active === chapter.id && (
-                    <motion.div 
-                      layoutId="active-bg-desktop"
-                      className="absolute inset-0 bg-primary/5 -z-10"
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                    />
-                  )}
-                  <div className="flex items-center gap-5">
-                    <motion.div 
-                      animate={active === chapter.id ? { scale: [1, 1.1, 1] } : {}}
-                      className={cn(
-                        "w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-md flex-shrink-0",
-                        active === chapter.id ? "bg-primary text-white" : "bg-muted text-muted-foreground"
-                      )}
-                    >
-                      <chapter.icon className="w-7 h-7" strokeWidth={1.5} />
-                    </motion.div>
-                    <div className="min-w-0 flex-1">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary mb-1 block">{t(chapter.eyebrowKey)}</span>
-                      <h3 className="font-serif text-2xl font-bold tracking-tight">{t(chapter.titleKey)}</h3>
+                  <div className="w-1/2 space-y-8">
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                        <chapter.icon className="w-8 h-8" strokeWidth={1.5} />
+                      </div>
+                      <span className="text-xs font-black uppercase tracking-[0.2em] text-primary">0{index + 1} // {t(chapter.eyebrowKey)}</span>
+                    </div>
+                    
+                    <h3 className="font-serif text-5xl font-bold tracking-tight leading-[1.1]">
+                      {t(chapter.titleKey)}
+                    </h3>
+                    
+                    <div className="space-y-6 text-xl leading-relaxed text-muted-foreground font-medium">
+                      {t(chapter.bodyKey).split("\n").filter(Boolean).map((p, i) => <p key={`${chapter.id}-desktop-para-${i}`}>{p}</p>)}
                     </div>
                   </div>
-                </button>
-              ))}
-            </div>
-          </motion.div>
 
-          {/* Desktop Story Content Panel */}
-          <div className="space-y-20">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-                className="space-y-12"
-              >
-                {/* Image with quote overlay */}
-                <div className="aspect-[4/5] rounded-[3rem] overflow-hidden concrete-shadow group relative">
-                  <motion.img 
-                    src={activeChapter.image} 
-                    alt={activeChapter.id} 
-                    className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105" 
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <motion.div 
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                    className="absolute bottom-10 left-10 right-10"
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-px bg-primary" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{t("workshop_insight")}</span>
+                  <div className="w-1/2 aspect-[4/5] rounded-[3rem] overflow-hidden concrete-shadow relative group">
+                    <img 
+                      src={chapter.image} 
+                      alt={chapter.id} 
+                      className="w-full h-full object-cover transition-transform duration-[2000ms] group-hover:scale-105" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-10 left-10 right-10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-px bg-primary" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">{t("workshop_insight")}</span>
+                      </div>
+                      <p className="text-white text-lg font-serif italic font-medium leading-relaxed">
+                        {chapter.id === 'makers' ? t("story.makers.quote") : t("story.default.quote")}
+                      </p>
                     </div>
-                    <p className="text-white text-lg lg:text-xl font-serif italic font-medium leading-relaxed">
-                      {activeChapter.id === 'makers' ? t("story.makers.quote") : t("story.default.quote")}
-                    </p>
-                  </motion.div>
+                  </div>
                 </div>
-                
-                {/* Story body text */}
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="space-y-8 text-xl leading-[1.7] text-muted-foreground font-medium"
-                >
-                  {t(activeChapter.bodyKey).split("\n").filter(Boolean).map((p, i) => <p key={`${activeChapter.id}-desktop-para-${i}`}>{p}</p>)}
-                </motion.div>
-                
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                  className="pt-8 border-t border-border/40"
-                >
-                  <Link href="/shop">
-                    <Button variant="link" className="text-primary p-0 font-black h-auto text-xl group/btn uppercase tracking-tight">
-                      {t("explore_collections")} <ArrowRight className="ml-3 w-6 h-6 transition-transform group-hover/btn:translate-x-2" />
-                    </Button>
-                  </Link>
-                </motion.div>
-              </motion.div>
-            </AnimatePresence>
+              ))}
+            </motion.div>
           </div>
         </div>
       </section>
@@ -654,9 +605,11 @@ export default function HomePage() {
                <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground leading-relaxed font-medium">{t("shop_teaser_desc")}</p>
             </div>
             <Link href="/shop">
-               <Button size="lg" particles particleCount={15} className="rounded-full px-8 sm:px-10 md:px-12 h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg font-black uppercase tracking-wider shadow-2xl shadow-primary/40 transition-all w-full md:w-auto">
-                  {t("shop_view_all")} <ArrowRight className="ml-2 sm:ml-3 md:ml-4 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-               </Button>
+               <MagneticButton strength={30}>
+                 <Button size="lg" particles particleCount={15} className="rounded-full px-8 sm:px-10 md:px-12 h-12 sm:h-14 md:h-16 text-sm sm:text-base md:text-lg font-black uppercase tracking-wider shadow-2xl shadow-primary/40 transition-all w-full md:w-auto">
+                    {t("shop_view_all")} <ArrowRight className="ml-2 sm:ml-3 md:ml-4 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                 </Button>
+               </MagneticButton>
             </Link>
          </div>
 

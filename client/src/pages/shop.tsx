@@ -7,6 +7,7 @@ import { Spinner } from '@/components/shared/LoadingStates';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Package, MoveRight } from 'lucide-react';
 import { useState } from 'react';
+import { MagneticButton } from '@/components/shared/MagneticButton';
 
 export default function ShopPage() {
   const { t, language } = useLanguage();
@@ -116,9 +117,11 @@ export default function ShopPage() {
                   <p className="text-xl text-muted-foreground font-medium mb-10 max-w-md mx-auto leading-relaxed relative z-10">
                     {t("shop_empty_desc")}
                   </p>
-                  <button onClick={() => setActiveTab('custom')} className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold hover:gap-5 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 relative z-10">
-                    {t("shop_enter_workshop")} <MoveRight className="w-5 h-5" />
-                  </button>
+                  <MagneticButton strength={25}>
+                    <button onClick={() => setActiveTab('custom')} className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold hover:gap-5 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 relative z-10">
+                      {t("shop_enter_workshop")} <MoveRight className="w-5 h-5" />
+                    </button>
+                  </MagneticButton>
                 </div>
               )}
             </motion.div>

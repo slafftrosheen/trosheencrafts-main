@@ -7,9 +7,9 @@ const envSchema = z.object({
   DATABASE_URL: z.string(),
   REDIS_URL: z.string().optional(),
   SESSION_SECRET: z.string(),
-  // Stripe is the only external service
-  STRIPE_SECRET_KEY: z.string().optional(),
-  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+  // SumUp is the primary payment gateway
+  SUMUP_API_KEY: z.string().optional(),
+  SUMUP_MERCHANT_CODE: z.string().optional(),
   // Email configuration (local SMTP)
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.string().optional(),

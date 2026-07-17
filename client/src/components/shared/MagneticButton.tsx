@@ -1,37 +1,32 @@
-import { useRef, useState, MouseEvent, ReactNode } from 'react';
+import { useRef, useState, ReactElement, cloneElement } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
 
 interface MagneticButtonProps {
-  children: ReactNode;
+  children: ReactElement;
   strength?: number;
-  className?: string;
-  onClick?: () => void;
 }
 
-export function MagneticButton({
-  children,
-  strength = 0.3,
-  className = '',
-  onClick
-}: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null);
+export function MagneticButton({ children, strength = 40 }: MagneticButtonProps) {
+  const ref = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
+  const springConfig = { damping: 15, stiffness: 150, mass: 0.1 };
 
-  const x = useSpring(0, { stiffness: 300, damping: 20 });
-  const y = useSpring(0, { stiffness: 300, damping: 20 });
+  const x = useSpring(0, springConfig);
+  const y = useSpring(0, springConfig);
 
-  const handleMouseMove = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!ref.current) return;
 
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current.getBoundingClientRect();
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
 
-    const distanceX = (e.clientX - centerX) * strength;
-    const distanceY = (e.clientY - centerY) * strength;
+    const distanceX = clientX - centerX;
+    const distanceY = clientY - centerY;
 
-    x.set(distanceX);
-    y.set(distanceY);
+    x.set((distanceX / width) * strength);
+    y.set((distanceY / height) * strength);
   };
 
   const handleMouseLeave = () => {
@@ -41,17 +36,16 @@ export function MagneticButton({
   };
 
   return (
-    <motion.button
+    <motion.div
       ref={ref}
-      className={className}
-      style={{ x, y }}
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      whileTap={{ scale: 0.95 }}
+      style={{ x, y }}
+      className="inline-block"
+      data-magnetic="true"
     >
       {children}
-    </motion.button>
+    </motion.div>
   );
 }

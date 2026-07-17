@@ -16,8 +16,6 @@ $npmExe = 'C:\Users\Slaff\AppData\Local\hermes\node\npm.cmd'
 $supabaseExe = 'C:\Users\Slaff\AppData\Local\hermes\node\supabase.cmd'
 $appServer = Join-Path $project 'dist\index.cjs'
 $dockerExe = 'C:\Program Files\Docker\Docker\Docker Desktop.exe'
-$cloudflaredImage = 'cloudflare/cloudflared:latest'
-$tunnelName = 'cloudflared'
 
 if (-not (Test-Path $logDir)) {
     New-Item -Path $logDir -ItemType Directory | Out-Null
@@ -159,99 +157,47 @@ if (Test-Path $envFile) {
     }
 }
 
-# Force production mode so the launched Node process always serves the SPA
-[System.Environment]::SetEnvironmentVariable('NODE_ENV', 'production', 'Process')
-
 # -------------------------------
-# 4. Start app server
+# 4. Start App and Cloudflare via Docker Compose
 # -------------------------------
-Write-Log 'Step 4: Starting app server...'
+Write-Log 'Step 4: Starting Docker Compose (App, Nginx, Cloudflared)...'
 
-$runtimeNodeEnv = [System.Environment]::GetEnvironmentVariable('NODE_ENV', 'Process')
-if (-not $runtimeNodeEnv) {
-    [System.Environment]::SetEnvironmentVariable('NODE_ENV', 'production', 'Process')
-}
-
-if (-not (Test-Path $appServer)) {
-    Write-Log 'Server build not found. Running build...'
-    if (Test-Path $npmExe) {
-        Push-Location $project
-        try {
-            & $npmExe run build 2>&1 | Out-Null
-            Write-Log 'Build complete.'
-        } catch {
-            Write-Log "Build failed: $_"
-        } finally {
-            Pop-Location
-        }
-    } else {
-        Write-Log 'npm missing; cannot rebuild.'
-    }
-}
-
-$nodeStdOut = Join-Path $logDir 'server_stdout.log'
-$nodeStdErr = Join-Path $logDir 'server_stderr.log'
-if (Test-Path $nodeStdOut) { Remove-Item $nodeStdOut -Force -ErrorAction SilentlyContinue }
-if (Test-Path $nodeStdErr) { Remove-Item $nodeStdErr -Force -ErrorAction SilentlyContinue }
-
-$serverProcess = $null
+Push-Location $project
 try {
-    $serverProcess = Start-Process -FilePath $nodeExe -ArgumentList $appServer -WindowStyle Hidden -RedirectStandardOutput $nodeStdOut -RedirectStandardError $nodeStdErr -PassThru
-    Write-Log "Started Node server with PID $($serverProcess.Id)"
-} catch {
-    Write-Log "Failed to start Node server: $_"
-}
-
-if ($null -ne $serverProcess) {
-    Start-Sleep -Seconds 8
-    $listener = $null
-    try {
-        $listener = Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue
-    } catch {}
-
-    if ($null -ne $listener) {
-        Write-Log 'Server is listening on port 5000.'
-        try {
-            $response = Invoke-WebRequest -Uri 'http://localhost:5000/' -UseBasicParsing -TimeoutSec 15
-            Set-Content -Path $statusCodeFile -Value $response.StatusCode
-            Write-Log "Server HTTP status: $($response.StatusCode)"
-        } catch {
-            Set-Content -Path $statusCodeFile -Value '000'
-            Write-Log "Server HTTP check failed: $_"
-        }
+    $proc = Start-Process -FilePath "docker" -ArgumentList "compose","up","-d","--build" -Wait -NoNewWindow -PassThru
+    if ($proc.ExitCode -eq 0) {
+        Write-Log 'Docker Compose started successfully.'
     } else {
-        Write-Log 'Server is NOT listening on port 5000.'
-        try {
-            $tail = Get-Content -Path $serverLog -ErrorAction SilentlyContinue | Select-Object -Last 100
-            if ($tail) {
-                "--- server.log tail ---" | Add-Content -Path $bootLog
-                $tail | Add-Content -Path $bootLog
-            }
-        } catch {}
-        Set-Content -Path $statusCodeFile -Value '000'
+        Write-Log "Docker Compose error output with exit code $($proc.ExitCode)"
     }
+} catch {
+    Write-Log "Docker Compose threw exception: $_"
+} finally {
+    Pop-Location
 }
 
 # -------------------------------
-# 5. Start Cloudflare Tunnel
+# 5. Check if service is listening locally (optional health check)
 # -------------------------------
-Write-Log 'Step 5: Starting Cloudflare Tunnel...'
+Start-Sleep -Seconds 8
+$listener = $null
+try {
+    $listener = Get-NetTCPConnection -LocalPort 5000 -State Listen -ErrorAction SilentlyContinue
+} catch {}
 
-if (-not (Test-Path env:\CF_TUNNEL_TOKEN)) {
-    Write-Log 'CF_TUNNEL_TOKEN environment variable is not set. Skipping tunnel.'
-    "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') Missing CF_TUNNEL_TOKEN; tunnel not started." | Add-Content -Path $bootLog
-} else {
-    $token = $env:CF_TUNNEL_TOKEN
+if ($null -ne $listener) {
+    Write-Log 'Server container is listening on port 5000.'
     try {
-        $dockerRun = Start-Process -FilePath 'docker' -ArgumentList @('run','-d','--rm','--name',$tunnelName,'--network','host',$cloudflaredImage,'tunnel','--no-autoupdate','run','--token',$token) -PassThru -NoNewWindow
-        if ($dockerRun.ExitCode -eq 0) {
-            Write-Log "Cloudflare tunnel container started as: $tunnelName"
-        } else {
-            Write-Log "Cloudflare tunnel docker run failed with exit code $($dockerRun.ExitCode)"
-        }
+        $response = Invoke-WebRequest -Uri 'http://localhost:5000/' -UseBasicParsing -TimeoutSec 15
+        Set-Content -Path $statusCodeFile -Value $response.StatusCode
+        Write-Log "Server HTTP status: $($response.StatusCode)"
     } catch {
-        Write-Log "Cloudflare tunnel error: $_"
+        Set-Content -Path $statusCodeFile -Value '000'
+        Write-Log "Server HTTP check failed: $_"
     }
+} else {
+    Write-Log 'WARNING: Port 5000 is not listening yet. Check Docker logs.'
+    Set-Content -Path $statusCodeFile -Value '000'
 }
 
 Write-Log '=== Trosheen Crafts Boot Sequence Complete ==='

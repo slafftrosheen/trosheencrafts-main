@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
+import { AnimatePresence } from 'framer-motion';
 import { Navigation } from './Navigation';
 import { MobileNavigation } from './MobileNavigation';
 import { Footer } from './Footer';
 import { NetworkStatus } from './NetworkStatus';
 import { ParticleSystem } from '@/components/effects/ParticleSystem';
+import { PageTransition } from './PageTransition';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { cn } from '@/lib/utils';
 
@@ -52,7 +54,11 @@ export function Layout({ children }: LayoutProps) {
           isMobile && "pb-16"
         )}
       >
-        {children}
+        <AnimatePresence mode="wait">
+          <PageTransition key={location}>
+            {children}
+          </PageTransition>
+        </AnimatePresence>
       </main>
 
       <Footer />

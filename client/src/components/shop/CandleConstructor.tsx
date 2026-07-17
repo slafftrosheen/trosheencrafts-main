@@ -11,7 +11,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { apiClient } from '@/lib/apiClient';
 
-interface ConstructorOption {
+import { CandlePreview3D } from './CandlePreview3D';
+
+export interface ConstructorOption {
   id: number;
   type: string;
   key: string;
@@ -26,6 +28,7 @@ interface ConstructorOption {
 export function CandleConstructor() {
   const { t, language } = useLanguage();
   const addItem = useCartStore((state) => state.addItem);
+  const [show3D, setShow3D] = useState(true);
 
   const { data: optionsData, isLoading } = useQuery<Record<string, ConstructorOption[]>>({
     queryKey: ['constructorOptions'],
@@ -101,27 +104,42 @@ export function CandleConstructor() {
           <div className="w-3/4 h-3/4 bg-primary/5 rounded-full blur-[100px]" />
         </div>
 
+        <div className="absolute top-6 right-6 z-20">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="rounded-full bg-background/50 backdrop-blur"
+            onClick={() => setShow3D(!show3D)}
+          >
+            {show3D ? 'View 2D' : 'View 3D'}
+          </Button>
+        </div>
+
         <motion.div 
-          className="relative z-10 w-full max-w-[350px] aspect-square flex items-center justify-center"
+          className="relative z-10 w-full max-w-[400px] aspect-square flex items-center justify-center"
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         >
           <AnimatePresence mode="wait">
             <motion.div
-              key={shape.id}
-              initial={{ opacity: 0, y: 20, rotate: -5 }}
+              key={show3D ? '3d' : shape.id}
+              initial={{ opacity: 0, y: 20, rotate: show3D ? 0 : -5 }}
               animate={{ opacity: 1, y: 0, rotate: 0 }}
-              exit={{ opacity: 0, y: -20, rotate: 5 }}
+              exit={{ opacity: 0, y: -20, rotate: show3D ? 0 : 5 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-full h-full drop-shadow-2xl hover:scale-105 transition-transform duration-700 cursor-grab active:cursor-grabbing"
+              className="w-full h-full drop-shadow-2xl transition-transform duration-700"
             >
-              {shape.imageUrl && (
-                <OptimizedImage
-                  src={shape.imageUrl}
-                  alt={getTranslatedName(shape)}
-                  className="w-full h-full object-contain filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)]"
-                />
+              {show3D ? (
+                <CandlePreview3D shapeKey={shape.key} colorHex={finish.color || '#e0d8cc'} />
+              ) : (
+                shape.imageUrl && (
+                  <OptimizedImage
+                    src={shape.imageUrl}
+                    alt={getTranslatedName(shape)}
+                    className="w-full h-full object-contain filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)]"
+                  />
+                )
               )}
             </motion.div>
           </AnimatePresence>
