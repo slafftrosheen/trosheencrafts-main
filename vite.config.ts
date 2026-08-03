@@ -8,10 +8,12 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-  ],  resolve: {
+  ],
+  resolve: {
     alias: {
       '@': path.resolve(__dirname, './client/src'),
     },
+    dedupe: ['react', 'react-dom'],
   },
   build: {
     outDir: '../dist/public',

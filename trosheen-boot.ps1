@@ -42,6 +42,7 @@ Write-Log 'Step 1: Ensuring Docker Desktop is available...'
 $dockerReady = $false
 $maxDockerWaitSeconds = 600
 $dockerWaitStart = Get-Date
+$dockerLaunchAttempted = $false
 
 while (-not $dockerReady) {
     try {
@@ -53,23 +54,24 @@ while (-not $dockerReady) {
         }
     } catch {}
 
-    if ((New-TimeSpan -Start $dockerWaitStart -End (Get-Date)).TotalSeconds -gt $maxDockerWaitSeconds) {
-        Write-Log 'Docker Desktop did not become ready in time. Launching Docker Desktop...'
+    if (-not $dockerLaunchAttempted) {
+        Write-Log 'Docker Desktop is not ready. Launching Docker Desktop...'
         if (Test-Path $dockerExe) {
             Start-Process -FilePath $dockerExe
-            Start-Sleep -Seconds 2
         } else {
             Write-Log "ERROR: Docker Desktop executable not found at: $dockerExe"
         }
+        $dockerLaunchAttempted = $true
+        Start-Sleep -Seconds 5
+    }
+
+    if ((New-TimeSpan -Start $dockerWaitStart -End (Get-Date)).TotalSeconds -gt $maxDockerWaitSeconds) {
+        Write-Log 'CRITICAL: Docker Desktop did not become ready in time. Aborting boot sequence.'
+        exit 1
     }
 
     Write-Log 'Waiting for Docker to become ready...'
     Start-Sleep -Seconds 10
-}
-
-if (-not $dockerReady) {
-    Write-Log 'CRITICAL: Docker Desktop is not available after extended wait. Aborting boot sequence.'
-    exit 1
 }
 
 "$(Get-Date -Format 'yyyy-MM-dd HH:mm:ss') Docker Desktop confirmed ready." | Add-Content -Path $dockerLog
