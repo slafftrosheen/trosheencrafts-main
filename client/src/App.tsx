@@ -91,7 +91,6 @@ function Router() {
           <AdminLayout><AdminCategories /></AdminLayout>
         </Route>
 
-
         {/* Public Routes */}
         <Route path="/">
           <Layout><Home /></Layout>
@@ -150,16 +149,12 @@ function Router() {
   );
 }
 
-import { ReactLenis } from '@studio-freight/react-lenis';
-import { CustomCursor } from '@/components/shared/CustomCursor';
-
 import { Preloader } from '@/components/shared/Preloader';
 
 function App() {
   return (
-    <ReactLenis root>
+    <>
       <Preloader />
-      <CustomCursor />
       <ErrorBoundary>
         <QueryClientProvider client={queryClient}>
           <LanguageProvider>
@@ -168,7 +163,7 @@ function App() {
           </LanguageProvider>
         </QueryClientProvider>
       </ErrorBoundary>
-    </ReactLenis>
+    </>
   );
 }
 
