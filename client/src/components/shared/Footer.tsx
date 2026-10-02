@@ -5,10 +5,19 @@ import { BrandAssets } from "@/lib/imageAssets";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
 
+const withdrawalLabels: Record<string, string> = {
+  en: "Withdraw from contract",
+  lv: "Atteikties no līguma",
+  ru: "Отказаться от договора",
+  pl: "Odstąp od umowy",
+  uk: "Відмовитися від договору",
+};
+
 export function Footer() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const config = useSiteConfig();
   const currentYear = new Date().getFullYear();
+  const withdrawalLabel = withdrawalLabels[language] || withdrawalLabels.en;
 
   const socialLinks = [
     { Icon: Instagram, href: config.social.instagram, label: "Instagram" },
@@ -94,7 +103,7 @@ export function Footer() {
         <div className="mt-14 flex flex-col gap-5 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>© {currentYear} Trosheen.Crafts · Daugavpils, Latvia</p>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <Link href="/withdrawal" className="font-semibold text-foreground hover:text-primary">Withdraw from contract</Link>
+            <Link href="/withdrawal" className="font-semibold text-foreground hover:text-primary">{withdrawalLabel}</Link>
             <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
             <Link href="/terms" className="hover:text-foreground">Terms</Link>
             <Link href="/cookies" className="hover:text-foreground">Cookies</Link>
