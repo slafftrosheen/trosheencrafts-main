@@ -42,61 +42,6 @@ export function useProduct(id: number, options?: Partial<UseQueryOptions<Product
   });
 }
 
-// Orders
-export interface Order {
-  id: number;
-  userId?: number;
-  items: Array<{
-    productId: number;
-    quantity: number;
-    price: number;
-  }>;
-  totalAmount: number;
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  shippingAddress: {
-    name: string;
-    street: string;
-    city: string;
-    postalCode: string;
-    country: string;
-  };
-  createdAt: string;
-  updatedAt: string;
-}
-
-export function useOrder(id: string, options?: Partial<UseQueryOptions<Order, ApiClientError>>) {
-  return useQuery<Order, ApiClientError>({
-    queryKey: ['orders', id],
-    queryFn: () => apiClient.get<Order>(`/orders/${id}`),
-    enabled: !!id,
-    ...options,
-  });
-}
-
-export interface CreateOrderInput {
-  items: Array<{
-    productId: number;
-    quantity: number;
-  }>;
-  shippingAddress: Order['shippingAddress'];
-  paymentMethodId?: string;
-}
-
-export function useCreateOrder(
-  options?: UseMutationOptions<Order, ApiClientError, CreateOrderInput>
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<Order, ApiClientError, CreateOrderInput>({
-    mutationFn: (data) => apiClient.post<Order>('/orders', data),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
-      toast.success('Order placed successfully!');
-    },
-    ...options,
-  });
-}
-
 // Blog Posts
 export interface BlogPost {
   id: number;
@@ -109,6 +54,8 @@ export interface BlogPost {
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
+  titleTranslations?: Record<string, string>;
+  excerptTranslations?: Record<string, string>;
 }
 
 export function useBlogPosts(options?: Partial<UseQueryOptions<BlogPost[], ApiClientError>>) {

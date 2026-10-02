@@ -1,46 +1,52 @@
-import { SumUp } from '@sumup/sdk';
+import { SumUp } from "@sumup/sdk";
 
 if (!process.env.SUMUP_API_KEY) {
-  console.warn('SUMUP_API_KEY is missing. SumUp payments will fail.');
+  console.warn("SUMUP_API_KEY is missing. SumUp payments will fail.");
 }
 
 if (!process.env.SUMUP_MERCHANT_CODE) {
-  console.warn('SUMUP_MERCHANT_CODE is missing. SumUp payments will fail.');
+  console.warn("SUMUP_MERCHANT_CODE is missing. SumUp payments will fail.");
 }
 
-// Initialize SumUp client
 export const sumupClient = new SumUp({
-  apiKey: process.env.SUMUP_API_KEY || 'dummy_key',
+  apiKey: process.env.SUMUP_API_KEY || "dummy_key",
 });
 
-/**
- * Creates a SumUp checkout session
- */
 export async function createSumupCheckout({
   amount,
   orderId,
-  customerEmail,
   successUrl,
+  callbackUrl,
 }: {
-  amount: number; // in major units, e.g. 25.00 for 25 EUR
+  amount: number;
   orderId: string;
-  customerEmail: string;
   successUrl: string;
+  callbackUrl?: string;
 }) {
-  return await sumupClient.checkouts.create({
+  const payload: any = {
     amount,
-    currency: 'EUR',
+    currency: "EUR",
     checkout_reference: orderId,
-    merchant_code: process.env.SUMUP_MERCHANT_CODE || 'dummy_merchant',
-    description: `Trosheen Crafts Order #${orderId}`,
-    return_url: successUrl,
-    pay_to_email: customerEmail,
-  });
+    merchant_code: process.env.SUMUP_MERCHANT_CODE || "dummy_merchant",
+    description: "Trosheen.Crafts order #" + orderId,
+    purpose: "CHECKOUT",
+    hosted_checkout: { enabled: true },
+    redirect_url: successUrl,
+  };
+
+  if (callbackUrl) {
+    payload.return_url = callbackUrl;
+  }
+
+  const checkout: any = await sumupClient.checkouts.create(payload);
+
+  if (!checkout?.id || !checkout?.hosted_checkout_url) {
+    throw new Error("SumUp did not return a hosted checkout URL.");
+  }
+
+  return checkout;
 }
 
-/**
- * Verifies a SumUp checkout by ID
- */
 export async function verifySumupCheckout(checkoutId: string) {
   return await sumupClient.checkouts.get(checkoutId);
 }

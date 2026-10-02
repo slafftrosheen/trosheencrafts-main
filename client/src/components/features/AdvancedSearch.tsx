@@ -210,7 +210,7 @@ export function AdvancedSearch() {
                             </div>
                             <div className="text-right shrink-0">
                               <span className="font-bold text-primary">
-                                €{(product.price / 100).toFixed(2)}
+                                €{Number(product.price).toFixed(2)}
                               </span>
                               <ArrowRight className="ml-2 inline opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
                             </div>

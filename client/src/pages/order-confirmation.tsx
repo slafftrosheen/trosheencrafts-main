@@ -1,36 +1,42 @@
-import { CheckCircle2, ShoppingBag } from 'lucide-react';
-import { Link } from 'wouter';
-import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/lib/LanguageContext';
+import { useEffect } from "react";
+import { CheckCircle2, ShoppingBag } from "lucide-react";
+import { Link } from "wouter";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/LanguageContext";
+import { useCartStore } from "@/lib/stores/cartStore";
 
 export default function OrderConfirmation() {
   const { t } = useLanguage();
+  const clearCart = useCartStore((state) => state.clearCart);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("order_id")) {
+      clearCart();
+    }
+  }, [clearCart]);
 
   return (
-    <div className="bg-background min-h-screen selection:bg-primary/20">
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40 noise" />
-      <div className="relative z-10 container mx-auto px-6 py-32 flex flex-col items-center">
-        <div className="w-24 h-24 bg-primary/10 rounded-[2rem] flex items-center justify-center text-primary mb-12 border-2 border-primary/20">
-          <CheckCircle2 size={48} />
+    <div className="site-container page-shell flex min-h-[70vh] items-center justify-center">
+      <div className="max-w-2xl text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <CheckCircle2 className="h-8 w-8" />
         </div>
-        <h1 className="text-5xl md:text-7xl font-serif font-bold tracking-tight mb-6 text-center">
-          {t("confirm.title").split(' ').map((word, i) => (
-            <span key={i} className={i === 1 ? "text-primary italic" : ""}>{word} </span>
-          ))}
+        <h1 className="mt-7 font-serif text-5xl font-semibold tracking-tight sm:text-6xl">
+          {t("confirm.title")}
         </h1>
-        <p className="text-2xl text-muted-foreground font-medium text-center max-w-2xl mb-12">
+        <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">
           {t("confirm.subtitle")}
         </p>
-        <div className="max-w-xl text-center bg-card/40 p-10 rounded-[2.5rem] border-2 border-border/40 backdrop-blur-sm mb-12 shadow-xl">
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            {t("confirm.desc")}
-          </p>
+        <div className="surface-muted mx-auto mt-8 max-w-xl p-6">
+          <p className="text-sm leading-7 text-muted-foreground">{t("confirm.desc")}</p>
         </div>
-        <Link href="/shop">
-          <Button size="lg" className="rounded-2xl h-16 px-10 font-bold text-lg shadow-xl shadow-primary/20">
-            <ShoppingBag className="mr-3" size={20} /> {t("confirm.continue")}
-          </Button>
-        </Link>
+        <Button asChild size="lg" className="mt-8">
+          <Link href="/shop">
+            <ShoppingBag className="h-4 w-4" />
+            {t("confirm.continue")}
+          </Link>
+        </Button>
       </div>
     </div>
   );

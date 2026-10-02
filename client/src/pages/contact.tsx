@@ -1,70 +1,96 @@
-import { ContactForm } from '@/components/features/ContactForm';
-import { Mail, Phone, MapPin, Clock } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { useSiteConfig } from '@/hooks/useSiteConfig';
-import { useLanguage } from '@/lib/LanguageContext';
+import { ContactForm } from "@/components/features/ContactForm";
+import { Mail, Phone, MapPin } from "lucide-react";
+import { useSiteConfig } from "@/hooks/useSiteConfig";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export default function ContactPage() {
   const config = useSiteConfig();
   const { t } = useLanguage();
 
+  const contactItems = [
+    {
+      icon: Mail,
+      label: t("admin.email"),
+      value: config.contact.email,
+      href: "mailto:" + config.contact.email,
+    },
+    {
+      icon: Phone,
+      label: t("contact.phone"),
+      value: config.contact.phone,
+      href: "tel:" + config.contact.phone.replace(/\s+/g, ""),
+    },
+    {
+      icon: MapPin,
+      label: t("contact.location"),
+      value: config.contact.address,
+      href: undefined,
+    },
+  ];
+
   return (
-    <div className="bg-background min-h-screen selection:bg-primary/20">
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40 noise" />
-      
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
-        <div className="max-w-3xl mb-20">
-          <span className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-4 block">{t("contact.title")}</span>
-          <h1 className="font-serif text-5xl md:text-7xl font-bold tracking-tight mb-8 leading-[0.9]">
-            {t("contact.let_start")} <span className="text-primary italic">{t("contact.conversation")}</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed font-medium">
-            {t("contact.desc")}
-          </p>
+    <div className="min-h-screen bg-background">
+      <section className="page-shell border-b border-border">
+        <div className="site-container">
+          <p className="eyebrow">{t("contact.title")}</p>
+          <div className="mt-4 grid gap-7 lg:grid-cols-[1fr_.8fr] lg:items-end">
+            <h1 className="display-title">
+              {t("contact.let_start")} <span className="italic text-primary">{t("contact.conversation")}</span>
+            </h1>
+            <p className="lead lg:pb-2">{t("contact.desc")}</p>
+          </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-20">
-          <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden group hover:border-primary/20 transition-all">
-            <CardContent className="p-10 text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 border border-primary/20 group-hover:scale-110 transition-transform">
-                <Mail className="h-8 w-8" />
-              </div>
-              <h3 className="font-serif text-2xl font-bold mb-2">{t("admin.email")}</h3>
-              <p className="text-muted-foreground font-medium">
-                {config.contact.email}
-              </p>
-            </CardContent>
-          </Card>
+      <section className="section-space">
+        <div className="site-container">
+          <div className="grid gap-4 md:grid-cols-3">
+            {contactItems.map((item) => {
+              const Icon = item.icon;
+              const content = (
+                <>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                    {item.label}
+                  </p>
+                  <p className="mt-2 break-words font-serif text-xl font-semibold">{item.value}</p>
+                </>
+              );
 
-          <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden group hover:border-primary/20 transition-all">
-            <CardContent className="p-10 text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 border border-primary/20 group-hover:scale-110 transition-transform">
-                <Phone className="h-8 w-8" />
-              </div>
-              <h3 className="font-serif text-2xl font-bold mb-2">{t("contact.phone")}</h3>
-              <p className="text-muted-foreground font-medium">
-                {config.contact.phone}
-              </p>
-            </CardContent>
-          </Card>
+              return item.href ? (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  className="surface p-6 transition-colors hover:border-foreground/20"
+                >
+                  {content}
+                </a>
+              ) : (
+                <div key={item.label} className="surface p-6">
+                  {content}
+                </div>
+              );
+            })}
+          </div>
 
-          <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden group hover:border-primary/20 transition-all">
-            <CardContent className="p-10 text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-6 border border-primary/20 group-hover:scale-110 transition-transform">
-                <MapPin className="h-8 w-8" />
-              </div>
-              <h3 className="font-serif text-2xl font-bold mb-2">{t("contact.location")}</h3>
-              <p className="text-muted-foreground font-medium">
-                {config.contact.address}
+          <div className="mt-12 grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-16">
+            <div>
+              <p className="eyebrow">From Daugavpils</p>
+              <h2 className="mt-4 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
+                Tell us what you want to make.
+              </h2>
+              <p className="mt-5 text-base leading-8 text-muted-foreground">
+                Questions about a piece, a custom order or the workshop are all welcome. We answer as a family workshop, not a call centre.
               </p>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="surface p-5 sm:p-7 md:p-9">
+              <ContactForm />
+            </div>
+          </div>
         </div>
-
-        <div className="max-w-4xl mx-auto">
-          <ContactForm />
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

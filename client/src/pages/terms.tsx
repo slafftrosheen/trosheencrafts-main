@@ -1,73 +1,73 @@
-import { motion } from "framer-motion";
 import { Link } from "wouter";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useLanguage } from "@/lib/LanguageContext";
 
 export default function TermsPage() {
-  const { t } = useLanguage();
-
   return (
-    <div className="min-h-screen bg-background py-20 px-6 selection:bg-primary/20">
-      <div className="fixed inset-0 pointer-events-none z-0 opacity-40 noise" />
-      
-      <div className="max-w-4xl mx-auto relative z-10">
-        <Link href="/">
-          <Button variant="ghost" className="mb-12 rounded-xl group font-bold">
-            <ArrowLeft size={18} className="mr-2 group-hover:-translate-x-1 transition-transform" /> Back
-          </Button>
-        </Link>
+    <div className="page-shell">
+      <div className="site-container max-w-4xl">
+        <Button asChild variant="ghost" className="-ml-3 mb-8">
+          <Link href="/">
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Link>
+        </Button>
 
-        <header className="mb-16">
-          <h1 className="font-serif text-5xl md:text-7xl font-bold tracking-tight mb-8">
-            Terms of <span className="text-primary italic">Service</span>
-          </h1>
-          <p className="text-xl text-muted-foreground font-medium">
-            Agreement for using our workshop studio services.
-          </p>
-        </header>
+        <p className="eyebrow">Legal</p>
+        <h1 className="display-title mt-4">Terms of sale</h1>
+        <p className="lead mt-6 max-w-3xl">
+          The practical terms for ordering handmade Trosheen.Crafts pieces online.
+        </p>
 
-        <div className="prose prose-stone prose-xl dark:prose-invert max-w-none text-muted-foreground space-y-12">
+        <div className="mt-12 space-y-10 text-base leading-8 text-muted-foreground">
           <section>
-            <h2 className="text-foreground font-serif text-3xl font-bold">1. Handcrafted Nature</h2>
-            <p>
-              Every piece at Trosheen Crafts is handmade by our family. Slight variations in color,
-              texture, and form are natural characteristics that make each piece unique. These are
-              not defects but proof of authentic handcraft.
+            <h2 className="font-serif text-3xl font-semibold text-foreground">1. Handmade character</h2>
+            <p className="mt-3">
+              Our pieces are made by hand. Small variations in colour, surface, texture and form are part of the material and making process. Product descriptions and photographs are intended to represent the piece as accurately as practical.
             </p>
           </section>
 
           <section>
-            <h2 className="text-foreground font-serif text-3xl font-bold">2. Orders & Processing</h2>
-            <p>
-              Orders are processed within 3-5 business days. Custom pieces may take 2-4 weeks
-              depending on complexity. We'll keep you updated throughout the creation process.
+            <h2 className="font-serif text-3xl font-semibold text-foreground">2. Orders and payment</h2>
+            <p className="mt-3">
+              The price shown at checkout is the order price. Payment is processed by SumUp. An order is accepted subject to successful payment and product availability.
             </p>
           </section>
 
           <section>
-            <h2 className="text-foreground font-serif text-3xl font-bold">3. Shipping</h2>
-            <p>
-              We ship from Daugavpils, Latvia. Each piece is carefully packed by hand using
-              sustainable materials. Shipping times vary by destination (EU: 5-10 days, International: 10-20 days).
+            <h2 className="font-serif text-3xl font-semibold text-foreground">3. Making and delivery</h2>
+            <p className="mt-3">
+              Ready-made pieces are normally prepared for dispatch within the timeframe shown with the product or order communication. Custom work may take longer. Delivery timing depends on destination and carrier and will be communicated where available.
             </p>
           </section>
 
           <section>
-            <h2 className="text-foreground font-serif text-3xl font-bold">4. Returns & Exchanges</h2>
-            <p>
-              Due to the handcrafted nature of our work, we cannot accept returns for change of mind.
-              However, if your piece arrives damaged, contact us within 48 hours with photos and
-              we'll make it right.
+            <h2 className="font-serif text-3xl font-semibold text-foreground">4. Right of withdrawal</h2>
+            <p className="mt-3">
+              For standard goods bought online, consumers generally have a 14-day statutory withdrawal period under applicable EU and Latvian distance-selling rules. The period and any return obligations are governed by the law that applies to the transaction.
+            </p>
+            <p className="mt-3">
+              Statutory exceptions can apply, including to goods made to the consumer&apos;s specifications or clearly personalised. A custom configuration is not automatically treated as exempt unless the legal conditions for the exception are met.
+            </p>
+            <Button asChild className="mt-6">
+              <Link href="/withdrawal">
+                Withdraw from contract
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+          </section>
+
+          <section>
+            <h2 className="font-serif text-3xl font-semibold text-foreground">5. Damaged or non-conforming goods</h2>
+            <p className="mt-3">
+              Statutory rights relating to damaged, defective or non-conforming goods are separate from the withdrawal right. If a piece arrives damaged or there is a problem with the order, contact us promptly with the order reference and photographs where useful.
             </p>
           </section>
 
           <section>
-            <h2 className="text-foreground font-serif text-3xl font-bold">5. Care Instructions</h2>
-            <p>
-              Concrete pieces are durable but require care. Keep indoor pieces away from excessive
-              moisture. Outdoor pieces are weatherproof but may develop natural patina over time—
-              this is intentional and adds character.
+            <h2 className="font-serif text-3xl font-semibold text-foreground">6. Care</h2>
+            <p className="mt-3">
+              Concrete, gypsum, resin, wax and decorative finishes have different care requirements. Follow the care guidance supplied with the piece and the guidance published on this site.
             </p>
           </section>
         </div>

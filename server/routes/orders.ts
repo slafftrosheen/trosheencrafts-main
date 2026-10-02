@@ -1,70 +1,17 @@
-import { Router } from 'express';
-import { z } from 'zod';
-import { db } from '../db';
-import { orders, orderItems, products } from '../db/schema';
-import { eq, desc } from 'drizzle-orm';
-import { validateRequest } from '../middleware/validation';
-import { adminAuthMiddleware, authMiddleware } from '../middleware/auth';
+import { Router } from "express";
+import { z } from "zod";
+import { db } from "../db";
+import { orders } from "../db/schema";
+import { desc, eq } from "drizzle-orm";
+import { validateRequest } from "../middleware/validation";
+import { adminAuthMiddleware, authMiddleware } from "../middleware/auth";
 
 export const ordersRouter = Router();
 
-const createOrderSchema = z.object({
-  body: z.object({
-    items: z.array(
-      z.object({
-        productId: z.union([z.number().positive(), z.string()]),
-        quantity: z.number().positive().min(1),
-        variant: z.string().optional()
-      })
-    ).min(1),
-    shippingAddress: z.object({
-      name: z.string().min(1),
-      street: z.string().min(1),
-      city: z.string().min(1),
-      postalCode: z.string().min(1),
-      country: z.string().min(1),
-    }),
-    paymentMethodId: z.string().optional(),
-  }),
-});
-
-ordersRouter.post(
-  '/',
-  validateRequest(createOrderSchema),
-  async (req, res, next) => {
-    try {
-      const { items, shippingAddress, paymentMethodId } = req.body as any;
-
-      // Create order in transaction
-      const order = await db.transaction(async (tx) => {
-        // Calculate total (simplified for brevity)
-        const totalAmount = "0"; // You should fetch prices from DB here
-
-        const [newOrder] = await tx
-          .insert(orders)
-          .values({
-            userId: (req as any).user?.id,
-            totalAmount,
-            status: 'pending',
-            shippingAddress,
-            paymentMethodId,
-          })
-          .returning();
-
-        return newOrder;
-      });
-
-      res.status(201).json(order);
-    } catch (error) {
-      next(error);
-    }
-  }
-);
-
-ordersRouter.get('/', authMiddleware, async (req, res, next) => {
+ordersRouter.get("/", authMiddleware, async (req, res, next) => {
   try {
     const userId = (req as any).user?.id;
-    const isAdmin = (req as any).user?.role === 'admin';
+    const isAdmin = (req as any).user?.role === "admin";
 
     let query = db.select().from(orders);
 
@@ -78,3 +25,38 @@ ordersRouter.get('/', authMiddleware, async (req, res, next) => {
     next(error);
   }
 });
+
+const statusSchema = z.object({
+  params: z.object({
+    id: z.coerce.number().int().positive(),
+  }),
+  body: z.object({
+    status: z.enum(["pending", "processing", "shipped", "delivered", "cancelled"]),
+  }),
+});
+
+ordersRouter.patch(
+  "/:id/status",
+  adminAuthMiddleware,
+  validateRequest(statusSchema),
+  async (req, res, next) => {
+    try {
+      const id = Number(req.params.id);
+      const { status } = req.body;
+
+      const [updated] = await db
+        .update(orders)
+        .set({ status, updatedAt: new Date() })
+        .where(eq(orders.id, id))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      res.json(updated);
+    } catch (error) {
+      next(error);
+    }
+  }
+);

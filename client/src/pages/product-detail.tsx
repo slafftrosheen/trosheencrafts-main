@@ -1,184 +1,204 @@
-import { useRoute } from 'wouter';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { useCartStore } from '@/lib/stores/cartStore';
-import { PageLoader } from '@/components/shared/LoadingStates';
-import { toast } from 'sonner';
-import { ShoppingCart, ArrowLeft, Check, Package } from 'lucide-react';
-import { Link } from 'wouter';
-import { useLanguage } from '@/lib/LanguageContext';
-import { OptimizedImage } from '@/components/shared/OptimizedImage';
-import { useColor } from 'color-thief-react';
-import { motion } from 'framer-motion';
-import { MagneticButton } from '@/components/shared/MagneticButton';
+import { useState } from "react";
+import { useRoute, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { ShoppingCart, ArrowLeft, Check, Package, Minus, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/lib/stores/cartStore";
+import { PageLoader } from "@/components/shared/LoadingStates";
+import { OptimizedImage } from "@/components/shared/OptimizedImage";
+import { useLanguage } from "@/lib/LanguageContext";
+import { apiClient } from "@/lib/apiClient";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
-  const [, params] = useRoute('/shop/:id');
+  const [, params] = useRoute("/shop/:id");
   const id = params?.id;
   const { language, t } = useLanguage();
-  const addItem = useCartStore(state => state.addItem);
+  const addItem = useCartStore((state) => state.addItem);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [quantity, setQuantity] = useState(1);
 
   const { data: product, isLoading, error } = useQuery({
-    queryKey: [`/api/products/${id}`],
-    queryFn: () => apiClient.get<any>(`/products/${id}`),
+    queryKey: ["/api/products/" + id],
+    queryFn: () => apiClient.get<any>("/products/" + id),
     enabled: !!id,
   });
 
-  const mainImage = product?.images?.[0] || product?.image || '';
-  const { data: dominantColor } = useColor(mainImage, 'hex', { crossOrigin: 'anonymous' });
-
   if (isLoading) return <PageLoader />;
-  
+
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
-        <div className="text-center max-w-md">
-          <div className="w-24 h-24 mx-auto mb-8 rounded-full bg-muted/60 flex items-center justify-center">
-            <Package className="w-12 h-12 text-muted-foreground" />
+      <div className="site-container page-shell flex min-h-[65vh] items-center justify-center">
+        <div className="max-w-md text-center">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted">
+            <Package className="h-7 w-7 text-muted-foreground" />
           </div>
-          <h1 className="font-serif text-4xl font-bold mb-4">{t("product.not_found")}</h1>
-          <p className="text-muted-foreground text-lg mb-8">
-            {t("product.not_found_desc")}
-          </p>
-          <Link href="/shop">
-            <Button className="rounded-full px-8 h-14 font-bold text-lg shadow-xl shadow-primary/20">
-              <ArrowLeft className="mr-2 h-5 w-5" />
+          <h1 className="mt-6 font-serif text-4xl font-semibold">{t("product.not_found")}</h1>
+          <p className="mt-3 text-muted-foreground">{t("product.not_found_desc")}</p>
+          <Button asChild className="mt-7">
+            <Link href="/shop">
+              <ArrowLeft className="h-4 w-4" />
               {t("product.back_to_shop")}
-            </Button>
-          </Link>
+            </Link>
+          </Button>
         </div>
       </div>
     );
   }
 
   const name = product.nameTranslations?.[language] || product.name;
-  const price = typeof product.price === 'string' ? parseFloat(product.price) : product.price;
+  const price = Number(product.price);
+  const images: string[] = product.images?.length ? product.images : product.image ? [product.image] : [];
+  const selectedImage = images[selectedImageIndex] || images[0] || "";
 
   const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      name: name,
-      price: price,
-      image: mainImage,
-    });
+    for (let i = 0; i < quantity; i += 1) {
+      addItem({
+        id: product.id,
+        name,
+        price,
+        image: selectedImage || images[0],
+      });
+    }
     toast.success(t("product.added_to_cart"));
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Dynamic Ambient Background Glow */}
-      <motion.div 
-        className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full blur-[150px] opacity-20 pointer-events-none mix-blend-screen"
-        animate={{ backgroundColor: dominantColor || 'hsl(var(--primary))' }}
-        transition={{ duration: 1.5 }}
-      />
-      
-      <div className="max-w-7xl mx-auto px-6 py-12 relative z-10">
-        <Link href="/shop">
-          <Button variant="ghost" className="mb-8 rounded-full font-bold">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            {t("product.back_to_shop")}
-          </Button>
+    <div className="bg-background">
+      <div className="site-container py-8 sm:py-10">
+        <Link
+          href="/shop"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("product.back_to_shop")}
         </Link>
+      </div>
 
-        <div className="grid lg:grid-cols-2 gap-16 items-start">
-          {/* Images */}
-          <div className="space-y-6">
-            <div className="aspect-square rounded-[3rem] overflow-hidden border-2 border-border/40 bg-card/40 shadow-2xl">
-              <OptimizedImage
-                src={product.images?.[0] || product.image}
-                alt={name}
-                className="w-full h-full object-cover"
-              />
+      <section className="site-container pb-16 sm:pb-24">
+        <div className="grid gap-10 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
+          <div>
+            <div className="aspect-[4/5] overflow-hidden rounded-3xl bg-muted">
+              {selectedImage ? (
+                <OptimizedImage
+                  src={selectedImage}
+                  alt={name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center text-muted-foreground">
+                  Trosheen.Crafts
+                </div>
+              )}
             </div>
-            {product.images && product.images.length > 1 && (
-              <div className="grid grid-cols-4 gap-4">
-                {product.images.slice(1, 5).map((img: string, i: number) => (
-                  <div key={i} className="aspect-square rounded-2xl overflow-hidden border-2 border-border/40 bg-card/40">
-                    <OptimizedImage
-                      src={img}
-                      alt={`${name} ${i + 2}`}
-                      className="w-full h-full object-cover hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
+
+            {images.length > 1 && (
+              <div className="mt-4 grid grid-cols-5 gap-3">
+                {images.slice(0, 5).map((image, index) => (
+                  <button
+                    key={image + index}
+                    type="button"
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={cn(
+                      "aspect-square overflow-hidden rounded-xl border bg-muted transition-colors",
+                      selectedImageIndex === index ? "border-primary" : "border-transparent hover:border-border"
+                    )}
+                    aria-label={"View image " + (index + 1)}
+                  >
+                    <OptimizedImage src={image} alt="" className="h-full w-full object-cover" />
+                  </button>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Details */}
-          <div className="lg:sticky lg:top-32 space-y-8">
-            <div className="space-y-4">
-              {product.category && (
-                <span className="px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest border border-primary/20">
-                  {product.category}
-                </span>
-              )}
-              <h1 className="font-serif text-5xl md:text-6xl font-bold tracking-tight leading-[0.95]">
-                {name}
-              </h1>
-            </div>
+          <div className="lg:sticky lg:top-28 lg:self-start">
+            {product.category && <p className="eyebrow">{product.category}</p>}
+            <h1 className="mt-4 font-serif text-[clamp(2.8rem,6vw,5.6rem)] font-semibold leading-[.94] tracking-[-.045em]">
+              {name}
+            </h1>
 
-            <div className="flex items-baseline gap-4">
-              <span className="font-serif text-5xl font-bold text-primary">
-                €{(price / 100).toFixed(2)}
+            <div className="mt-7 flex items-baseline gap-3">
+              <span className="font-serif text-3xl font-semibold text-primary sm:text-4xl">
+                €{price.toFixed(2)}
               </span>
-              {product.compareAtPrice && (
-                <span className="text-2xl text-muted-foreground line-through">
-                  €{(product.compareAtPrice / 100).toFixed(2)}
+              {product.compareAtPrice && Number(product.compareAtPrice) > price && (
+                <span className="text-lg text-muted-foreground line-through">
+                  €{Number(product.compareAtPrice).toFixed(2)}
                 </span>
               )}
             </div>
 
-            {product.inStock !== false ? (
-              <div className="flex items-center gap-2 text-primary font-bold">
-                <Check className="w-5 h-5" />
-                {t("product.in_stock")}
-              </div>
-            ) : (
-              <div className="text-destructive font-bold">{t("product.out_of_stock")}</div>
+            <div className="mt-5">
+              {product.inStock !== false ? (
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
+                  <Check className="h-4 w-4" />
+                  {t("product.in_stock")}
+                </span>
+              ) : (
+                <span className="text-sm font-semibold text-destructive">{t("product.out_of_stock")}</span>
+              )}
+            </div>
+
+            {product.description && (
+              <p className="mt-7 text-base leading-8 text-muted-foreground sm:text-lg">{product.description}</p>
             )}
 
-            <div className="prose prose-lg max-w-none">
-              <p className="text-xl text-muted-foreground leading-relaxed">
-                {product.description}
-              </p>
-            </div>
+            <div className="mt-8 flex gap-3">
+              <div className="flex h-12 items-center rounded-full border border-border bg-card">
+                <button
+                  type="button"
+                  className="px-4 text-muted-foreground hover:text-foreground"
+                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="h-4 w-4" />
+                </button>
+                <span className="min-w-8 text-center text-sm font-semibold">{quantity}</span>
+                <button
+                  type="button"
+                  className="px-4 text-muted-foreground hover:text-foreground"
+                  onClick={() => setQuantity((value) => value + 1)}
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="h-4 w-4" />
+                </button>
+              </div>
 
-            <MagneticButton strength={15}>
               <Button
                 size="lg"
                 onClick={handleAddToCart}
                 disabled={product.inStock === false}
-                className="w-full h-20 rounded-3xl font-bold text-2xl shadow-2xl shadow-primary/20 transition-all hover:scale-[1.02]"
+                className="flex-1"
               >
-                <ShoppingCart className="mr-3 h-7 w-7" />
+                <ShoppingCart className="h-4 w-4" />
                 {t("product.add_to_cart")}
               </Button>
-            </MagneticButton>
+            </div>
+
+            <div className="surface-muted mt-8 p-5">
+              <p className="text-sm leading-6 text-muted-foreground">
+                {t("product.handcrafted_note")}
+              </p>
+            </div>
 
             {product.metadata && Object.keys(product.metadata).length > 0 && (
-              <div className="pt-8 border-t-2 border-border/40">
-                <h3 className="font-serif text-2xl font-bold mb-6">{t("product.details")}</h3>
-                <dl className="space-y-4">
+              <div className="mt-9 border-t border-border pt-7">
+                <h2 className="font-serif text-2xl font-semibold">{t("product.details")}</h2>
+                <dl className="mt-5">
                   {Object.entries(product.metadata).map(([key, value]) => (
-                    <div key={key} className="flex justify-between items-center py-3 border-b border-border/20">
-                      <dt className="text-muted-foreground font-medium capitalize">{key}</dt>
-                      <dd className="font-bold">{String(value)}</dd>
+                    <div key={key} className="flex justify-between gap-6 border-b border-border py-3 text-sm">
+                      <dt className="capitalize text-muted-foreground">{key}</dt>
+                      <dd className="text-right font-semibold">{String(value)}</dd>
                     </div>
                   ))}
                 </dl>
               </div>
             )}
-
-            <div className="p-6 rounded-[2rem] bg-primary/5 border-2 border-primary/10">
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                <span className="font-bold text-foreground">{t("product.handcrafted_note").split('.')[0]}.</span> {t("product.handcrafted_note").split('.').slice(1).join('.')}
-              </p>
-            </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

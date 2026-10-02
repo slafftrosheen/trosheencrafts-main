@@ -1,247 +1,170 @@
-import { motion } from "framer-motion";
-import { Link } from "wouter";
-import { ArrowLeft, Beaker, Recycle, Droplets, Heart, ShieldCheck, Sun } from "lucide-react";
+import { Droplets, Heart, ShieldCheck, Sun, Recycle, Beaker } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { ScrollStoryPhotos } from "@/lib/imageAssets";
 
 export default function GuidePage() {
   const { t } = useLanguage();
 
+  const advantages = [
+    { icon: Droplets, text: t("guide_material_adv_water") },
+    { icon: ShieldCheck, text: t("guide_material_adv_density") },
+    { icon: Sun, text: t("guide_material_adv_aesthetics") },
+    { icon: Heart, text: t("guide_material_adv_safety") },
+  ];
+
+  const careGroups = [
+    {
+      icon: ShieldCheck,
+      title: t("guide_care_general_title"),
+      items: [t("guide_care_cleaning"), t("guide_care_protection"), t("guide_care_caution")],
+    },
+    {
+      icon: Droplets,
+      title: t("guide_care_planters_title"),
+      items: [t("guide_care_planters_planting"), t("guide_care_planters_winter")],
+    },
+  ];
+
   return (
-    <div className="min-h-screen bg-background selection:bg-primary/20 pb-24">
-      {/* Back Button */}
-      <div className="pt-24 md:pt-32 px-6 max-w-7xl mx-auto">
-        <Link href="/">
-          <a className="inline-flex items-center text-sm font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors group">
-            <ArrowLeft className="mr-2 w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-            {t("nav.home")}
-          </a>
-        </Link>
-      </div>
+    <div className="min-h-screen bg-background">
+      <section className="page-shell border-b border-border">
+        <div className="site-container max-w-5xl text-center">
+          <p className="eyebrow">{t("guide_material_eyebrow")}</p>
+          <h1 className="display-title mt-5">{t("guide_material_title")}</h1>
+          <p className="lead mx-auto mt-6 max-w-3xl">{t("guide_material_intro")}</p>
+        </div>
+      </section>
 
-      {/* Hero Header */}
-      <header className="px-6 py-12 md:py-20 max-w-4xl mx-auto text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <span className="text-xs font-black uppercase tracking-[0.3em] text-primary/60 mb-4 block">
-            {t("guide_material_eyebrow")}
-          </span>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif text-primary leading-[1.1] mb-6">
-            {t("guide_material_title")}
-          </h1>
-          <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed max-w-2xl mx-auto font-medium">
-            {t("guide_material_intro")}
-          </p>
-        </motion.div>
-      </header>
+      <section className="section-space">
+        <div className="site-container grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
+          <div>
+            <p className="eyebrow">{t("guide_material_eyebrow")}</p>
+            <h2 className="section-title mt-4">{t("guide_material_subtitle")}</h2>
+            <p className="lead mt-6">{t("guide_material_base")}</p>
 
-      {/* Material Composition Section */}
-      <section className="py-16 md:py-24 bg-primary/5">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="space-y-8"
-            >
-              <h2 className="text-3xl md:text-4xl font-serif text-primary">
-                {t("guide_material_subtitle")}
-              </h2>
-              <p className="text-lg text-muted-foreground font-medium">
-                {t("guide_material_base")}
-              </p>
-              
-              <ul className="space-y-6">
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 mt-1 mr-4 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <ShieldCheck className="w-5 h-5" />
+            <div className="mt-8 space-y-5">
+              {[
+                { icon: ShieldCheck, text: t("guide_material_gypsum") },
+                { icon: Beaker, text: t("guide_material_silica") },
+                { icon: Droplets, text: t("guide_material_plasticizer") },
+              ].map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.text} className="flex gap-4 border-t border-border pt-5">
+                    <Icon className="mt-1 h-5 w-5 shrink-0 text-primary" />
+                    <p className="text-sm leading-7 text-muted-foreground sm:text-base">{item.text}</p>
                   </div>
-                  <div>
-                    <p className="text-lg text-foreground font-medium leading-relaxed">
-                      {t("guide_material_gypsum")}
-                    </p>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 mt-1 mr-4 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Beaker className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-lg text-foreground font-medium leading-relaxed">
-                      {t("guide_material_silica")}
-                    </p>
-                  </div>
-                </li>
-                <li className="flex items-start">
-                  <div className="flex-shrink-0 mt-1 mr-4 w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-                    <Droplets className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-lg text-foreground font-medium leading-relaxed">
-                      {t("guide_material_plasticizer")}
-                    </p>
-                  </div>
-                </li>
-              </ul>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="relative aspect-square md:aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl"
-            >
-              <img 
-                src={ScrollStoryPhotos[1]} 
-                alt="Material mixing process" 
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-primary/10 mix-blend-overlay"></div>
-            </motion.div>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="aspect-[4/5] overflow-hidden rounded-3xl bg-muted">
+            <img
+              src={ScrollStoryPhotos.chapter2_materials}
+              alt="Material mixing process"
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
           </div>
         </div>
       </section>
 
-      {/* Advantages Section */}
-      <section className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-5xl font-serif text-center mb-16 text-primary"
-          >
-            {t("guide_material_adv_title")}
-          </motion.h2>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              { icon: Droplets, text: t("guide_material_adv_water") },
-              { icon: ShieldCheck, text: t("guide_material_adv_density") },
-              { icon: Sun, text: t("guide_material_adv_aesthetics") },
-              { icon: Heart, text: t("guide_material_adv_safety") },
-            ].map((adv, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-card border border-border p-8 rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
-              >
-                <div className="w-14 h-14 bg-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-6">
-                  <adv.icon className="w-6 h-6" />
+      <section className="border-y border-border bg-card">
+        <div className="site-container section-space">
+          <p className="eyebrow text-center">Material qualities</p>
+          <h2 className="section-title mx-auto mt-4 max-w-3xl text-center">{t("guide_material_adv_title")}</h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {advantages.map((item) => {
+              const Icon = item.icon;
+              return (
+                <div key={item.text} className="surface-muted p-6">
+                  <Icon className="h-5 w-5 text-primary" />
+                  <p className="mt-5 text-sm leading-7 text-muted-foreground">{item.text}</p>
                 </div>
-                <p className="text-muted-foreground leading-relaxed font-medium">
-                  {adv.text}
-                </p>
-              </motion.div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Art Cast in Stone */}
-      <section className="py-20 md:py-32 bg-primary text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
-        <div className="max-w-4xl mx-auto px-6 relative z-10 text-center">
-          <h2 className="text-4xl md:text-6xl font-serif mb-8">{t("guide_art_title")}</h2>
-          <p className="text-xl md:text-2xl text-primary-foreground/90 font-medium leading-relaxed mb-16">
-            {t("guide_art_intro")}
+      <section className="bg-secondary text-secondary-foreground">
+        <div className="site-container section-space max-w-5xl">
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary-foreground/50">
+            Trosheen material philosophy
           </p>
-          
-          <div className="text-left bg-background/10 backdrop-blur-sm border border-white/20 p-8 md:p-12 rounded-[2rem]">
-            <h3 className="text-2xl font-bold mb-6">{t("guide_art_why_title")}</h3>
-            <ul className="space-y-6">
+          <h2 className="mt-4 font-serif text-4xl font-semibold tracking-tight sm:text-6xl">{t("guide_art_title")}</h2>
+          <p className="mt-6 max-w-3xl text-base leading-8 text-secondary-foreground/70 sm:text-lg">{t("guide_art_intro")}</p>
+
+          <div className="mt-10 border-t border-white/15 pt-8">
+            <h3 className="font-serif text-2xl font-semibold">{t("guide_art_why_title")}</h3>
+            <div className="mt-6 grid gap-x-10 gap-y-5 md:grid-cols-2">
               {[
                 t("guide_art_scale"),
                 t("guide_art_durability"),
                 t("guide_art_aesthetics"),
                 t("guide_art_handmade"),
-                t("guide_art_eco")
-              ].map((item, i) => (
-                <li key={i} className="flex gap-4">
-                  <div className="mt-1 w-2 h-2 rounded-full bg-accent flex-shrink-0" />
-                  <p className="text-lg leading-relaxed font-medium text-white/90">{item}</p>
-                </li>
+                t("guide_art_eco"),
+              ].map((item) => (
+                <div key={item} className="flex gap-3">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#d9cdbb]" />
+                  <p className="text-sm leading-7 text-secondary-foreground/75">{item}</p>
+                </div>
               ))}
-            </ul>
-            <div className="mt-10 pt-10 border-t border-white/20 text-center">
-              <p className="text-2xl font-serif italic text-accent">{t("guide_art_outro")}</p>
             </div>
+            <p className="mt-9 font-serif text-2xl italic text-[#d9cdbb]">{t("guide_art_outro")}</p>
           </div>
         </div>
       </section>
 
-      {/* Care Guide */}
-      <section className="py-20 md:py-32 max-w-4xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <span className="text-xs font-black uppercase tracking-[0.3em] text-primary/60 mb-4 block">
-            {t("guide_care_eyebrow")}
-          </span>
-          <h2 className="text-4xl md:text-5xl font-serif text-primary mb-6">
-            {t("guide_care_title")}
-          </h2>
-          <p className="text-xl text-muted-foreground font-medium">
-            {t("guide_care_intro")}
-          </p>
-        </div>
-
-        <div className="space-y-16">
-          {/* General Care */}
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-primary flex items-center gap-3">
-              <ShieldCheck className="text-accent" /> {t("guide_care_general_title")}
-            </h3>
-            <ul className="space-y-4">
-              <li className="bg-card p-6 rounded-2xl border border-border/50 text-muted-foreground font-medium">{t("guide_care_cleaning")}</li>
-              <li className="bg-card p-6 rounded-2xl border border-border/50 text-muted-foreground font-medium">{t("guide_care_protection")}</li>
-              <li className="bg-card p-6 rounded-2xl border border-border/50 text-muted-foreground font-medium">{t("guide_care_caution")}</li>
-            </ul>
+      <section className="section-space">
+        <div className="site-container max-w-5xl">
+          <div className="max-w-3xl">
+            <p className="eyebrow">{t("guide_care_eyebrow")}</p>
+            <h2 className="section-title mt-4">{t("guide_care_title")}</h2>
+            <p className="lead mt-5">{t("guide_care_intro")}</p>
           </div>
 
-          {/* Zero Waste */}
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-primary flex items-center gap-3">
-              <Recycle className="text-accent" /> {t("guide_care_zero_title")}
-            </h3>
-            <div className="bg-card p-8 rounded-3xl border border-border/50 shadow-sm">
-              <p className="text-lg text-foreground font-medium mb-8">
-                {t("guide_care_zero_intro")}
-              </p>
-              <ol className="space-y-6 pl-2">
+          <div className="mt-10 grid gap-5 md:grid-cols-2">
+            {careGroups.map((group) => {
+              const Icon = group.icon;
+              return (
+                <div key={group.title} className="surface p-6 sm:p-8">
+                  <div className="flex items-center gap-3">
+                    <Icon className="h-5 w-5 text-primary" />
+                    <h3 className="font-serif text-2xl font-semibold">{group.title}</h3>
+                  </div>
+                  <ul className="mt-6 space-y-4">
+                    {group.items.map((item) => (
+                      <li key={item} className="border-t border-border pt-4 text-sm leading-7 text-muted-foreground">
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+
+            <div className="surface md:col-span-2 p-6 sm:p-8">
+              <div className="flex items-center gap-3">
+                <Recycle className="h-5 w-5 text-primary" />
+                <h3 className="font-serif text-2xl font-semibold">{t("guide_care_zero_title")}</h3>
+              </div>
+              <p className="mt-4 text-sm leading-7 text-muted-foreground">{t("guide_care_zero_intro")}</p>
+              <ol className="mt-6 grid gap-4 sm:grid-cols-2">
                 {[
                   t("guide_care_zero_step1"),
                   t("guide_care_zero_step2"),
                   t("guide_care_zero_step3"),
-                  t("guide_care_zero_step4")
-                ].map((step, idx) => (
-                  <li key={idx} className="flex gap-4">
-                    <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold">
-                      {idx + 1}
-                    </span>
-                    <span className="text-muted-foreground font-medium pt-1">
-                      {step}
-                    </span>
+                  t("guide_care_zero_step4"),
+                ].map((step, index) => (
+                  <li key={step} className="flex gap-3 border-t border-border pt-4">
+                    <span className="font-serif text-lg font-semibold text-primary">0{index + 1}</span>
+                    <span className="text-sm leading-7 text-muted-foreground">{step}</span>
                   </li>
                 ))}
               </ol>
             </div>
-          </div>
-
-          {/* Planters & Fountains */}
-          <div className="space-y-6">
-            <h3 className="text-2xl font-bold text-primary flex items-center gap-3">
-              <Droplets className="text-accent" /> {t("guide_care_planters_title")}
-            </h3>
-            <ul className="space-y-4">
-              <li className="bg-card p-6 rounded-2xl border border-border/50 text-muted-foreground font-medium">{t("guide_care_planters_planting")}</li>
-              <li className="bg-card p-6 rounded-2xl border border-border/50 text-muted-foreground font-medium">{t("guide_care_planters_winter")}</li>
-            </ul>
           </div>
         </div>
       </section>

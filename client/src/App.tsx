@@ -25,10 +25,10 @@ const GalleryDetail = lazy(() => import("@/pages/galleryDetail"));
 const Privacy = lazy(() => import("@/pages/privacy"));
 const Terms = lazy(() => import("@/pages/terms"));
 const Cookies = lazy(() => import("@/pages/cookies"));
+const Withdrawal = lazy(() => import("@/pages/withdrawal"));
 const Guide = lazy(() => import("@/pages/guide"));
 const NotFound = lazy(() => import("@/pages/not-found"));
 
-// Admin Pages
 const AdminLogin = lazy(() => import("@/pages/admin/Login"));
 const AdminDashboard = lazy(() => import("@/pages/admin/Dashboard"));
 const AdminProducts = lazy(() => import("@/pages/admin/Products"));
@@ -49,121 +49,54 @@ function Router() {
     <Suspense fallback={<PageLoader />}>
       <Switch>
         <Route path="/admin/login" component={AdminLogin} />
-        
-        {/* Admin Routes */}
-        <Route path="/admin">
-          <AdminLayout><AdminDashboard /></AdminLayout>
-        </Route>
-        <Route path="/admin/promotions">
-          <AdminLayout><AdminPromotions /></AdminLayout>
-        </Route>
-        <Route path="/admin/subscribers">
-          <AdminLayout><AdminNewsletterSubscribers /></AdminLayout>
-        </Route>
-        <Route path="/admin/products">
-          <AdminLayout><AdminProducts /></AdminLayout>
-        </Route>
-        <Route path="/admin/constructor">
-          <AdminLayout><AdminConstructor /></AdminLayout>
-        </Route>
-        <Route path="/admin/orders">
-          <AdminLayout><AdminOrders /></AdminLayout>
-        </Route>
-        <Route path="/admin/messages">
-          <AdminLayout><AdminMessages /></AdminLayout>
-        </Route>
-        <Route path="/admin/blog">
-          <AdminLayout><AdminBlog /></AdminLayout>
-        </Route>
-        <Route path="/admin/gallery">
-          <AdminLayout><AdminGallery /></AdminLayout>
-        </Route>
-        <Route path="/admin/analytics">
-          <AdminLayout><AdminAnalytics /></AdminLayout>
-        </Route>
-        <Route path="/admin/settings">
-          <AdminLayout><AdminSettings /></AdminLayout>
-        </Route>
-        <Route path="/admin/inventory">
-          <AdminLayout><AdminInventory /></AdminLayout>
-        </Route>
-        <Route path="/admin/categories">
-          <AdminLayout><AdminCategories /></AdminLayout>
-        </Route>
+        <Route path="/admin"><AdminLayout><AdminDashboard /></AdminLayout></Route>
+        <Route path="/admin/promotions"><AdminLayout><AdminPromotions /></AdminLayout></Route>
+        <Route path="/admin/subscribers"><AdminLayout><AdminNewsletterSubscribers /></AdminLayout></Route>
+        <Route path="/admin/products"><AdminLayout><AdminProducts /></AdminLayout></Route>
+        <Route path="/admin/constructor"><AdminLayout><AdminConstructor /></AdminLayout></Route>
+        <Route path="/admin/orders"><AdminLayout><AdminOrders /></AdminLayout></Route>
+        <Route path="/admin/messages"><AdminLayout><AdminMessages /></AdminLayout></Route>
+        <Route path="/admin/blog"><AdminLayout><AdminBlog /></AdminLayout></Route>
+        <Route path="/admin/gallery"><AdminLayout><AdminGallery /></AdminLayout></Route>
+        <Route path="/admin/analytics"><AdminLayout><AdminAnalytics /></AdminLayout></Route>
+        <Route path="/admin/settings"><AdminLayout><AdminSettings /></AdminLayout></Route>
+        <Route path="/admin/inventory"><AdminLayout><AdminInventory /></AdminLayout></Route>
+        <Route path="/admin/categories"><AdminLayout><AdminCategories /></AdminLayout></Route>
 
-        {/* Public Routes */}
-        <Route path="/">
-          <Layout><Home /></Layout>
-        </Route>
-        <Route path="/shop">
-          <Layout><Shop /></Layout>
-        </Route>
-        <Route path="/shop/:id">
-          <Layout><ProductDetail /></Layout>
-        </Route>
-        <Route path="/gallery">
-          <Layout><Gallery /></Layout>
-        </Route>
-        <Route path="/gallery/:slug">
-          <Layout><GalleryDetail /></Layout>
-        </Route>
-        <Route path="/cart">
-          <Layout><Cart /></Layout>
-        </Route>
-        <Route path="/checkout">
-          <Layout><Checkout /></Layout>
-        </Route>
-        <Route path="/order-confirmation">
-          <Layout><OrderConfirmation /></Layout>
-        </Route>
-        <Route path="/order/:id">
-          <Layout><OrderTracking /></Layout>
-        </Route>
-        <Route path="/blog">
-          <Layout><Blog /></Layout>
-        </Route>
-        <Route path="/blog/:slug">
-          <Layout><BlogPost /></Layout>
-        </Route>
-        <Route path="/contact">
-          <Layout><Contact /></Layout>
-        </Route>
-        <Route path="/about">
-          <Layout><About /></Layout>
-        </Route>
-        <Route path="/guide">
-          <Layout><Guide /></Layout>
-        </Route>
-        <Route path="/privacy">
-          <Layout><Privacy /></Layout>
-        </Route>
-        <Route path="/terms">
-          <Layout><Terms /></Layout>
-        </Route>
-        <Route path="/cookies">
-          <Layout><Cookies /></Layout>
-        </Route>
+        <Route path="/"><Layout><Home /></Layout></Route>
+        <Route path="/shop"><Layout><Shop /></Layout></Route>
+        <Route path="/shop/:id"><Layout><ProductDetail /></Layout></Route>
+        <Route path="/gallery"><Layout><Gallery /></Layout></Route>
+        <Route path="/gallery/:slug"><Layout><GalleryDetail /></Layout></Route>
+        <Route path="/cart"><Layout><Cart /></Layout></Route>
+        <Route path="/checkout"><Layout><Checkout /></Layout></Route>
+        <Route path="/order-confirmation"><Layout><OrderConfirmation /></Layout></Route>
+        <Route path="/order/:id"><Layout><OrderTracking /></Layout></Route>
+        <Route path="/blog"><Layout><Blog /></Layout></Route>
+        <Route path="/blog/:slug"><Layout><BlogPost /></Layout></Route>
+        <Route path="/contact"><Layout><Contact /></Layout></Route>
+        <Route path="/about"><Layout><About /></Layout></Route>
+        <Route path="/guide"><Layout><Guide /></Layout></Route>
+        <Route path="/privacy"><Layout><Privacy /></Layout></Route>
+        <Route path="/terms"><Layout><Terms /></Layout></Route>
+        <Route path="/cookies"><Layout><Cookies /></Layout></Route>
+        <Route path="/withdrawal"><Layout><Withdrawal /></Layout></Route>
         <Route component={NotFound} />
       </Switch>
     </Suspense>
   );
 }
 
-import { Preloader } from '@/components/shared/Preloader';
-
 function App() {
   return (
-    <>
-      <Preloader />
-      <ErrorBoundary>
-        <QueryClientProvider client={queryClient}>
-          <LanguageProvider>
-            <Router />
-            <Toaster position="top-right" richColors />
-          </LanguageProvider>
-        </QueryClientProvider>
-      </ErrorBoundary>
-    </>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <LanguageProvider>
+          <Router />
+          <Toaster position="top-right" richColors />
+        </LanguageProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 

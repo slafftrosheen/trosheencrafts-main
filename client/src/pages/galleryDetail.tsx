@@ -1,67 +1,55 @@
-import { useState, Suspense } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useRoute, Link } from 'wouter';
-import { motion } from 'framer-motion';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useGLTF, Html, useProgress } from '@react-three/drei';
-import { ArrowLeft, Heart, Eye, Share2, Maximize2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { useLanguage } from '@/lib/LanguageContext';
-import { useToast } from '@/hooks/use-toast';
+import { Suspense, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRoute, Link } from "wouter";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useGLTF, Html, useProgress } from "@react-three/drei";
+import { ArrowLeft, Heart, Share2, Maximize2, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/lib/LanguageContext";
+import { apiClient } from "@/lib/apiClient";
+import { toast } from "sonner";
 
 function CanvasLoader() {
   const { progress } = useProgress();
   return (
     <Html center>
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-        <p className="text-sm font-bold text-foreground whitespace-nowrap bg-background/80 px-3 py-1 rounded-full backdrop-blur-sm border border-border/40 shadow-xl">
-          {progress.toFixed(0)}% Loading
-        </p>
+      <div className="rounded-full border border-border bg-background/90 px-4 py-2 text-xs font-semibold shadow-sm backdrop-blur">
+        {progress.toFixed(0)}% loading
       </div>
     </Html>
   );
 }
 
-function Model3D({ url }: { url: string }) {
-  // Graceful fallback if the URL is not a valid 3D model path (e.g. placeholder data)
-  if (!url || (!url.endsWith('.glb') && !url.endsWith('.gltf'))) {
-    return (
-      <mesh>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="#8b7355" metalness={0.2} roughness={0.8} />
-      </mesh>
-    );
-  }
-  
+function GltfModel({ url }: { url: string }) {
   const { scene } = useGLTF(url);
   return <primitive object={scene} />;
 }
 
+function Model3D({ url }: { url: string }) {
+  if (!url || (!url.endsWith(".glb") && !url.endsWith(".gltf"))) {
+    return (
+      <mesh>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial color="#746353" metalness={0.1} roughness={0.85} />
+      </mesh>
+    );
+  }
+
+  return <GltfModel url={url} />;
+}
+
 function ThreeViewer({ modelUrl }: { modelUrl: string }) {
   return (
-    <div className="w-full h-[600px] rounded-3xl overflow-hidden bg-gradient-to-br from-muted/30 to-muted/10 border-2 border-border/40 relative cursor-grab active:cursor-grabbing">
+    <div className="h-[55vh] min-h-[420px] w-full overflow-hidden rounded-3xl border border-border bg-muted/40">
       <Canvas>
         <PerspectiveCamera makeDefault position={[0, 2, 5]} />
-        <OrbitControls
-          enablePan
-          enableZoom
-          enableRotate
-          minDistance={2}
-          maxDistance={10}
-        />
+        <OrbitControls enablePan enableZoom enableRotate minDistance={2} maxDistance={10} />
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
         <Suspense fallback={<CanvasLoader />}>
           <Model3D url={modelUrl} />
-          <ContactShadows
-            position={[0, -2, 0]}
-            opacity={0.4}
-            scale={10}
-            blur={2}
-          />
+          <ContactShadows position={[0, -2, 0]} opacity={0.35} scale={10} blur={2} />
           <Environment preset="studio" />
         </Suspense>
       </Canvas>
@@ -69,42 +57,42 @@ function ThreeViewer({ modelUrl }: { modelUrl: string }) {
   );
 }
 
-function PhotoViewer({ imageUrl, alt }: { imageUrl: string; alt: string }) {
-  const [isFullscreen, setIsFullscreen] = useState(false);
+function MediaViewer({ item }: { item: any }) {
+  const [fullscreen, setFullscreen] = useState(false);
+
+  if (item.type === "3d") {
+    return <ThreeViewer modelUrl={item.mediaUrl} />;
+  }
 
   return (
     <>
-      <div className="relative w-full rounded-3xl overflow-hidden border-2 border-border/40">
-        <img
-          src={imageUrl}
-          alt={alt}
-          className="w-full h-auto object-contain max-h-[600px]"
-        />
-        <button
-          onClick={() => setIsFullscreen(true)}
-          className="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white p-3 rounded-full hover:bg-black/80 transition"
-        >
-          <Maximize2 className="w-5 h-5" />
-        </button>
+      <div className="relative overflow-hidden rounded-3xl border border-border bg-muted">
+        {item.type === "video" ? (
+          <video src={item.mediaUrl} poster={item.thumbnailUrl} controls playsInline className="max-h-[75vh] w-full bg-black object-contain" />
+        ) : (
+          <img src={item.mediaUrl} alt={item.title} className="max-h-[75vh] w-full object-contain" />
+        )}
+        {item.type === "photo" && (
+          <button
+            type="button"
+            onClick={() => setFullscreen(true)}
+            className="absolute right-4 top-4 rounded-full bg-black/65 p-3 text-white backdrop-blur hover:bg-black/80"
+            aria-label="View fullscreen"
+          >
+            <Maximize2 className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
-      {isFullscreen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
-          onClick={() => setIsFullscreen(false)}
+      {fullscreen && (
+        <button
+          type="button"
+          onClick={() => setFullscreen(false)}
+          className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-black/95 p-4"
+          aria-label="Close fullscreen"
         >
-          <button
-            className="absolute top-4 right-4 text-white p-3 rounded-full hover:bg-white/10 transition"
-            onClick={() => setIsFullscreen(false)}
-          >
-            ✕
-          </button>
-          <img
-            src={imageUrl}
-            alt={alt}
-            className="max-w-full max-h-full object-contain"
-          />
-        </div>
+          <img src={item.mediaUrl} alt={item.title} className="max-h-full max-w-full object-contain" />
+        </button>
       )}
     </>
   );
@@ -112,31 +100,21 @@ function PhotoViewer({ imageUrl, alt }: { imageUrl: string; alt: string }) {
 
 export default function GalleryDetailPage() {
   const { t } = useLanguage();
-  const { toast } = useToast();
-  const [, params] = useRoute('/gallery/:slug');
+  const [, params] = useRoute("/gallery/:slug");
   const slug = params?.slug;
+  const queryClient = useQueryClient();
 
-  const { data: item, isLoading } = useQuery({
-    queryKey: ['galleryItem', slug],
-    queryFn: async () => {
-      const res = await fetch(`/api/gallery/items/${slug}`);
-      if (!res.ok) throw new Error('Failed to fetch item');
-      return res.json();
-    },
+  const { data: item, isLoading, isError } = useQuery({
+    queryKey: ["galleryItem", slug],
+    queryFn: () => apiClient.get<any>("/gallery/items/" + slug),
     enabled: !!slug,
   });
 
   const likeMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const res = await fetch(`/api/gallery/items/${id}/like`, { method: 'POST' });
-      if (!res.ok) throw new Error('Failed to like');
-      return res.json();
-    },
+    mutationFn: (id: number) => apiClient.post("/gallery/items/" + id + "/like"),
     onSuccess: () => {
-      toast({
-        title: t('gallery.liked'),
-        description: t('gallery.liked_desc'),
-      });
+      queryClient.invalidateQueries({ queryKey: ["galleryItem", slug] });
+      toast.success(t("gallery.liked"));
     },
   });
 
@@ -147,71 +125,48 @@ export default function GalleryDetailPage() {
         text: item.description,
         url: window.location.href,
       });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast({
-        title: t('gallery.link_copied'),
-        description: t('gallery.link_copied_desc'),
-      });
+      return;
     }
+
+    await navigator.clipboard.writeText(window.location.href);
+    toast.success(t("gallery.link_copied"));
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">{t('common.loading')}</p>
-        </div>
-      </div>
-    );
+    return <div className="site-container page-shell min-h-[60vh] animate-pulse rounded-3xl bg-muted/40" />;
   }
 
-  if (!item) {
+  if (isError || !item) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-6">
-        <div className="text-center">
-          <h2 className="font-serif text-3xl font-bold mb-4">{t('gallery.item_not_found')}</h2>
-          <p className="text-muted-foreground mb-8">{t('gallery.item_not_found_desc')}</p>
-          <Link href="/gallery">
-            <Button className="rounded-full px-8">{t('gallery.back_to_gallery')}</Button>
-          </Link>
+      <div className="site-container page-shell flex min-h-[60vh] items-center justify-center text-center">
+        <div>
+          <h1 className="font-serif text-4xl font-semibold">{t("gallery.item_not_found")}</h1>
+          <Button asChild className="mt-6">
+            <Link href="/gallery">{t("gallery.back_to_gallery")}</Link>
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-32 pb-20 px-6">
-      <div className="max-w-7xl mx-auto">
-        <Link href="/gallery">
-          <Button variant="ghost" className="mb-8 rounded-full -ml-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            {t('gallery.back_to_gallery')}
-          </Button>
+    <div className="page-shell pt-8 sm:pt-10">
+      <div className="site-container">
+        <Link
+          href="/gallery"
+          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("gallery.back_to_gallery")}
         </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          <div className="lg:col-span-2">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              {item.type === '3d' ? (
-                <ThreeViewer modelUrl={item.mediaUrl} />
-              ) : (
-                <PhotoViewer imageUrl={item.mediaUrl} alt={item.title} />
-              )}
-            </motion.div>
-
-            {item.tags && item.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-6">
-                {item.tags.map((tag: string, idx: number) => (
-                  <span
-                    key={idx}
-                    className="px-3 py-1 rounded-full bg-muted text-sm font-medium"
-                  >
+        <div className="mt-8 grid gap-10 lg:grid-cols-[1.35fr_.65fr] lg:gap-14">
+          <div>
+            <MediaViewer item={item} />
+            {item.tags?.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {item.tags.map((tag: string) => (
+                  <span key={tag} className="rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground">
                     #{tag}
                   </span>
                 ))}
@@ -219,107 +174,37 @@ export default function GalleryDetailPage() {
             )}
           </div>
 
-          <div className="space-y-8">
-            <motion.div
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <Badge className="mb-4 rounded-full px-4 py-1.5 font-bold">
-                {item.type === '3d' ? t('gallery.3d_model') : t('gallery.photograph')}
-              </Badge>
+          <aside className="lg:sticky lg:top-28 lg:self-start">
+            <p className="eyebrow">{item.type === "3d" ? "Interactive 3D" : item.type}</p>
+            <h1 className="mt-4 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+              {item.title}
+            </h1>
+            {item.description && (
+              <p className="mt-5 text-base leading-8 text-muted-foreground">{item.description}</p>
+            )}
 
-              <h1 className="font-serif text-4xl font-bold mb-4 leading-tight">
-                {item.title}
-              </h1>
+            <div className="mt-7 flex items-center gap-5 border-y border-border py-4 text-xs font-semibold text-muted-foreground">
+              <span className="flex items-center gap-1.5"><Eye className="h-4 w-4" /> {item.viewCount}</span>
+              <span className="flex items-center gap-1.5"><Heart className="h-4 w-4" /> {item.likes}</span>
+            </div>
 
-              {item.description && (
-                <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
-                  {item.description}
-                </p>
-              )}
+            <div className="mt-6 flex gap-3">
+              <Button onClick={() => likeMutation.mutate(item.id)} disabled={likeMutation.isPending}>
+                <Heart className="h-4 w-4" />
+                {t("gallery.like")}
+              </Button>
+              <Button variant="outline" onClick={handleShare}>
+                <Share2 className="h-4 w-4" />
+                {t("gallery.share")}
+              </Button>
+            </div>
 
-              <div className="flex items-center gap-6 py-6 border-y border-border/40">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Eye className="w-5 h-5" />
-                  <span className="font-medium">{item.viewCount}</span>
-                </div>
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Heart className="w-5 h-5" />
-                  <span className="font-medium">{item.likes}</span>
-                </div>
-              </div>
-
-              {item.metadata && (
-                <div className="space-y-4 py-6 border-b border-border/40">
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground">
-                    {t('gallery.details')}
-                  </h3>
-                  {item.metadata.year && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('gallery.year')}</span>
-                      <span className="font-medium">{item.metadata.year}</span>
-                    </div>
-                  )}
-                  {item.metadata.materials && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('gallery.materials')}</span>
-                      <span className="font-medium">{item.metadata.materials.join(', ')}</span>
-                    </div>
-                  )}
-                  {item.metadata.dimensions && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('gallery.dimensions')}</span>
-                      <span className="font-medium">
-                        {item.metadata.dimensions.width} × {item.metadata.dimensions.height}
-                        {item.metadata.dimensions.depth && ` × ${item.metadata.dimensions.depth}`} cm
-                      </span>
-                    </div>
-                  )}
-                  {item.metadata.location && (
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">{t('gallery.location')}</span>
-                      <span className="font-medium">{item.metadata.location}</span>
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <div className="space-y-3 pt-6">
-                <Button
-                  onClick={() => likeMutation.mutate(item.id)}
-                  variant="outline"
-                  className="w-full rounded-full h-12 font-bold hover:bg-primary hover:text-primary-foreground"
-                  disabled={likeMutation.isPending}
-                >
-                  <Heart className="w-5 h-5 mr-2" />
-                  {t('gallery.like_this')}
-                </Button>
-                <Button
-                  onClick={handleShare}
-                  variant="outline"
-                  className="w-full rounded-full h-12 font-bold"
-                >
-                  <Share2 className="w-5 h-5 mr-2" />
-                  {t('gallery.share')}
-                </Button>
-              </div>
-
-              <div className="mt-8 p-6 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20">
-                <h3 className="font-serif text-xl font-bold mb-2">
-                  {t('gallery.cta_title')}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  {t('gallery.cta_desc')}
-                </p>
-                <Link href="/contact">
-                  <Button className="w-full rounded-full font-bold">
-                    {t('contact.title')}
-                  </Button>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
+            {item.type === "3d" && (
+              <p className="surface-muted mt-7 p-5 text-sm leading-6 text-muted-foreground">
+                Drag to rotate, scroll or pinch to zoom, and inspect the piece from every side.
+              </p>
+            )}
+          </aside>
         </div>
       </div>
     </div>

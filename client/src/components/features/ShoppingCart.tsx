@@ -1,116 +1,129 @@
-import { useState } from 'react';
-import { Link } from 'wouter';
-import { ShoppingCart, X, Plus, Minus, ShoppingBag } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useCartStore } from '@/lib/stores/cartStore';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { Link } from "wouter";
+import { ShoppingCart, X, Plus, Minus, ShoppingBag } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useCartStore } from "@/lib/stores/cartStore";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export function ShoppingCartComponent() {
-  const { items, updateQuantity, removeItem, totalPrice } = useCartStore();
+  const { items, updateQuantity, removeItem, getTotalPrice } = useCartStore();
   const [open, setOpen] = useState(false);
+  const { t } = useLanguage();
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+  const totalPrice = getTotalPrice();
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button 
-          variant="ghost" 
-          size="icon"
-          className="relative h-12 w-12 rounded-2xl hover:bg-primary/5 transition-all group"
-        >
-          <ShoppingCart className="h-6 w-6 transition-transform group-hover:scale-110" />
+        <Button variant="ghost" size="icon" className="relative" aria-label={t("cart.basket") || "Basket"}>
+          <ShoppingCart className="h-5 w-5" />
           {totalItems > 0 && (
-            <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-black rounded-full h-5 w-5 flex items-center justify-center shadow-lg border-2 border-background">
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-bold text-primary-foreground">
               {totalItems}
             </span>
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-md rounded-l-[3rem] border-l-2 border-border/40 p-0 overflow-hidden flex flex-col">
-        <SheetHeader className="p-8 border-b border-border/40 bg-muted/20">
-          <SheetTitle className="font-serif text-3xl font-bold flex items-center gap-3">
-            <ShoppingBag className="text-primary" /> Your Basket
+
+      <SheetContent className="flex w-full flex-col border-l border-border bg-background p-0 sm:max-w-md">
+        <SheetHeader className="border-b border-border px-6 py-5">
+          <SheetTitle className="flex items-center gap-2 font-serif text-2xl font-semibold">
+            <ShoppingBag className="h-5 w-5 text-primary" />
+            {t("cart.basket") || "Your basket"}
           </SheetTitle>
         </SheetHeader>
-        
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+
+        <div className="flex-1 overflow-y-auto px-6 py-6">
           {items.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-center">
-              <div className="w-20 h-20 bg-muted rounded-full flex items-center justify-center mb-6">
-                <ShoppingBag className="h-10 w-10 text-muted-foreground/40" />
+            <div className="flex h-full min-h-80 flex-col items-center justify-center text-center">
+              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-muted">
+                <ShoppingBag className="h-6 w-6 text-muted-foreground" />
               </div>
-              <h3 className="text-xl font-serif font-bold mb-2">Basket is empty</h3>
-              <p className="text-muted-foreground mb-8">Discover our latest handcrafted artefacts.</p>
-              <Button onClick={() => setOpen(false)} className="rounded-xl px-8" asChild>
-                <Link href="/shop">Start Exploring</Link>
+              <h3 className="font-serif text-2xl font-semibold">{t("cart.empty_title")}</h3>
+              <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">
+                {t("cart.empty_desc")}
+              </p>
+              <Button className="mt-7" asChild onClick={() => setOpen(false)}>
+                <Link href="/shop">{t("cart.start_exploring")}</Link>
               </Button>
             </div>
           ) : (
-            items.map((item) => (
-              <div key={item.id} className="flex items-center gap-6 group">
-                <div className="w-20 h-20 rounded-2xl bg-muted overflow-hidden border-2 border-border/40 shrink-0">
-                  <img
-                    src={item.image || '/placeholder.webp'}
-                    alt={item.name}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                  />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-bold text-lg truncate mb-1">{item.name}</h3>
-                  <p className="font-serif font-bold text-primary">
-                    €{(item.price / 100).toFixed(2)}
-                  </p>
-                  <div className="flex items-center gap-3 mt-3">
-                    <div className="flex items-center gap-1 bg-muted rounded-lg p-0.5 border border-border/40">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 rounded-md"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
+            <div className="space-y-6">
+              {items.map((item) => (
+                <div key={String(item.id) + (item.variant || "")} className="flex gap-4 border-b border-border pb-6 last:border-0">
+                  <div className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-muted">
+                    <img
+                      src={item.image || "/placeholder.webp"}
+                      alt={item.name}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <h3 className="line-clamp-2 text-sm font-semibold">{item.name}</h3>
+                        {item.variant && (
+                          <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{item.variant}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-destructive"
+                        onClick={() => removeItem(item.id, item.variant)}
+                        aria-label="Remove item"
                       >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-6 text-center text-xs font-bold">{item.quantity}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6 rounded-md"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant)}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
+                        <X className="h-4 w-4" />
+                      </button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-lg text-destructive/60 hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => removeItem(item.id, item.variant)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <div className="flex items-center rounded-full border border-border">
+                        <button
+                          type="button"
+                          className="p-2 text-muted-foreground hover:text-foreground"
+                          onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
+                          aria-label="Decrease quantity"
+                        >
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="min-w-7 text-center text-xs font-semibold">{item.quantity}</span>
+                        <button
+                          type="button"
+                          className="p-2 text-muted-foreground hover:text-foreground"
+                          onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant)}
+                          aria-label="Increase quantity"
+                        >
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
+                      <span className="font-serif text-lg font-semibold">€{(item.price * item.quantity).toFixed(2)}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              ))}
+            </div>
           )}
         </div>
-        
+
         {items.length > 0 && (
-          <div className="p-8 border-t border-border/40 bg-muted/20 space-y-6">
-            <div className="flex justify-between items-end">
-              <span className="font-black uppercase tracking-[0.2em] text-xs text-muted-foreground">Subtotal</span>
-              <span className="font-serif text-3xl font-bold">€{(totalPrice / 100).toFixed(2)}</span>
+          <div className="border-t border-border bg-card px-6 py-6">
+            <div className="mb-5 flex items-end justify-between">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                {t("cart.subtotal")}
+              </span>
+              <span className="font-serif text-3xl font-semibold">€{totalPrice.toFixed(2)}</span>
             </div>
-            
-            <div className="grid gap-3">
-              <Button className="w-full h-14 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20" asChild onClick={() => setOpen(false)}>
-                <Link href="/checkout">Checkout Now</Link>
-              </Button>
-              <Button variant="outline" className="w-full h-12 rounded-xl border-2" onClick={() => setOpen(false)}>
-                Continue Shopping
-              </Button>
-            </div>
+            <Button className="w-full" size="lg" asChild onClick={() => setOpen(false)}>
+              <Link href="/checkout">{t("cart.checkout")}</Link>
+            </Button>
+            <Button
+              variant="ghost"
+              className="mt-2 w-full"
+              onClick={() => setOpen(false)}
+            >
+              {t("nav_shop")}
+            </Button>
           </div>
         )}
       </SheetContent>

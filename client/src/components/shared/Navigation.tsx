@@ -1,77 +1,62 @@
-import { useState, useEffect } from 'react';
-import { motion } from "framer-motion";
-import { Link, useLocation } from 'wouter';
-import { ShoppingCart, Search, User, ArrowRight } from 'lucide-react';
-import { navigationConfig } from '@/config/navigation';
-import { cn } from '@/lib/utils';
-import { useCartStore } from '@/lib/stores/cartStore';
-import { Button } from '@/components/ui/button';
-import { useLanguage } from '@/lib/LanguageContext';
-import { ShoppingCartComponent } from '@/components/features/ShoppingCart';
-import { BrandAssets } from '@/lib/imageAssets';
-import { LanguageSwitcher } from './LanguageSwitcher';
+import { Link, useLocation } from "wouter";
+import { BrandAssets } from "@/lib/imageAssets";
+import { useLanguage } from "@/lib/LanguageContext";
+import { cn } from "@/lib/utils";
+import { ShoppingCartComponent } from "@/components/features/ShoppingCart";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function Navigation() {
   const [location] = useLocation();
   const { t } = useLanguage();
-  const cartItemsCount = useCartStore((state) => state.getTotalItems());
+
+  const links = [
+    { href: "/about", label: t("nav_story") },
+    { href: "/shop", label: t("nav_shop") },
+    { href: "/gallery", label: t("nav_gallery") },
+    { href: "/blog", label: t("nav_blog") },
+    { href: "/guide", label: t("guide_care_eyebrow") },
+    { href: "/contact", label: t("nav_contact") || "Contact" },
+  ];
+
+  const isActive = (href: string) =>
+    href === "/" ? location === "/" : location === href || location.startsWith(href + "/");
 
   return (
-    <nav className="fixed top-0 w-full z-40 border-b border-border/40 bg-background/60 backdrop-blur-md hidden md:block">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="group flex items-center">
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            transition={{ duration: 0.3 }}
-            className="relative w-20 h-20 flex items-center justify-center"
-          >
-            <img 
-              src={BrandAssets.logo} 
-              alt="Trosheen Crafts Logo" 
-              className="w-full h-full object-contain"
-            />
-          </motion.div>
+    <header className="sticky top-0 z-50 hidden md:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
+      <div className="site-container flex h-[72px] items-center justify-between gap-8">
+        <Link href="/" className="flex min-w-0 items-center gap-3">
+          <img
+            src={BrandAssets.logo}
+            alt="Trosheen.Crafts"
+            className="h-11 w-11 object-contain"
+          />
+          <span className="hidden font-serif text-lg font-semibold tracking-tight text-foreground lg:block">
+            Trosheen.Crafts
+          </span>
         </Link>
-        <div className="flex items-center gap-8">
-          <Link href="/#story" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
-            {t("nav_story")}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
-          </Link>
-          <Link href="/shop" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
-            {t("nav_shop")}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
-          </Link>
-          <Link href="/blog" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
-            {t("nav_blog")}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
-          </Link>
-          <Link href="/guide" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
-            {t("guide_care_eyebrow")}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
-          </Link>
-          <Link href="/gallery" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
-            {t("nav_gallery")}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
-          </Link>
-          <Link href="/contact" className="text-sm font-medium hover:text-primary transition-colors relative group/nav">
-            {t("nav_contact") || "Contact"}
-            <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover/nav:w-full" />
-          </Link>
-          
-          <div className="flex items-center gap-2 ml-4">
-            <LanguageSwitcher />
-            <ShoppingCartComponent />
-            <Link href="/shop">
-              <Button className="rounded-full px-6 hover-elevate shadow-xl shadow-primary/10 ml-2">{t("nav_cta")}</Button>
+
+        <nav className="flex items-center gap-1" aria-label="Primary navigation">
+          {links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className={cn(
+                "rounded-full px-3 py-2 text-[13px] font-semibold transition-colors",
+                isActive(link.href)
+                  ? "bg-muted text-foreground"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              )}
+            >
+              {link.label}
             </Link>
-            <Link href="/admin/login">
-              <Button variant="ghost" size="icon" className="rounded-full">
-                <User className="h-5 w-5" />
-              </Button>
-            </Link>
-          </div>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <ShoppingCartComponent />
         </div>
       </div>
-    </nav>
+    </header>
   );
 }

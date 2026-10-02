@@ -1,143 +1,135 @@
-import { useLanguage } from '@/lib/LanguageContext';
-import { CandleConstructor } from '@/components/shop/CandleConstructor';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useProducts } from '@/hooks/useApi';
-import { ProductCard } from '@/components/features/product/ProductCard';
-import { Spinner } from '@/components/shared/LoadingStates';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Package, MoveRight } from 'lucide-react';
-import { useState } from 'react';
-import { MagneticButton } from '@/components/shared/MagneticButton';
+import { useState } from "react";
+import { Package, Sparkles } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
+import { CandleConstructor } from "@/components/shop/CandleConstructor";
+import { useProducts } from "@/hooks/useApi";
+import { ProductCard } from "@/components/features/product/ProductCard";
+import { Spinner } from "@/components/shared/LoadingStates";
+import { cn } from "@/lib/utils";
 
 export default function ShopPage() {
   const { t, language } = useLanguage();
   const { data: products, isLoading } = useProducts();
-  const [activeTab, setActiveTab] = useState('collections');
+  const [activeTab, setActiveTab] = useState<"collections" | "custom">("collections");
+
+  const publishedProducts = products?.filter((product) => product.published) || [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/20 relative overflow-hidden">
-      {/* Premium ambient background elements */}
-      <div className="absolute top-0 left-0 w-full h-[600px] bg-gradient-to-b from-primary/10 via-primary/5 to-transparent pointer-events-none" />
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-primary/15 rounded-full blur-[150px] pointer-events-none" />
-      <div className="absolute top-[20%] right-[-10%] w-[40%] h-[40%] bg-secondary/15 rounded-full blur-[150px] pointer-events-none" />
-      
-      <div className="max-w-[1400px] mx-auto px-6 pt-32 pb-32 relative z-10">
-        <header className="text-center mb-24">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 10 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          >
-            <h1 className="text-5xl md:text-7xl font-serif mb-6 tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-foreground via-foreground to-muted-foreground drop-shadow-sm">
-              {t("nav_shop")}
-            </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground font-medium max-w-2xl mx-auto leading-relaxed">
-              {t("shop_teaser_desc")}
-            </p>
-          </motion.div>
-        </header>
+    <div className="min-h-screen bg-background">
+      <section className="page-shell border-b border-border">
+        <div className="site-container">
+          <p className="eyebrow">{t("curated_selection")}</p>
+          <div className="mt-4 grid gap-7 lg:grid-cols-[1fr_.8fr] lg:items-end">
+            <h1 className="display-title">{t("nav_shop")}</h1>
+            <p className="lead lg:pb-2">{t("shop_teaser_desc")}</p>
+          </div>
 
-        <div className="flex justify-center mb-20">
-          <div className="glass p-2.5 rounded-[2.5rem] border border-border/50 shadow-2xl shadow-primary/5 inline-flex relative bg-background/60 backdrop-blur-xl">
-            <AnimatePresence>
-              <motion.div
-                className="absolute inset-y-2.5 rounded-[2rem] bg-primary shadow-lg shadow-primary/20"
-                initial={false}
-                animate={{
-                  left: activeTab === 'collections' ? '0.625rem' : 'calc(50% + 0.3125rem)',
-                  width: 'calc(50% - 0.9375rem)',
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              />
-            </AnimatePresence>
+          <div
+            className="mt-10 inline-flex w-full rounded-full border border-border bg-card p-1 sm:w-auto"
+            role="tablist"
+            aria-label="Shop sections"
+          >
             <button
-              onClick={() => setActiveTab('collections')}
-              className={`relative z-10 px-10 py-4 text-lg font-bold rounded-[2rem] transition-colors flex items-center gap-3 w-[220px] justify-center ${
-                activeTab === 'collections' ? 'text-primary-foreground' : 'text-foreground hover:text-primary'
-              }`}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "collections"}
+              onClick={() => setActiveTab("collections")}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors sm:flex-none",
+                activeTab === "collections"
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
-              <Package className="w-5 h-5" />
+              <Package className="h-4 w-4" />
               {t("curated_selection")}
             </button>
             <button
-              onClick={() => setActiveTab('custom')}
-              className={`relative z-10 px-10 py-4 text-lg font-bold rounded-[2rem] transition-colors flex items-center gap-3 w-[220px] justify-center ${
-                activeTab === 'custom' ? 'text-primary-foreground' : 'text-foreground hover:text-primary'
-              }`}
+              type="button"
+              role="tab"
+              aria-selected={activeTab === "custom"}
+              onClick={() => setActiveTab("custom")}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors sm:flex-none",
+                activeTab === "custom"
+                  ? "bg-foreground text-background"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
             >
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="h-4 w-4" />
               {t("shop_custom_builder")}
             </button>
           </div>
         </div>
+      </section>
 
-        <AnimatePresence mode="wait">
-          {activeTab === 'collections' ? (
-            <motion.div
-              key="collections"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
+      <section className="section-space pt-10 sm:pt-14">
+        <div className="site-container">
+          {activeTab === "collections" ? (
+            <>
+              <div className="mb-8 flex items-center justify-between border-b border-border pb-4">
+                <p className="text-sm font-semibold">
+                  {publishedProducts.length} {publishedProducts.length === 1 ? "piece" : "pieces"}
+                </p>
+                <p className="hidden text-xs text-muted-foreground sm:block">
+                  Hand-cast in Daugavpils, Latvia
+                </p>
+              </div>
+
               {isLoading ? (
-                <div className="py-32 flex justify-center">
+                <div className="flex min-h-72 items-center justify-center">
                   <Spinner size="lg" className="text-primary" />
                 </div>
-              ) : products && products.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16">
-                  {products.filter(p => p.published).map((product, index) => {
+              ) : publishedProducts.length > 0 ? (
+                <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {publishedProducts.map((product) => {
                     const translatedName = product.nameTranslations?.[language] || product.name;
                     return (
-                      <motion.div
+                      <ProductCard
                         key={product.id}
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.1, duration: 0.6, ease: "easeOut" }}
-                      >
-                        <ProductCard
-                          id={product.id}
-                          name={translatedName}
-                          price={Number(product.price)}
-                          image={product.image || ''}
-                          category={product.category || 'Collection'}
-                          isHandmade={true}
-                        />
-                      </motion.div>
+                        id={product.id}
+                        name={translatedName}
+                        price={Number(product.price)}
+                        image={product.image || ""}
+                        category={product.category || "Collection"}
+                        isHandmade
+                      />
                     );
                   })}
                 </div>
               ) : (
-                <div className="text-center py-32 bg-card/60 backdrop-blur-2xl rounded-[3rem] border border-border/50 shadow-2xl max-w-2xl mx-auto relative overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
-                  <div className="w-28 h-28 bg-muted rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner border border-white/5 relative z-10">
-                    <Package className="w-14 h-14 text-muted-foreground opacity-60" />
-                  </div>
-                  <h3 className="text-4xl font-serif text-foreground mb-4 relative z-10">{t("shop_empty_title")}</h3>
-                  <p className="text-xl text-muted-foreground font-medium mb-10 max-w-md mx-auto leading-relaxed relative z-10">
+                <div className="surface mx-auto max-w-2xl px-7 py-14 text-center sm:px-12">
+                  <Package className="mx-auto h-9 w-9 text-primary" />
+                  <h2 className="mt-5 font-serif text-3xl font-semibold tracking-tight">
+                    {t("shop_empty_title")}
+                  </h2>
+                  <p className="mx-auto mt-3 max-w-lg leading-relaxed text-muted-foreground">
                     {t("shop_empty_desc")}
                   </p>
-                  <MagneticButton strength={25}>
-                    <button onClick={() => setActiveTab('custom')} className="inline-flex items-center gap-3 px-8 py-4 bg-primary text-primary-foreground rounded-full font-bold hover:gap-5 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 relative z-10">
-                      {t("shop_enter_workshop")} <MoveRight className="w-5 h-5" />
-                    </button>
-                  </MagneticButton>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("custom")}
+                    className="mt-7 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground"
+                  >
+                    {t("shop_enter_workshop")}
+                    <Sparkles className="h-4 w-4" />
+                  </button>
                 </div>
               )}
-            </motion.div>
+            </>
           ) : (
-            <motion.div
-              key="custom"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            >
+            <div>
+              <div className="mb-8 max-w-2xl">
+                <p className="eyebrow">{t("shop_custom_builder")}</p>
+                <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
+                  Build a piece with the workshop
+                </h2>
+              </div>
               <CandleConstructor />
-            </motion.div>
+            </div>
           )}
-        </AnimatePresence>
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

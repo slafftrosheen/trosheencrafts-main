@@ -46,6 +46,7 @@ export const orders = pgTable('orders', {
     city: string;
     postalCode: string;
     country: string;
+    email?: string;
   }>(),
   paymentMethodId: text('payment_method_id'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
