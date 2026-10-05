@@ -216,7 +216,7 @@ export default function Analytics() {
                         tickFormatter={(value) => `€${value}`}
                       />
                       <Tooltip
-                        formatter={(value: number) => [euro.format(Number(value)), "Revenue"]}
+                        formatter={(value: any) => [euro.format(Number(value)), "Revenue"]}
                         labelFormatter={(label) => new Date(label).toLocaleDateString()}
                       />
                       <Area
