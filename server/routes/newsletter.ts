@@ -162,8 +162,12 @@ router.post('/unsubscribe', async (req: Request, res: Response) => {
 // Admin: Get all subscribers (protected route)
 router.get('/subscribers', adminAuthMiddleware, async (req: Request, res: Response) => {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 50;
+    const requestedPage = Number.parseInt(String(req.query.page || "1"), 10);
+    const requestedLimit = Number.parseInt(String(req.query.limit || "50"), 10);
+    const page = Number.isFinite(requestedPage) ? Math.max(requestedPage, 1) : 1;
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 100)
+      : 50;
     const offset = (page - 1) * limit;
 
     const subscribers = await db
