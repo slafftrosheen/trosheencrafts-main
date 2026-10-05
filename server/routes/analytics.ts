@@ -1,64 +1,51 @@
-import { Router } from 'express';
-import { db } from '../db';
-import { products, orders, orderItems, contactSubmissions, blogPosts } from '../db/schema';
-import { sql, eq, gte, desc } from 'drizzle-orm';
-import { adminAuthMiddleware } from '../middleware/auth';
+import { Router } from "express";
+import { db } from "../db";
+import { products, orders, orderItems, contactSubmissions } from "../db/schema";
+import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { adminAuthMiddleware } from "../middleware/auth";
 
 export const analyticsRouter = Router();
 
-/**
- * GET /api/analytics/dashboard
- * 
- * Get dashboard statistics
- */
-analyticsRouter.get('/dashboard', adminAuthMiddleware, async (req, res, next) => {
+const REVENUE_STATUSES = ["processing", "shipped", "delivered"];
+
+analyticsRouter.get("/dashboard", adminAuthMiddleware, async (_req, res, next) => {
   try {
-    // Get total products
     const [productsCount] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(products);
 
-    // Get total orders
     const [ordersCount] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(orders);
 
-    // Get total revenue
     const [revenueData] = await db
-      .select({ 
-        total: sql<string>`coalesce(sum(total_amount), 0)` 
-      })
+      .select({ total: sql<string>`coalesce(sum(total_amount), 0)` })
       .from(orders)
-      .where(eq(orders.status, 'completed'));
+      .where(inArray(orders.status, REVENUE_STATUSES));
 
-    // Get pending orders
     const [pendingCount] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(orders)
-      .where(eq(orders.status, 'pending'));
+      .where(eq(orders.status, "pending"));
 
-    // Get low stock products (< 5)
     const [lowStockCount] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(products)
       .where(sql`stock < 5 AND stock > 0`);
 
-    // Get out of stock products
     const [outOfStockCount] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(products)
       .where(eq(products.stock, 0));
 
-    // Get unread messages
     const [unreadMessages] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(contactSubmissions)
-      .where(eq(contactSubmissions.status, 'new'));
+      .where(eq(contactSubmissions.status, "new"));
 
-    // Get recent orders (last 7 days)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    
+
     const [recentOrdersCount] = await db
       .select({ count: sql<number>`cast(count(*) as int)` })
       .from(orders)
@@ -67,7 +54,7 @@ analyticsRouter.get('/dashboard', adminAuthMiddleware, async (req, res, next) =>
     res.json({
       totalProducts: productsCount.count,
       totalOrders: ordersCount.count,
-      totalRevenue: parseFloat(revenueData.total),
+      totalRevenue: Number(revenueData.total || 0),
       pendingOrders: pendingCount.count,
       lowStockProducts: lowStockCount.count,
       outOfStockProducts: outOfStockCount.count,
@@ -79,24 +66,20 @@ analyticsRouter.get('/dashboard', adminAuthMiddleware, async (req, res, next) =>
   }
 });
 
-/**
- * GET /api/analytics/sales
- * 
- * Get sales data over time
- */
-analyticsRouter.get('/sales', adminAuthMiddleware, async (req, res, next) => {
+analyticsRouter.get("/sales", adminAuthMiddleware, async (req, res, next) => {
   try {
-    const { period = '30d' } = req.query;
-
-    let daysBack = 30;
-    if (period === '7d') daysBack = 7;
-    if (period === '90d') daysBack = 90;
-    if (period === '365d') daysBack = 365;
+    const period = String(req.query.period || "30d");
+    const daysByPeriod: Record<string, number> = {
+      "7d": 7,
+      "30d": 30,
+      "90d": 90,
+      "365d": 365,
+    };
+    const daysBack = daysByPeriod[period] || 30;
 
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysBack);
 
-    // Get daily sales
     const salesData = await db
       .select({
         date: sql<string>`DATE(created_at)`,
@@ -104,28 +87,33 @@ analyticsRouter.get('/sales', adminAuthMiddleware, async (req, res, next) => {
         orders: sql<number>`cast(count(*) as int)`,
       })
       .from(orders)
-      .where(gte(orders.createdAt, startDate))
+      .where(
+        and(
+          gte(orders.createdAt, startDate),
+          inArray(orders.status, REVENUE_STATUSES)
+        )
+      )
       .groupBy(sql`DATE(created_at)`)
       .orderBy(sql`DATE(created_at)`);
 
-    res.json(salesData.map(s => ({
-      date: s.date,
-      revenue: parseFloat(s.revenue),
-      orders: s.orders,
-    })));
+    res.json(
+      salesData.map((entry) => ({
+        date: entry.date,
+        revenue: Number(entry.revenue || 0),
+        orders: entry.orders,
+      }))
+    );
   } catch (error) {
     next(error);
   }
 });
 
-/**
- * GET /api/analytics/top-products
- * 
- * Get best selling products
- */
-analyticsRouter.get('/top-products', adminAuthMiddleware, async (req, res, next) => {
+analyticsRouter.get("/top-products", adminAuthMiddleware, async (req, res, next) => {
   try {
-    const { limit = '10' } = req.query;
+    const requestedLimit = Number.parseInt(String(req.query.limit || "10"), 10);
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(Math.max(requestedLimit, 1), 50)
+      : 10;
 
     const topProducts = await db
       .select({
@@ -135,28 +123,27 @@ analyticsRouter.get('/top-products', adminAuthMiddleware, async (req, res, next)
         totalRevenue: sql<string>`coalesce(sum(${orderItems.price} * ${orderItems.quantity}), 0)`,
       })
       .from(orderItems)
+      .innerJoin(orders, eq(orderItems.orderId, orders.id))
       .leftJoin(products, eq(orderItems.productId, products.id))
+      .where(inArray(orders.status, REVENUE_STATUSES))
       .groupBy(orderItems.productId, products.name)
       .orderBy(desc(sql`sum(${orderItems.quantity})`))
-      .limit(parseInt(limit as string));
+      .limit(limit);
 
-    res.json(topProducts.map(p => ({
-      productId: p.productId,
-      productName: p.productName,
-      totalQuantity: p.totalQuantity,
-      totalRevenue: parseFloat(p.totalRevenue),
-    })));
+    res.json(
+      topProducts.map((product) => ({
+        productId: product.productId,
+        productName: product.productName || "Deleted product",
+        totalQuantity: product.totalQuantity,
+        totalRevenue: Number(product.totalRevenue || 0),
+      }))
+    );
   } catch (error) {
     next(error);
   }
 });
 
-/**
- * GET /api/analytics/categories
- * 
- * Get sales by category
- */
-analyticsRouter.get('/categories', adminAuthMiddleware, async (req, res, next) => {
+analyticsRouter.get("/categories", adminAuthMiddleware, async (_req, res, next) => {
   try {
     const categorySales = await db
       .select({
@@ -165,28 +152,26 @@ analyticsRouter.get('/categories', adminAuthMiddleware, async (req, res, next) =
         orders: sql<number>`cast(count(DISTINCT ${orderItems.orderId}) as int)`,
       })
       .from(orderItems)
+      .innerJoin(orders, eq(orderItems.orderId, orders.id))
       .leftJoin(products, eq(orderItems.productId, products.id))
+      .where(inArray(orders.status, REVENUE_STATUSES))
       .groupBy(products.category)
       .orderBy(desc(sql`sum(${orderItems.price} * ${orderItems.quantity})`));
 
-    res.json(categorySales.map(c => ({
-      category: c.category || 'Uncategorized',
-      revenue: parseFloat(c.revenue),
-      orders: c.orders,
-    })));
+    res.json(
+      categorySales.map((category) => ({
+        category: category.category || "Uncategorized",
+        revenue: Number(category.revenue || 0),
+        orders: category.orders,
+      }))
+    );
   } catch (error) {
     next(error);
   }
 });
 
-/**
- * GET /api/analytics/recent-activity
- * 
- * Get recent system activity
- */
-analyticsRouter.get('/recent-activity', adminAuthMiddleware, async (req, res, next) => {
+analyticsRouter.get("/recent-activity", adminAuthMiddleware, async (_req, res, next) => {
   try {
-    // Get recent orders
     const recentOrders = await db
       .select({
         id: orders.id,
@@ -196,39 +181,42 @@ analyticsRouter.get('/recent-activity', adminAuthMiddleware, async (req, res, ne
       })
       .from(orders)
       .orderBy(desc(orders.createdAt))
-      .limit(5);
+      .limit(6);
 
-    // Get recent messages
     const recentMessages = await db
       .select({
         id: contactSubmissions.id,
         status: contactSubmissions.status,
         name: contactSubmissions.name,
+        subject: contactSubmissions.subject,
         createdAt: contactSubmissions.createdAt,
       })
       .from(contactSubmissions)
       .orderBy(desc(contactSubmissions.createdAt))
-      .limit(5);
+      .limit(6);
 
-    // Combine and sort
-    const allActivity = [
-      ...recentOrders.map(o => ({
-        id: o.id,
-        type: 'order' as const,
-        description: `Order #${o.id} - ${o.status}`,
-        amount: parseFloat(o.amount),
-        createdAt: o.createdAt,
+    const activity = [
+      ...recentOrders.map((order) => ({
+        id: "order-" + order.id,
+        entityId: order.id,
+        type: "order" as const,
+        description: `Order #${order.id} · ${order.status}`,
+        amount: Number(order.amount),
+        createdAt: order.createdAt,
       })),
-      ...recentMessages.map(m => ({
-        id: m.id,
-        type: 'message' as const,
-        description: `Message from ${m.name}`,
-        status: m.status,
-        createdAt: m.createdAt,
+      ...recentMessages.map((message) => ({
+        id: "message-" + message.id,
+        entityId: message.id,
+        type: "message" as const,
+        description: message.subject || `Message from ${message.name}`,
+        status: message.status,
+        createdAt: message.createdAt,
       })),
-    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()).slice(0, 10);
+    ]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 10);
 
-    res.json(allActivity);
+    res.json(activity);
   } catch (error) {
     next(error);
   }
