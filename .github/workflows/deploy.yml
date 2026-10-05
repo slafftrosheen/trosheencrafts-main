@@ -1,47 +1,26 @@
-name: Validate and Deploy
+name: Deploy
 
 on:
   push:
     branches: [main]
 
-concurrency:
-  group: trosheencrafts-production
-  cancel-in-progress: true
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci --legacy-peer-deps
-
-      - name: Type check
-        run: npx tsc --noEmit
-
-      - name: Production build
-        run: npm run build
-
-      - name: Deploy to server
-        uses: appleboy/ssh-action@v1.2.0
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           script: |
-            set -e
             cd /var/www/trosheencrafts
-            git pull --ff-only origin main
+            git pull origin main
             docker-compose down
             docker-compose build
             docker-compose up -d
