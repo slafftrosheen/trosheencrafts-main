@@ -1,57 +1,23 @@
 import { db } from "./index";
-import { users, products, blogPosts } from "./schema";
-import bcrypt from "bcryptjs";
+import { products, blogPosts } from "./schema";
 import * as dotenv from "dotenv";
 
 dotenv.config();
 
+/**
+ * Development/sample-content seed.
+ *
+ * IMPORTANT:
+ * - This script deliberately does not read, create, update, or delete users.
+ * - Admin accounts and passwords are production data and must never be changed by content seeding.
+ */
 async function seed() {
-  console.log("Seeding database...");
+  console.log("Seeding sample content...");
 
   try {
-    console.log("Removing existing seed data...");
+    console.log("Removing existing sample blog/product data...");
     await db.delete(blogPosts);
     await db.delete(products);
-    await db.delete(users);
-
-    const adminPassword = process.env.SEED_ADMIN_PASSWORD || process.env.ADMIN_PASSWORD;
-    const adminEmail = process.env.SEED_ADMIN_EMAIL;
-    const adminUsername = process.env.SEED_ADMIN_USERNAME;
-
-    if (!adminPassword || adminPassword.length < 8 || !adminEmail || !adminUsername) {
-      throw new Error(
-        "Admin seed credentials are missing. Set SEED_ADMIN_EMAIL, SEED_ADMIN_USERNAME and SEED_ADMIN_PASSWORD (minimum 8 characters)."
-      );
-    }
-
-    const adminUsers = [
-      {
-        email: adminEmail,
-        username: adminUsername,
-        password: await bcrypt.hash(adminPassword, 12),
-        role: "admin",
-      },
-    ];
-
-    const secondPassword = process.env.SEED_SECOND_ADMIN_PASSWORD;
-    const secondEmail = process.env.SEED_SECOND_ADMIN_EMAIL;
-    const secondUsername = process.env.SEED_SECOND_ADMIN_USERNAME;
-
-    if (secondPassword && secondEmail && secondUsername) {
-      if (secondPassword.length < 8) {
-        throw new Error("SEED_SECOND_ADMIN_PASSWORD must be at least 8 characters.");
-      }
-
-      adminUsers.push({
-        email: secondEmail,
-        username: secondUsername,
-        password: await bcrypt.hash(secondPassword, 12),
-        role: "admin",
-      });
-    }
-
-    await db.insert(users).values(adminUsers);
-    console.log("Created admin seed user(s)");
 
     const sampleProducts = [
       {
@@ -116,7 +82,7 @@ async function seed() {
 
     await db.insert(blogPosts).values(samplePosts);
     console.log("Created sample blog posts");
-    console.log("Database seeding complete");
+    console.log("Sample-content seeding complete; user accounts were not touched.");
   } catch (error) {
     console.error("Seeding failed:", error);
     process.exit(1);
