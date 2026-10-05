@@ -1,10 +1,18 @@
-import { useState, useEffect } from "react";
-import { useLocation } from "wouter";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { AlertCircle, CheckCircle, Loader2, Package, Search } from "lucide-react";
+import { toast } from "sonner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -13,11 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { AlertCircle, CheckCircle, Package, Loader2 } from "lucide-react";
-import { toast } from "sonner";
 import { apiClient } from "@/lib/apiClient";
-import { useCurrentUser } from "@/hooks/useApi";
-import { cn } from "@/lib/utils";
 
 interface Product {
   id: number;
@@ -25,98 +29,84 @@ interface Product {
   stock: number;
   category: string;
   price: number | string;
+  published?: boolean;
 }
 
 export default function Inventory() {
-  const [stockUpdates, setStockUpdates] = useState<Record<number, number>>({});
-  const [, navigate] = useLocation();
-  const { data: user, isLoading: userLoading } = useCurrentUser();
   const queryClient = useQueryClient();
+  const [stockUpdates, setStockUpdates] = useState<Record<number, number>>({});
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
 
-  useEffect(() => {
-    if (!userLoading && (!user || user.role !== "admin")) {
-      navigate("/admin/login");
-    }
-  }, [user, userLoading, navigate]);
-
-  const { data: products, isLoading, error, refetch } = useQuery({
+  const { data: products = [], isLoading, error, refetch } = useQuery({
     queryKey: ["inventory-products"],
-    queryFn: async () => apiClient.get<Product[]>("/products"),
-    enabled: !!user && user.role === "admin",
-    retry: 2,
+    queryFn: () => apiClient.get<Product[]>("/products", { params: { limit: 100 } }),
+    retry: 1,
   });
 
   const updateStockMutation = useMutation({
-    mutationFn: async ({ id, stock }: { id: number; stock: number }) =>
+    mutationFn: ({ id, stock }: { id: number; stock: number }) =>
       apiClient.put("/products/" + id, { stock }),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["inventory-products"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
-      setStockUpdates({});
-      toast.success("Stock updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-dashboard-overview"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-analytics-dashboard"] });
+      setStockUpdates((current) => {
+        const next = { ...current };
+        delete next[variables.id];
+        return next;
+      });
+      toast.success("Stock updated");
     },
     onError: (mutationError: any) => {
       toast.error(mutationError?.message || "Failed to update stock");
     },
   });
 
-  const handleStockChange = (id: number, value: string) => {
-    const parsed = parseInt(value, 10);
-    setStockUpdates((previous) => ({ ...previous, [id]: Number.isNaN(parsed) ? 0 : parsed }));
-  };
+  const visibleProducts = useMemo(() => {
+    const term = search.trim().toLowerCase();
 
-  const handleUpdateStock = (id: number) => {
-    const stock = stockUpdates[id];
-    if (stock !== undefined) {
-      updateStockMutation.mutate({ id, stock });
-    }
-  };
+    return products.filter((product) => {
+      if (filter === "attention" && !(product.stock < 5)) return false;
+      if (filter === "out" && product.stock !== 0) return false;
+      if (filter === "low" && !(product.stock > 0 && product.stock < 5)) return false;
+
+      if (!term) return true;
+      return [product.name, product.category].filter(Boolean).join(" ").toLowerCase().includes(term);
+    });
+  }, [products, search, filter]);
+
+  const lowStockProducts = products.filter((product) => product.stock > 0 && product.stock < 5);
+  const outOfStockProducts = products.filter((product) => product.stock === 0);
 
   const getStockStatus = (stock: number) => {
-    if (stock === 0) return { label: "Out of Stock", variant: "destructive" as const, icon: AlertCircle };
-    if (stock < 5) return { label: "Low Stock", variant: "secondary" as const, icon: AlertCircle };
-    return { label: "In Stock", variant: "default" as const, icon: CheckCircle };
+    if (stock === 0) return { label: "Out of stock", variant: "destructive" as const, icon: AlertCircle };
+    if (stock < 5) return { label: "Low stock", variant: "secondary" as const, icon: AlertCircle };
+    return { label: "In stock", variant: "default" as const, icon: CheckCircle };
   };
 
-  if (userLoading) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  if (!user || user.role !== "admin") return null;
-
-  const productsList = products || [];
-  const lowStockProducts = productsList.filter((product) => product.stock < 5 && product.stock > 0);
-  const outOfStockProducts = productsList.filter((product) => product.stock === 0);
-
-  if (error) {
-    return (
-      <Card className="p-8 text-center">
-        <AlertCircle className="mx-auto h-10 w-10 text-destructive" />
-        <h2 className="mt-4 text-xl font-semibold">Error loading inventory</h2>
-        <p className="mt-2 text-muted-foreground">{(error as any)?.message || "Failed to load inventory data"}</p>
-        <Button onClick={() => refetch()} className="mt-5">Try again</Button>
-      </Card>
-    );
-  }
+  const updateDraft = (id: number, value: string) => {
+    const parsed = Number.parseInt(value, 10);
+    setStockUpdates((current) => ({
+      ...current,
+      [id]: Number.isFinite(parsed) ? Math.max(parsed, 0) : 0,
+    }));
+  };
 
   return (
     <div className="space-y-8">
-      <header>
-        <h1 className="font-serif text-4xl font-semibold tracking-tight">
-          Inventory <span className="italic text-primary">Management</span>
-        </h1>
-        <p className="mt-2 text-muted-foreground">Monitor and update product stock levels</p>
+      <header className="border-b border-border pb-6">
+        <p className="text-sm font-medium text-muted-foreground">Catalogue availability</p>
+        <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Inventory</h1>
+        <p className="mt-2 text-muted-foreground">Monitor stock warnings and make quick quantity corrections.</p>
       </header>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "Total Products", value: productsList.length, note: "In catalogue", icon: Package },
-          { label: "Low Stock", value: lowStockProducts.length, note: "Need attention", icon: AlertCircle },
-          { label: "Out of Stock", value: outOfStockProducts.length, note: "Unavailable", icon: AlertCircle },
+          { label: "Products", value: products.length, note: "Loaded from catalogue", icon: Package },
+          { label: "Low stock", value: lowStockProducts.length, note: "1–4 units remaining", icon: AlertCircle },
+          { label: "Out of stock", value: outOfStockProducts.length, note: "Unavailable to fulfill", icon: AlertCircle },
         ].map((metric) => {
           const Icon = metric.icon;
           return (
@@ -132,89 +122,127 @@ export default function Inventory() {
             </Card>
           );
         })}
+      </section>
+
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 md:flex-row">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search product or category"
+            className="pl-9"
+          />
+        </div>
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="w-full md:w-[190px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All stock</SelectItem>
+            <SelectItem value="attention">Needs attention</SelectItem>
+            <SelectItem value="low">Low stock</SelectItem>
+            <SelectItem value="out">Out of stock</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button variant="outline" onClick={() => refetch()}>Refresh</Button>
       </div>
 
-      <Card className="overflow-hidden">
-        {isLoading ? (
-          <div className="flex items-center justify-center p-10">
-            <Loader2 className="h-7 w-7 animate-spin text-primary" />
-          </div>
-        ) : (
-          <Table>
-            <TableHeader className="bg-muted/50">
-              <TableRow>
-                <TableHead className="px-6">Product Name</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Current Stock</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Update Stock</TableHead>
-                <TableHead className="px-6 text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {productsList.length === 0 ? (
+      {error ? (
+        <Card className="p-8 text-center">
+          <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
+          <p className="mt-3 font-semibold">Unable to load inventory</p>
+          <p className="mt-1 text-sm text-muted-foreground">{(error as any)?.message}</p>
+          <Button className="mt-4" onClick={() => refetch()}>Try again</Button>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          {isLoading ? (
+            <div className="flex items-center justify-center p-12">
+              <Loader2 className="h-7 w-7 animate-spin text-primary" />
+            </div>
+          ) : (
+            <Table>
+              <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">No products found</TableCell>
+                  <TableHead className="px-6">Product</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Price</TableHead>
+                  <TableHead>Current</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>New stock</TableHead>
+                  <TableHead className="px-6 text-right">Action</TableHead>
                 </TableRow>
-              ) : (
-                productsList.map((product) => {
-                  const status = getStockStatus(product.stock);
-                  const StatusIcon = status.icon;
-                  const currentStock = stockUpdates[product.id] ?? product.stock;
+              </TableHeader>
+              <TableBody>
+                {visibleProducts.length ? (
+                  visibleProducts.map((product) => {
+                    const status = getStockStatus(product.stock);
+                    const StatusIcon = status.icon;
+                    const draft = stockUpdates[product.id] ?? product.stock;
+                    const rowPending =
+                      updateStockMutation.isPending &&
+                      updateStockMutation.variables?.id === product.id;
 
-                  return (
-                    <TableRow key={product.id}>
-                      <TableCell className="px-6 font-medium">{product.name}</TableCell>
-                      <TableCell>{product.category || "-"}</TableCell>
-                      <TableCell>€{Number(product.price).toFixed(2)}</TableCell>
-                      <TableCell className="font-semibold">{product.stock}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={status.variant}
-                          className={cn(
-                            "flex w-fit items-center gap-1",
-                            status.variant === "secondary" && "bg-amber-100 text-amber-800"
+                    return (
+                      <TableRow key={product.id}>
+                        <TableCell className="px-6 font-medium">
+                          {product.name}
+                          {product.published === false && (
+                            <Badge variant="outline" className="ml-2">Hidden</Badge>
                           )}
-                        >
-                          <StatusIcon className="h-3 w-3" />
-                          {status.label}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={currentStock}
-                          onChange={(event) => handleStockChange(product.id, event.target.value)}
-                          className="h-9 w-20 rounded-xl"
-                        />
-                      </TableCell>
-                      <TableCell className="px-6 text-right">
-                        <Button
-                          size="sm"
-                          onClick={() => handleUpdateStock(product.id)}
-                          disabled={
-                            stockUpdates[product.id] === undefined ||
-                            stockUpdates[product.id] === product.stock ||
-                            updateStockMutation.isPending
-                          }
-                        >
-                          {updateStockMutation.isPending ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                          ) : (
-                            "Update"
-                          )}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
-              )}
-            </TableBody>
-          </Table>
-        )}
-      </Card>
+                        </TableCell>
+                        <TableCell>{product.category || "—"}</TableCell>
+                        <TableCell>€{Number(product.price).toFixed(2)}</TableCell>
+                        <TableCell className="font-semibold">{product.stock}</TableCell>
+                        <TableCell>
+                          <Badge variant={status.variant} className="gap-1">
+                            <StatusIcon className="h-3 w-3" />
+                            {status.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            min="0"
+                            value={draft}
+                            onChange={(event) => updateDraft(product.id, event.target.value)}
+                            className="h-9 w-24"
+                          />
+                        </TableCell>
+                        <TableCell className="px-6 text-right">
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              updateStockMutation.mutate({
+                                id: product.id,
+                                stock: stockUpdates[product.id],
+                              })
+                            }
+                            disabled={
+                              stockUpdates[product.id] === undefined ||
+                              stockUpdates[product.id] === product.stock ||
+                              rowPending
+                            }
+                          >
+                            {rowPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
+                      No products match this filter.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
+        </Card>
+      )}
     </div>
   );
 }
