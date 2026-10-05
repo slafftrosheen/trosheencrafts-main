@@ -37,19 +37,37 @@ contactRouter.get("/admin/all", adminAuthMiddleware, async (_req, res, next) => 
   }
 });
 
-contactRouter.patch("/:id/status", adminAuthMiddleware, async (req, res, next) => {
-  try {
-    const [item] = await db
-      .update(contactSubmissions)
-      .set({ status: req.body.status })
-      .where(eq(contactSubmissions.id, parseInt(req.params.id, 10)))
-      .returning();
-
-    res.json(item);
-  } catch (error) {
-    next(error);
-  }
+const contactStatusSchema = z.object({
+  params: z.object({
+    id: z.coerce.number().int().positive(),
+  }),
+  body: z.object({
+    status: z.enum(["new", "read", "resolved"]),
+  }),
 });
+
+contactRouter.patch(
+  "/:id/status",
+  adminAuthMiddleware,
+  validateRequest(contactStatusSchema),
+  async (req, res, next) => {
+    try {
+      const [item] = await db
+        .update(contactSubmissions)
+        .set({ status: req.body.status })
+        .where(eq(contactSubmissions.id, Number(req.params.id)))
+        .returning();
+
+      if (!item) {
+        return res.status(404).json({ message: "Message not found" });
+      }
+
+      res.json(item);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 const withdrawalSchema = z.object({
   body: z.object({
