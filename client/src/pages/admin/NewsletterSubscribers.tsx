@@ -1,7 +1,17 @@
-import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
-import { Mail, Download, UserCheck, UserX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Download, Mail, Search, UserCheck, UserX } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -9,154 +19,192 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
+import { apiClient } from "@/lib/apiClient";
+
+interface Subscriber {
+  id: number;
+  email: string;
+  subscribedAt: string;
+  unsubscribedAt?: string | null;
+  source?: string | null;
+  isActive: boolean;
+}
+
+interface SubscriberResponse {
+  subscribers: Subscriber[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+const csvCell = (value: unknown) => {
+  const text = String(value ?? "");
+  return `"${text.replace(/"/g, '""')}"`;
+};
 
 export default function NewsletterSubscribersPage() {
-  const { data, isLoading } = useQuery({
-    queryKey: ['newsletter-subscribers'],
-    queryFn: async () => {
-      const res = await fetch('/api/newsletter/subscribers');
-      if (!res.ok) throw new Error('Failed to fetch subscribers');
-      return res.json();
-    },
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["newsletter-subscribers"],
+    queryFn: () =>
+      apiClient.get<SubscriberResponse>("/newsletter/subscribers", {
+        params: { page: 1, limit: 100 },
+      }),
+    retry: 1,
   });
 
-  const exportSubscribers = () => {
-    if (!data?.subscribers) return;
-    
-    const csv = [
-      ['Email', 'Subscribed At', 'Source', 'Status'].join(','),
-      ...data.subscribers.map((sub: any) =>
-        [
-          sub.email,
-          new Date(sub.subscribedAt).toLocaleDateString(),
-          sub.source,
-          sub.isActive ? 'Active' : 'Unsubscribed'
-        ].join(',')
-      ),
-    ].join('\n');
+  const subscribers = data?.subscribers || [];
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+  const visibleSubscribers = useMemo(() => {
+    const term = search.trim().toLowerCase();
+
+    return subscribers.filter((subscriber) => {
+      if (filter === "active" && !subscriber.isActive) return false;
+      if (filter === "inactive" && subscriber.isActive) return false;
+      if (!term) return true;
+      return [subscriber.email, subscriber.source].filter(Boolean).join(" ").toLowerCase().includes(term);
+    });
+  }, [subscribers, search, filter]);
+
+  const activeCount = subscribers.filter((subscriber) => subscriber.isActive).length;
+  const inactiveCount = subscribers.length - activeCount;
+
+  const exportSubscribers = () => {
+    const rows = [
+      ["Email", "Subscribed At", "Source", "Status"],
+      ...visibleSubscribers.map((subscriber) => [
+        subscriber.email,
+        new Date(subscriber.subscribedAt).toISOString(),
+        subscriber.source || "",
+        subscriber.isActive ? "Active" : "Unsubscribed",
+      ]),
+    ];
+
+    const csv = rows.map((row) => row.map(csvCell).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `newsletter-subscribers-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `newsletter-subscribers-${new Date().toISOString().split("T")[0]}.csv`;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
   };
 
-  if (isLoading) return <div className="p-8">Loading...</div>;
-
-  const activeCount = data?.subscribers?.filter((s: any) => s.isActive).length || 0;
-  const totalCount = data?.subscribers?.length || 0;
-
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <div className="mb-8">
-        <h1 className="font-serif text-4xl font-bold mb-2">Newsletter Subscribers</h1>
-        <p className="text-muted-foreground">Manage your email subscriber list</p>
-      </div>
+    <div className="space-y-8">
+      <header className="border-b border-border pb-6">
+        <p className="text-sm font-medium text-muted-foreground">Audience</p>
+        <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Newsletter subscribers</h1>
+        <p className="mt-2 text-muted-foreground">
+          Review subscription health, acquisition source and export the currently filtered list.
+        </p>
+      </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-6 rounded-2xl bg-card border-2 border-border/40"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-primary/10 text-primary">
-              <Mail className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{totalCount}</p>
-              <p className="text-sm text-muted-foreground">Total Subscribers</p>
-            </div>
-          </div>
-        </motion.div>
+      <section className="grid gap-4 sm:grid-cols-3">
+        {[
+          { label: "Loaded", value: subscribers.length, note: `${data?.pagination.total || 0} total records`, icon: Mail },
+          { label: "Active", value: activeCount, note: "Eligible subscribers", icon: UserCheck },
+          { label: "Unsubscribed", value: inactiveCount, note: "Inactive records", icon: UserX },
+        ].map((metric) => {
+          const Icon = metric.icon;
+          return (
+            <Card key={metric.label}>
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">{metric.label}</CardTitle>
+                <Icon className="h-4 w-4 text-primary" />
+              </CardHeader>
+              <CardContent>
+                <div className="font-serif text-3xl font-semibold">{metric.value}</div>
+                <p className="mt-1 text-xs text-muted-foreground">{metric.note}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </section>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="p-6 rounded-2xl bg-card border-2 border-border/40"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-green-500/10 text-green-500">
-              <UserCheck className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{activeCount}</p>
-              <p className="text-sm text-muted-foreground">Active</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="p-6 rounded-2xl bg-card border-2 border-border/40"
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-xl bg-destructive/10 text-destructive">
-              <UserX className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-3xl font-bold">{totalCount - activeCount}</p>
-              <p className="text-sm text-muted-foreground">Unsubscribed</p>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">Subscriber List</h2>
-        <Button onClick={exportSubscribers} variant="outline" className="gap-2">
-          <Download className="w-4 h-4" />
+      <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 md:flex-row">
+        <div className="relative flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Search email or source"
+            className="pl-9"
+          />
+        </div>
+        <Select value={filter} onValueChange={setFilter}>
+          <SelectTrigger className="w-full md:w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All subscribers</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Unsubscribed</SelectItem>
+          </SelectContent>
+        </Select>
+        <Button variant="outline" onClick={() => refetch()}>Refresh</Button>
+        <Button variant="outline" onClick={exportSubscribers} disabled={!visibleSubscribers.length}>
+          <Download className="mr-2 h-4 w-4" />
           Export CSV
         </Button>
       </div>
 
-      <div className="rounded-2xl border-2 border-border/40 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Email</TableHead>
-              <TableHead>Subscribed</TableHead>
-              <TableHead>Source</TableHead>
-              <TableHead>Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data?.subscribers?.map((subscriber: any) => (
-              <TableRow key={subscriber.id}>
-                <TableCell className="font-medium">{subscriber.email}</TableCell>
-                <TableCell>
-                  {new Date(subscriber.subscribedAt).toLocaleDateString()}
-                </TableCell>
-                <TableCell className="capitalize">{subscriber.source}</TableCell>
-                <TableCell>
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${subscriber.isActive
-                      ? 'bg-green-500/10 text-green-500'
-                      : 'bg-destructive/10 text-destructive'
-                    }`}
-                  >
-                    {subscriber.isActive ? (
-                      <>
-                        <UserCheck className="w-3 h-3" /> Active
-                      </>
-                    ) : (
-                      <>
-                        <UserX className="w-3 h-3" /> Unsubscribed
-                      </>
-                    )}
-                  </span>
-                </TableCell>
+      {error ? (
+        <Card className="p-8 text-center">
+          <p className="font-semibold">Unable to load subscribers</p>
+          <p className="mt-1 text-sm text-muted-foreground">{(error as any)?.message}</p>
+          <Button className="mt-4" onClick={() => refetch()}>Try again</Button>
+        </Card>
+      ) : (
+        <Card className="overflow-hidden">
+          <Table>
+            <TableHeader className="bg-muted/50">
+              <TableRow>
+                <TableHead className="px-6">Email</TableHead>
+                <TableHead>Subscribed</TableHead>
+                <TableHead>Source</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
+                    Loading subscribers…
+                  </TableCell>
+                </TableRow>
+              ) : visibleSubscribers.length ? (
+                visibleSubscribers.map((subscriber) => (
+                  <TableRow key={subscriber.id}>
+                    <TableCell className="px-6 font-medium">{subscriber.email}</TableCell>
+                    <TableCell className="text-sm text-muted-foreground">
+                      {new Date(subscriber.subscribedAt).toLocaleString()}
+                    </TableCell>
+                    <TableCell className="capitalize">{subscriber.source || "website"}</TableCell>
+                    <TableCell>
+                      <Badge variant={subscriber.isActive ? "default" : "secondary"}>
+                        {subscriber.isActive ? "Active" : "Unsubscribed"}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
+                    No subscribers match this filter.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
     </div>
   );
 }
