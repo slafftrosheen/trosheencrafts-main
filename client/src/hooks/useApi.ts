@@ -112,26 +112,21 @@ export function useCurrentUser(options?: Partial<UseQueryOptions<User | null, Ap
       try {
         return await apiClient.get<User>('/auth/me');
       } catch (error: any) {
-        // Log error for debugging but handle gracefully
-        if (error?.status !== 401 && error?.status !== 404) {
-          console.error('Failed to fetch current user:', error);
-        }
-        
-        // Only return null for authentication-related errors
-        if (error?.status === 401 || error?.status === 404) {
+        const status = error?.statusCode ?? error?.status;
+
+        if (status === 401 || status === 404) {
           return null;
         }
-        
-        // Re-throw other errors so React Query can retry
+
+        console.error('Failed to fetch current user:', error);
         throw error;
       }
     },
     retry: (failureCount, error: any) => {
-      // Don't retry on authentication errors
-      if (error?.status === 401 || error?.status === 404) {
+      const status = error?.statusCode ?? error?.status;
+      if (status === 401 || status === 404) {
         return false;
       }
-      // Retry up to 2 times for other errors
       return failureCount < 2;
     },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000),
@@ -140,19 +135,19 @@ export function useCurrentUser(options?: Partial<UseQueryOptions<User | null, Ap
 }
 
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
 export function useLogin(
-  options?: UseMutationOptions<{ user: User }, ApiClientError, LoginCredentials>
+  options?: UseMutationOptions<User, ApiClientError, LoginCredentials>
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation<{ user: User }, ApiClientError, LoginCredentials>({
-    mutationFn: (credentials) => apiClient.post<{ user: User }>('/auth/login', credentials),
+  return useMutation<User, ApiClientError, LoginCredentials>({
+    mutationFn: (credentials) => apiClient.post<User>('/auth/login', credentials),
     onSuccess: (data) => {
-      queryClient.setQueryData(['currentUser'], data.user);
+      queryClient.setQueryData(['currentUser'], data);
       toast.success('Logged in successfully!');
     },
     ...options,
