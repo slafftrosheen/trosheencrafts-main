@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { z } from "zod";
 import { db } from "../db";
-import { orders } from "../db/schema";
-import { desc, eq } from "drizzle-orm";
+import { orderItems, orders, products } from "../db/schema";
+import { desc, eq, inArray } from "drizzle-orm";
 import { validateRequest } from "../middleware/validation";
 import { adminAuthMiddleware, authMiddleware } from "../middleware/auth";
 
@@ -20,7 +20,38 @@ ordersRouter.get("/", authMiddleware, async (req, res, next) => {
     }
 
     const userOrders = await query.orderBy(desc(orders.createdAt));
-    res.json(userOrders);
+
+    if (userOrders.length === 0) {
+      return res.json([]);
+    }
+
+    const items = await db
+      .select({
+        id: orderItems.id,
+        orderId: orderItems.orderId,
+        productId: orderItems.productId,
+        quantity: orderItems.quantity,
+        price: orderItems.price,
+        productName: products.name,
+        productSlug: products.slug,
+      })
+      .from(orderItems)
+      .leftJoin(products, eq(orderItems.productId, products.id))
+      .where(inArray(orderItems.orderId, userOrders.map((order) => order.id)));
+
+    const itemsByOrder = new Map<number, typeof items>();
+    for (const item of items) {
+      const currentItems = itemsByOrder.get(item.orderId) || [];
+      currentItems.push(item);
+      itemsByOrder.set(item.orderId, currentItems);
+    }
+
+    res.json(
+      userOrders.map((order) => ({
+        ...order,
+        items: itemsByOrder.get(order.id) || [],
+      }))
+    );
   } catch (error) {
     next(error);
   }
