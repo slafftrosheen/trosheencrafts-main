@@ -1,6 +1,14 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+export interface CustomConfiguration {
+  vesselId: number;
+  finishId: number;
+  waxId: number;
+  aromaId: number;
+  customDescription?: string;
+}
+
 export interface CartItem {
   id: number | string;
   name: string;
@@ -8,6 +16,7 @@ export interface CartItem {
   quantity: number;
   image?: string;
   variant?: string;
+  customConfiguration?: CustomConfiguration;
 }
 
 interface CartState {
