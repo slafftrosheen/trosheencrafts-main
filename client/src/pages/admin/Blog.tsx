@@ -34,13 +34,13 @@ export default function AdminBlog() {
     mutationFn: (id: number) => apiClient.delete(`/blog/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-blog-posts'] });
-      toast.success(t('admin.entry_deleted') || 'Entry deleted');
+      toast.success(t('admin.entry_deleted') || 'Запись удалена');
     },
-    onError: () => toast.error(t('admin.delete_error') || 'Failed to delete'),
+    onError: () => toast.error(t('admin.delete_error') || 'Не удалось удалить'),
   });
 
   const handleDelete = (id: number) => {
-    if (window.confirm(t('admin.confirm_delete') || 'Are you sure you want to delete this entry?')) {
+    if (window.confirm(t('admin.confirm_delete') || 'Удалить эту запись?')) {
       deleteMutation.mutate(id);
     }
   };
@@ -90,7 +90,7 @@ export default function AdminBlog() {
                     </TableCell>
                     <TableCell className="font-medium">{post.author}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString() : "—"}
+                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString("ru-RU") : "—"}
                     </TableCell>
                     <TableCell className="text-right px-8">
                       <div className="flex justify-end gap-2">
