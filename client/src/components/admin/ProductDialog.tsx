@@ -22,10 +22,10 @@ import { toast } from "sonner";
 import { useLanguage } from "@/lib/LanguageContext";
 
 const productSchema = z.object({
-  name: z.string().min(1, "Name is required"),
-  description: z.string().min(1, "Description is required"),
+  name: z.string().min(1, "Укажите название"),
+  description: z.string().min(1, "Введите описание"),
   price: z.coerce.number().positive(),
-  category: z.string().min(1, "Category is required"),
+  category: z.string().min(1, "Укажите категорию"),
   image: z.string().optional(),
   stock: z.coerce.number().int().min(0).default(1),
   inStock: z.boolean().default(true),
@@ -115,7 +115,7 @@ export function ProductDialog({
             {isEditing ? t("admin.edit_artefact") : t("admin.add_artefact")}
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {isEditing ? "Update the catalogue piece." : "Add a new piece to the catalogue."}
+            {isEditing ? "Измените данные товара в каталоге." : "Добавьте новый товар в каталог."}
           </DialogDescription>
         </DialogHeader>
 
@@ -141,7 +141,7 @@ export function ProductDialog({
               </div>
 
               <div className="space-y-2">
-                <Label>Stock quantity</Label>
+                <Label>Количество на складе</Label>
                 <Input
                   type="number"
                   min="0"
@@ -173,7 +173,7 @@ export function ProductDialog({
             <div>
               <Label>{t("admin.stock")}</Label>
               <p className="mt-1 text-xs text-muted-foreground">
-                Turning this off sets the available stock to zero.
+                При отключении доступный остаток будет установлен в ноль.
               </p>
             </div>
             <Switch
