@@ -69,10 +69,10 @@ export default function ShopPage() {
             <>
               <div className="mb-8 flex items-center justify-between border-b border-border pb-4">
                 <p className="text-sm font-semibold">
-                  {publishedProducts.length} {publishedProducts.length === 1 ? "piece" : "pieces"}
+                  {publishedProducts.length} {publishedProducts.length === 1 ? t("shop.piece") : t("shop.pieces")}
                 </p>
                 <p className="hidden text-xs text-muted-foreground sm:block">
-                  Hand-cast in Daugavpils, Latvia
+                  {t("shop.handcast_location")}
                 </p>
               </div>
 
@@ -122,7 +122,7 @@ export default function ShopPage() {
               <div className="mb-8 max-w-2xl">
                 <p className="eyebrow">{t("shop_custom_builder")}</p>
                 <h2 className="mt-3 font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-                  Build a piece with the workshop
+                  {t("shop.builder_intro")}
                 </h2>
               </div>
               <CandleConstructor />
