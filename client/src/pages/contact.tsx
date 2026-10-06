@@ -52,7 +52,7 @@ export default function ContactPage() {
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <Icon className="h-4 w-4" />
                   </div>
-                  <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  <p className="mt-5 text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
                     {item.label}
                   </p>
                   <p className="mt-2 break-words font-serif text-xl font-semibold">{item.value}</p>
