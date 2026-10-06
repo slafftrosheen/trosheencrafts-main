@@ -43,16 +43,17 @@ export const useCartStore = create<CartState>()(
           
           if (existingItem) {
             return {
-              items: state.items.map((i) =>
-                i.id === item.id && i.variant === item.variant
-                  ? {
-                      ...i,
-                      quantity: i.maxStock
-                        ? Math.min(i.quantity + 1, i.maxStock)
-                        : i.quantity + 1,
-                    }
-                  : i
-              ),
+              items: state.items.map((i) => {
+                if (i.id !== item.id || i.variant !== item.variant) return i;
+                const maxStock = item.maxStock ?? i.maxStock;
+                return {
+                  ...i,
+                  maxStock,
+                  quantity: maxStock
+                    ? Math.min(i.quantity + 1, maxStock)
+                    : i.quantity + 1,
+                };
+              }),
             };
           }
 
