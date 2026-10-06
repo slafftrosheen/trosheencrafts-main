@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/LanguageContext';
@@ -100,7 +100,7 @@ export function CandleConstructor() {
   };
 
   return (
-    <div className="w-full bg-background min-h-screen relative flex flex-col md:flex-row rounded-3xl overflow-hidden border border-border shadow-sm">
+    <div className="w-full bg-background min-h-[720px] relative flex flex-col md:flex-row rounded-3xl overflow-hidden border border-border shadow-sm">
       
       {/* LEFT: Sticky Immersive Visualizer */}
       <div className="md:w-1/2 md:sticky md:top-0 md:h-[calc(100vh-8rem)] min-h-[450px] relative bg-muted/30 overflow-hidden flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-border/40">
@@ -157,7 +157,7 @@ export function CandleConstructor() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="absolute bottom-6 left-1/2 w-[calc(100%-3rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-border bg-background/95 px-5 py-4 shadow-lg backdrop-blur flex flex-col items-center"
+          className="absolute bottom-6 left-1/2 w-[calc(100%_-_3rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-border bg-background/95 px-5 py-4 shadow-lg backdrop-blur flex flex-col items-center"
         >
           <div className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-2">{t('constructor.review_design')}</div>
           <div className="w-full space-y-1.5 text-sm font-medium">
@@ -174,7 +174,7 @@ export function CandleConstructor() {
       </div>
 
       {/* RIGHT: Scrollable Configurator Options */}
-      <div className="md:w-1/2 relative bg-background/50 h-[600px] md:h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar pb-32">
+      <div className="md:w-1/2 relative bg-background/50 md:h-[calc(100vh-8rem)] md:overflow-y-auto custom-scrollbar pb-32">
         <div className="max-w-2xl mx-auto p-6 md:p-12 space-y-16">
           
           {/* Section 1: Vessel */}
@@ -302,7 +302,7 @@ export function CandleConstructor() {
                     key={w.id}
                     onClick={() => setWax(w)}
                     className={cn(
-                      "w-full relative group p-5 rounded-2xl border transition-all duration-300 flex justify-between items-center text-left outline-none",
+                      "w-full relative group p-5 rounded-2xl border transition-colors duration-200 flex justify-between items-center text-left outline-none",
                       isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
                     )}
                   >
@@ -343,7 +343,7 @@ export function CandleConstructor() {
                     key={a.id}
                     onClick={() => setAroma(a)}
                     className={cn(
-                      "relative group p-4 rounded-2xl border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center text-left outline-none gap-2",
+                      "relative group p-4 rounded-2xl border transition-colors duration-200 flex flex-col sm:flex-row justify-between items-center text-left outline-none gap-2",
                       isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
                     )}
                   >
