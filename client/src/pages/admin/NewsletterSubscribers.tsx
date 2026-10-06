@@ -77,12 +77,12 @@ export default function NewsletterSubscribersPage() {
 
   const exportSubscribers = () => {
     const rows = [
-      ["Email", "Subscribed At", "Source", "Status"],
+      ["Email", "Дата подписки", "Источник", "Статус"],
       ...visibleSubscribers.map((subscriber) => [
         subscriber.email,
         new Date(subscriber.subscribedAt).toISOString(),
         subscriber.source || "",
-        subscriber.isActive ? "Active" : "Unsubscribed",
+        subscriber.isActive ? "Активен" : "Отписался",
       ]),
     ];
 
@@ -99,18 +99,18 @@ export default function NewsletterSubscribersPage() {
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-6">
-        <p className="text-sm font-medium text-muted-foreground">Audience</p>
-        <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Newsletter subscribers</h1>
+        <p className="text-sm font-medium text-muted-foreground">Аудитория</p>
+        <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Подписчики рассылки</h1>
         <p className="mt-2 text-muted-foreground">
-          Review subscription health, acquisition source and export the currently filtered list.
+          Просматривайте состояние подписок, источник привлечения и экспортируйте отфильтрованный список.
         </p>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "Loaded", value: subscribers.length, note: `${data?.pagination.total || 0} total records`, icon: Mail },
-          { label: "Active", value: activeCount, note: "Eligible subscribers", icon: UserCheck },
-          { label: "Unsubscribed", value: inactiveCount, note: "Inactive records", icon: UserX },
+          { label: "Загружено", value: subscribers.length, note: `${data?.pagination.total || 0} записей всего`, icon: Mail },
+          { label: "Активные", value: activeCount, note: "Получают рассылку", icon: UserCheck },
+          { label: "Отписавшиеся", value: inactiveCount, note: "Неактивные записи", icon: UserX },
         ].map((metric) => {
           const Icon = metric.icon;
           return (
@@ -134,7 +134,7 @@ export default function NewsletterSubscribersPage() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search email or source"
+            placeholder="Поиск по email или источнику"
             className="pl-9"
           />
         </div>
@@ -143,23 +143,23 @@ export default function NewsletterSubscribersPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All subscribers</SelectItem>
-            <SelectItem value="active">Active</SelectItem>
-            <SelectItem value="inactive">Unsubscribed</SelectItem>
+            <SelectItem value="all">Все подписчики</SelectItem>
+            <SelectItem value="active">Активные</SelectItem>
+            <SelectItem value="inactive">Отписавшиеся</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" onClick={() => refetch()}>Refresh</Button>
+        <Button variant="outline" onClick={() => refetch()}>Обновить</Button>
         <Button variant="outline" onClick={exportSubscribers} disabled={!visibleSubscribers.length}>
           <Download className="mr-2 h-4 w-4" />
-          Export CSV
+          Экспорт CSV
         </Button>
       </div>
 
       {error ? (
         <Card className="p-8 text-center">
-          <p className="font-semibold">Unable to load subscribers</p>
+          <p className="font-semibold">Не удалось загрузить подписчиков</p>
           <p className="mt-1 text-sm text-muted-foreground">{(error as any)?.message}</p>
-          <Button className="mt-4" onClick={() => refetch()}>Try again</Button>
+          <Button className="mt-4" onClick={() => refetch()}>Повторить</Button>
         </Card>
       ) : (
         <Card className="overflow-hidden">
@@ -167,16 +167,16 @@ export default function NewsletterSubscribersPage() {
             <TableHeader className="bg-muted/50">
               <TableRow>
                 <TableHead className="px-6">Email</TableHead>
-                <TableHead>Subscribed</TableHead>
-                <TableHead>Source</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>Подписан</TableHead>
+                <TableHead>Источник</TableHead>
+                <TableHead>Статус</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isLoading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
-                    Loading subscribers…
+                    Загрузка подписчиков…
                   </TableCell>
                 </TableRow>
               ) : visibleSubscribers.length ? (
@@ -184,12 +184,12 @@ export default function NewsletterSubscribersPage() {
                   <TableRow key={subscriber.id}>
                     <TableCell className="px-6 font-medium">{subscriber.email}</TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {new Date(subscriber.subscribedAt).toLocaleString()}
+                      {new Date(subscriber.subscribedAt).toLocaleString("ru-RU")}
                     </TableCell>
-                    <TableCell className="capitalize">{subscriber.source || "website"}</TableCell>
+                    <TableCell className="capitalize">{subscriber.source || "сайт"}</TableCell>
                     <TableCell>
                       <Badge variant={subscriber.isActive ? "default" : "secondary"}>
-                        {subscriber.isActive ? "Active" : "Unsubscribed"}
+                        {subscriber.isActive ? "Активен" : "Отписался"}
                       </Badge>
                     </TableCell>
                   </TableRow>
@@ -197,7 +197,7 @@ export default function NewsletterSubscribersPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="py-12 text-center text-muted-foreground">
-                    No subscribers match this filter.
+                    Нет подписчиков, соответствующих фильтру.
                   </TableCell>
                 </TableRow>
               )}
