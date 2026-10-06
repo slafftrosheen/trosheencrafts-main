@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { haptics } from "@/lib/haptics";
+import { apiClient } from "@/lib/apiClient";
 
 interface NewsletterSubscribeProps {
   variant?: "default" | "compact" | "hero" | "footer";
@@ -42,39 +43,22 @@ export function NewsletterSubscribe({
     haptics.playInteraction("tap");
 
     try {
-      const csrfToken = await fetch("/api/csrf-token")
-        .then((r) => r.json())
-        .then((d) => d.csrfToken)
-        .catch(() => "");
+      const data = await apiClient.post<{ success: boolean; message: string }>(
+        "/newsletter/subscribe",
+        { email, source, preferences }
+      );
 
-      const response = await fetch("/api/newsletter/subscribe", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        body: JSON.stringify({ email, source, preferences }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setStatus("success");
-        setMessage(data.message);
-        setEmail("");
-        haptics.playSuccess();
-        window.setTimeout(() => {
-          setStatus("idle");
-          setMessage("");
-        }, 5000);
-      } else {
-        setStatus("error");
-        setMessage(data.message);
-        haptics.playError();
-      }
-    } catch {
+      setStatus("success");
+      setMessage(data.message);
+      setEmail("");
+      haptics.playSuccess();
+      window.setTimeout(() => {
+        setStatus("idle");
+        setMessage("");
+      }, 5000);
+    } catch (error: any) {
       setStatus("error");
-      setMessage("Unable to subscribe. Please try again later.");
+      setMessage(error?.message || "Unable to subscribe. Please try again later.");
       haptics.playError();
     }
   };
