@@ -65,7 +65,7 @@ interface GalleryItem {
   featured: boolean;
   published: boolean;
   viewCount: number;
-  отметок «Нравится»: number;
+  likes: number;
   sortOrder: number;
   metadata?: any;
 }
@@ -206,7 +206,7 @@ function CategoryManager() {
                 <TableCell>
                   <Badge variant="outline" className="rounded-full">
                     {cat.type === '3d' ? <Grid3x3 className="w-3 h-3 mr-1" /> : <Images className="w-3 h-3 mr-1" />}
-                    {cat.type === '3d' ? '3D-модели' : 'Фотографии'}
+                    {cat.type === '3d' ? '3D-модели' : cat.type === 'video' ? 'Видео' : 'Фотографии'}
                   </Badge>
                 </TableCell>
                 <TableCell>
