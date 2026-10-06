@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 type Language = "en" | "lv" | "ru" | "pl" | "uk";
 
@@ -736,6 +736,10 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     }
     return "lv";
   });
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
