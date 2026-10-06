@@ -114,7 +114,7 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="keep">Оставить как есть</SelectItem>
-                  <SelectItem value="true">Published</SelectItem>
+                  <SelectItem value="true">Опубликовано</SelectItem>
                   <SelectItem value="false">Скрыто</SelectItem>
                 </SelectContent>
               </Select>
@@ -122,14 +122,14 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
 
             {/* Featured */}
             <div className="space-y-3">
-              <Label className="text-xs font-black uppercase tracking-widest text-primary/60 ml-1">Featured</Label>
+              <Label className="text-xs font-black uppercase tracking-widest text-primary/60 ml-1">Избранное</Label>
               <Select value={featured} onValueChange={(v: any) => setFeatured(v)}>
                 <SelectTrigger className="rounded-xl border-2 bg-background/50 h-12">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="keep">Keep existing</SelectItem>
-                  <SelectItem value="true">Featured</SelectItem>
+                  <SelectItem value="keep">Оставить как есть</SelectItem>
+                  <SelectItem value="true">Избранное</SelectItem>
                   <SelectItem value="false">Обычное</SelectItem>
                 </SelectContent>
               </Select>
