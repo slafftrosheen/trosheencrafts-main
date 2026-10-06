@@ -31,8 +31,8 @@ export function FileUploader({
     // Size validation
     if (file.size > maxSizeMB * 1024 * 1024) {
       toast({
-        title: 'File too large',
-        description: `Maximum file size is ${maxSizeMB}MB`,
+        title: 'Файл слишком большой',
+        description: `Максимальный размер файла — ${maxSizeMB} МБ`,
         variant: 'destructive',
       });
       return;
@@ -56,14 +56,14 @@ export function FileUploader({
 
       onUploadComplete(data.url);
       toast({
-        title: 'Upload successful',
-        description: `File uploaded: ${file.name}`,
+        title: 'Файл загружен',
+        description: `Загружен файл: ${file.name}`,
       });
     } catch (e: any) {
       console.error(e);
       toast({
-        title: 'Upload failed',
-        description: e.message || 'Failed to upload file',
+        title: 'Ошибка загрузки',
+        description: e.message || 'Не удалось загрузить файл',
         variant: 'destructive',
       });
       setPreview(null);
@@ -118,7 +118,7 @@ export function FileUploader({
           <div className="relative">
             <img
               src={preview}
-              alt="Preview"
+              alt="Предпросмотр"
               className="max-h-64 mx-auto rounded-xl object-contain"
             />
             <button
@@ -141,11 +141,11 @@ export function FileUploader({
             )}
 
             <p className="text-sm font-medium mb-2">
-              {uploading ? 'Uploading...' : 'Drop file here or click to browse'}
+              {uploading ? 'Загрузка...' : 'Перетащите файл сюда или нажмите для выбора'}
             </p>
             <p className="text-xs text-muted-foreground mb-4">
-              {type === '3d' ? 'GLB or GLTF files' : type === 'video' ? 'MP4 or WebM videos' : 'JPG, PNG, GIF or WEBP images'}
-              {' • '}Max {maxSizeMB}MB
+              {type === '3d' ? 'Файлы GLB или GLTF' : type === 'video' ? 'Видео MP4 или WebM' : 'Изображения JPG, PNG, GIF или WEBP'}
+              {' • '}Макс. {maxSizeMB} МБ
             </p>
           </>
         )}
@@ -172,12 +172,12 @@ export function FileUploader({
                 {uploading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Uploading...
+                    Загрузка...
                   </>
                 ) : (
                   <>
                     <Upload className="w-4 h-4 mr-2" />
-                    Choose File
+                    Выбрать файл
                   </>
                 )}
               </span>
@@ -197,14 +197,14 @@ export function FileUploader({
 
       {currentUrl && (!preview || type === '3d' || type === 'video') && (
         <div className="text-sm text-muted-foreground">
-          Current file:{' '}
+          Текущий файл:{' '}
           <a
             href={currentUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
           >
-            View current file →
+            Открыть текущий файл →
           </a>
         </div>
       )}
