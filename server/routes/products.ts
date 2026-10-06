@@ -120,7 +120,7 @@ productsRouter.get(
         .where(eq(products.id, id))
         .limit(1);
 
-      if (!product) {
+      if (!product || (product.published === false && !req.isAuthenticated())) {
         return res.status(404).json({ message: 'Product not found' });
       }
 
