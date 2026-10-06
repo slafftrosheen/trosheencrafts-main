@@ -85,7 +85,7 @@ export default function AdminPromotions() {
         </Button>
       </header>
 
-      <Card className="p-6 mb-8 rounded-[2rem] border-2 border-border/40 bg-card/40">
+      <Card className="p-6 mb-8 rounded-xl border-border bg-card shadow-sm">
         <h3 className="font-serif text-lg font-bold mb-4">Gallery Settings</h3>
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
@@ -112,7 +112,7 @@ export default function AdminPromotions() {
       {isLoading ? (
         <div className="flex justify-center py-20"><Spinner size="lg" /></div>
       ) : (
-        <Card className="rounded-[2.5rem] border-2 border-border/40 overflow-hidden bg-card/40 shadow-xl">
+        <Card className="overflow-hidden border-border bg-card shadow-sm">
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
