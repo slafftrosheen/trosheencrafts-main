@@ -751,7 +751,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string) => {
-    return translations[key]?.[language] || key;
+    const activeLanguage: Language =
+      typeof window !== "undefined" && window.location.pathname.startsWith("/admin")
+        ? "ru"
+        : language;
+    return translations[key]?.[activeLanguage] || key;
   };
 
   return (
