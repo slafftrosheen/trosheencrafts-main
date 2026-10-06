@@ -62,6 +62,7 @@ export default function ProductDetail() {
         name,
         price,
         image: selectedImage || images[0],
+        maxStock: availableStock,
       });
     }
     toast.success(t("product.added_to_cart"));
