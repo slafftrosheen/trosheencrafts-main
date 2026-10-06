@@ -133,7 +133,7 @@ analyticsRouter.get("/top-products", adminAuthMiddleware, async (req, res, next)
     res.json(
       topProducts.map((product) => ({
         productId: product.productId,
-        productName: product.productName || "Deleted product",
+        productName: product.productName || "Удалённый товар",
         totalQuantity: product.totalQuantity,
         totalRevenue: Number(product.totalRevenue || 0),
       }))
@@ -160,7 +160,7 @@ analyticsRouter.get("/categories", adminAuthMiddleware, async (_req, res, next) 
 
     res.json(
       categorySales.map((category) => ({
-        category: category.category || "Uncategorized",
+        category: category.category || "Без категории",
         revenue: Number(category.revenue || 0),
         orders: category.orders,
       }))
@@ -195,12 +195,20 @@ analyticsRouter.get("/recent-activity", adminAuthMiddleware, async (_req, res, n
       .orderBy(desc(contactSubmissions.createdAt))
       .limit(6);
 
+    const orderStatusLabels: Record<string, string> = {
+      pending: "ожидает",
+      processing: "в обработке",
+      shipped: "отправлен",
+      delivered: "доставлен",
+      cancelled: "отменён",
+    };
+
     const activity = [
       ...recentOrders.map((order) => ({
         id: "order-" + order.id,
         entityId: order.id,
         type: "order" as const,
-        description: `Order #${order.id} · ${order.status}`,
+        description: `Заказ #${order.id} · ${orderStatusLabels[order.status] || order.status}`,
         amount: Number(order.amount),
         createdAt: order.createdAt,
       })),
@@ -208,7 +216,7 @@ analyticsRouter.get("/recent-activity", adminAuthMiddleware, async (_req, res, n
         id: "message-" + message.id,
         entityId: message.id,
         type: "message" as const,
-        description: message.subject || `Message from ${message.name}`,
+        description: message.subject || `Сообщение от ${message.name}`,
         status: message.status,
         createdAt: message.createdAt,
       })),
