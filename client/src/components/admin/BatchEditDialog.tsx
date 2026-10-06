@@ -33,8 +33,8 @@ interface BatchEditDialogProps {
 export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: BatchEditDialogProps) {
   const queryClient = useQueryClient();
   const [categoryId, setCategoryId] = useState<string>('keep');
-  const [published, setPublished] = useState<'keep' | 'true' | 'false'>('keep');
-  const [featured, setFeatured] = useState<'keep' | 'true' | 'false'>('keep');
+  const [published, setОпубликовано] = useState<'keep' | 'true' | 'false'>('keep');
+  const [featured, setИзбранное] = useState<'keep' | 'true' | 'false'>('keep');
   const [regenerateSlugs, setRegenerateSlugs] = useState(false);
 
   const { data: categories = [] } = useQuery({
@@ -49,12 +49,12 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
     }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryItems'] });
-      toast.success(`Successfully updated ${selectedIds.length} items`);
+      toast.success(`Обновлено элементов: ${selectedIds.length}`);
       onSuccess();
       onOpenChange(false);
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to batch update items');
+      toast.error(error.message || 'Не удалось массово обновить элементы');
     }
   });
 
@@ -66,7 +66,7 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
     if (regenerateSlugs) updates.regenerateSlugs = true;
 
     if (Object.keys(updates).length === 0) {
-      toast.error('No changes selected to apply');
+      toast.error('Не выбраны изменения для применения');
       return;
     }
 
@@ -79,24 +79,24 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
         <DialogHeader>
           <DialogTitle className="text-2xl font-serif font-bold flex items-center gap-3">
             <Settings2 className="text-primary w-6 h-6" />
-            Batch Edit ({selectedIds.length} items)
+            Пакетное редактирование ({selectedIds.length})
           </DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            Apply changes to all selected gallery items at once.
+            Примените изменения сразу ко всем выбранным элементам галереи.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-6 py-6">
           {/* Category */}
           <div className="space-y-3">
-            <Label className="text-xs font-black uppercase tracking-widest text-primary/60 ml-1">Update Category</Label>
+            <Label className="text-xs font-black uppercase tracking-widest text-primary/60 ml-1">Категория</Label>
             <Select value={categoryId} onValueChange={setCategoryId}>
               <SelectTrigger className="rounded-xl border-2 bg-background/50 h-12">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="keep">— Keep existing —</SelectItem>
-                <SelectItem value="none">No Category</SelectItem>
+                <SelectItem value="keep">— Оставить как есть —</SelectItem>
+                <SelectItem value="none">Без категории</SelectItem>
                 {categories.map(cat => (
                   <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name} ({cat.type})</SelectItem>
                 ))}
@@ -107,15 +107,15 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
           <div className="grid grid-cols-2 gap-4">
             {/* Published */}
             <div className="space-y-3">
-              <Label className="text-xs font-black uppercase tracking-widest text-primary/60 ml-1">Visibility</Label>
+              <Label className="text-xs font-black uppercase tracking-widest text-primary/60 ml-1">Видимость</Label>
               <Select value={published} onValueChange={(v: any) => setPublished(v)}>
                 <SelectTrigger className="rounded-xl border-2 bg-background/50 h-12">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="keep">Keep existing</SelectItem>
+                  <SelectItem value="keep">Оставить как есть</SelectItem>
                   <SelectItem value="true">Published</SelectItem>
-                  <SelectItem value="false">Hidden</SelectItem>
+                  <SelectItem value="false">Скрыто</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -130,7 +130,7 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
                 <SelectContent>
                   <SelectItem value="keep">Keep existing</SelectItem>
                   <SelectItem value="true">Featured</SelectItem>
-                  <SelectItem value="false">Regular</SelectItem>
+                  <SelectItem value="false">Обычное</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -143,9 +143,9 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
             <div className="space-y-0.5">
               <Label htmlFor="regen-slugs" className="font-bold flex items-center gap-2 cursor-pointer">
                 <RefreshCcw className="w-4 h-4 text-primary" />
-                Regenerate Names (Slugs)
+                Пересоздать slug
               </Label>
-              <p className="text-[10px] text-muted-foreground font-medium">Re-sync web links with titles</p>
+              <p className="text-[10px] text-muted-foreground font-medium">Синхронизировать URL с названиями</p>
             </div>
             <Switch 
               id="regen-slugs" 
@@ -157,10 +157,10 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl h-12 flex-1 border-2">
-            Cancel
+            Отмена
           </Button>
           <Button onClick={handleSave} disabled={mutation.isPending} className="rounded-xl h-12 flex-1 font-bold shadow-lg shadow-primary/20">
-            {mutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Apply Changes'}
+            {mutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : 'Применить изменения'}
           </Button>
         </DialogFooter>
       </DialogContent>
