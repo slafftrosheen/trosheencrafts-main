@@ -41,6 +41,7 @@ interface OrderItem {
   productId: number;
   quantity: number;
   price: number | string;
+  variant?: string | null;
   productName: string | null;
   productSlug: string | null;
 }
@@ -315,6 +316,11 @@ export default function AdminOrders() {
                                         <p className="text-xs text-muted-foreground">
                                           Qty {item.quantity} × {euro.format(Number(item.price || 0))}
                                         </p>
+                                        {item.variant && (
+                                          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                                            {item.variant}
+                                          </p>
+                                        )}
                                       </div>
                                       <span className="text-sm font-semibold">
                                         {euro.format(Number(item.price || 0) * item.quantity)}
