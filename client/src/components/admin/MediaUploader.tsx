@@ -121,7 +121,7 @@ export function MediaUploader({
   );
 
   const handleFileSelect = useCallback(
-    (e: React.ЗаменитьEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files || files.length === 0) return;
 
@@ -271,7 +271,7 @@ export function MediaUploader({
               </p>
               {uploadedFile && (
                 <p className="text-xs text-muted-foreground">
-                  {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
+                  {(uploadedFile.size / 1024 / 1024).toFixed(2)} МБ
                 </p>
               )}
               <div className="mt-4 flex items-center gap-2 text-xs text-green-600">
