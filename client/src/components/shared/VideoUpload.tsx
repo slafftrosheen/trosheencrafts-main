@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 
 interface VideoUploadProps {
   value?: string;
-  onЗаменить: (url: string) => void;
-  onУдалить?: () => void;
+  onChange: (url: string) => void;
+  onRemove?: () => void;
   className?: string;
   maxSizeMB?: number;
 }
