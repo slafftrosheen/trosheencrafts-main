@@ -1,17 +1,26 @@
 import { Router, Request } from "express";
 import { z } from "zod";
 import { db } from "../db";
-import { orders, orderItems, products } from "../db/schema";
+import { constructorOptions, orders, orderItems, products } from "../db/schema";
 import { eq, inArray } from "drizzle-orm";
 import { validateRequest } from "../middleware/validation";
 import { createSumupCheckout, verifySumupCheckout } from "../lib/sumup";
 
 export const checkoutRouter = Router();
 
+interface CustomConfiguration {
+  vesselId: number;
+  finishId: number;
+  waxId: number;
+  aromaId: number;
+  customDescription?: string;
+}
+
 interface CartItem {
   productId: number | string;
   quantity: number;
   variant?: string;
+  customConfiguration?: CustomConfiguration;
 }
 
 interface ShippingAddress {
@@ -26,6 +35,14 @@ interface AuthenticatedRequest extends Request {
   user?: Express.User;
 }
 
+const customConfigurationSchema = z.object({
+  vesselId: z.number().int().positive(),
+  finishId: z.number().int().positive(),
+  waxId: z.number().int().positive(),
+  aromaId: z.number().int().positive(),
+  customDescription: z.string().trim().max(500).optional(),
+});
+
 const createCheckoutSchema = z.object({
   body: z.object({
     items: z
@@ -34,6 +51,7 @@ const createCheckoutSchema = z.object({
           productId: z.union([z.number().int().positive(), z.string().min(1)]),
           quantity: z.number().int().positive().max(99),
           variant: z.string().max(1000).optional(),
+          customConfiguration: customConfigurationSchema.optional(),
         })
       )
       .min(1)
@@ -49,22 +67,10 @@ const createCheckoutSchema = z.object({
   }),
 });
 
-function customPriceFromVariant(variant = "") {
-  let price = 0;
-
-  if (variant.includes("Heart Vessel")) price += 15;
-  else if (variant.includes("Minimalist Sphere")) price += 18;
-  else price += 12;
-
-  if (variant.includes("Marble Effect")) price += 5;
-  if (variant.includes("Painted Bronze")) price += 8;
-  if (variant.includes("Gold Leaf Detail")) price += 10;
-  if (variant.includes("Clear Gel Wax")) price += 3;
-  if (variant.includes("Natural Beeswax")) price += 5;
-  if (!variant.includes("Unscented")) price += 2;
-
-  return price;
-}
+const optionName = (option: typeof constructorOptions.$inferSelect) => {
+  const names = option.nameTranslations as { en?: string };
+  return names?.en || option.key;
+};
 
 checkoutRouter.post(
   "/create-session",
@@ -94,6 +100,10 @@ checkoutRouter.post(
       }
 
       for (const item of items) {
+        if (typeof item.productId === "string" && !item.productId.startsWith("custom-")) {
+          return res.status(400).json({ message: "A selected piece is not valid." });
+        }
+
         if (typeof item.productId !== "number") continue;
 
         const product = foundProducts.find((candidate) => candidate.id === item.productId);
@@ -109,25 +119,96 @@ checkoutRouter.post(
         }
       }
 
-      const totalAmount = items.reduce((sum, item) => {
-        if (typeof item.productId === "string" && item.productId.startsWith("custom-")) {
-          return sum + customPriceFromVariant(item.variant) * item.quantity;
+      const customItems = items.filter(
+        (item) => typeof item.productId === "string" && item.productId.startsWith("custom-")
+      );
+
+      for (const item of customItems) {
+        if (!item.customConfiguration) {
+          return res.status(400).json({
+            message: "A custom piece is missing its configuration. Please rebuild it in the workshop.",
+          });
+        }
+      }
+
+      const optionIds = Array.from(
+        new Set(
+          customItems.flatMap((item) => {
+            const config = item.customConfiguration!;
+            return [config.vesselId, config.finishId, config.waxId, config.aromaId];
+          })
+        )
+      );
+
+      const foundOptions = optionIds.length
+        ? await db.select().from(constructorOptions).where(inArray(constructorOptions.id, optionIds))
+        : [];
+
+      const optionById = new Map(foundOptions.map((option) => [option.id, option]));
+
+      const pricedItems = items.map((item) => {
+        if (typeof item.productId === "number") {
+          const product = foundProducts.find((candidate) => candidate.id === item.productId)!;
+          return {
+            item,
+            unitPrice: Number(product.price),
+            variant: item.variant?.trim() || null,
+          };
         }
 
-        const product = foundProducts.find((candidate) => candidate.id === item.productId);
-        return sum + Number(product!.price) * item.quantity;
-      }, 0);
+        const config = item.customConfiguration!;
+        const vessel = optionById.get(config.vesselId);
+        const finish = optionById.get(config.finishId);
+        const wax = optionById.get(config.waxId);
+        const aroma = optionById.get(config.aromaId);
+
+        const typedOptions = [
+          ["vessel", vessel],
+          ["finish", finish],
+          ["wax", wax],
+          ["aroma", aroma],
+        ] as const;
+
+        for (const [expectedType, option] of typedOptions) {
+          if (!option || option.type !== expectedType || option.active === false) {
+            throw new Error("INVALID_CUSTOM_CONFIGURATION");
+          }
+        }
+
+        const unitPrice =
+          Number(vessel!.price) +
+          Number(finish!.price) +
+          Number(wax!.price) +
+          Number(aroma!.price);
+
+        const customNote = config.customDescription?.trim();
+        const finishLabel =
+          optionName(finish!) + (customNote ? " (" + customNote + ")" : "");
+
+        return {
+          item,
+          unitPrice,
+          variant: [
+            optionName(vessel!),
+            finishLabel,
+            optionName(wax!),
+            optionName(aroma!),
+          ].join(" / "),
+        };
+      });
+
+      const totalAmount = pricedItems.reduce(
+        (sum, priced) => sum + priced.unitPrice * priced.item.quantity,
+        0
+      );
 
       if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
         return res.status(400).json({ message: "Unable to calculate a valid order total." });
       }
 
       let customProductId: number | null = null;
-      const hasCustomItems = items.some(
-        (item) => typeof item.productId === "string" && item.productId.startsWith("custom-")
-      );
 
-      if (hasCustomItems) {
+      if (customItems.length > 0) {
         const [existingCustom] = await db
           .select()
           .from(products)
@@ -143,7 +224,7 @@ checkoutRouter.post(
               name: "Custom Crafted Candle",
               slug: "custom-candle-builder",
               description: "A custom configured candle built by the customer.",
-              price: "15.00",
+              price: "0.00",
               category: "Custom",
               published: false,
               stock: 0,
@@ -166,24 +247,16 @@ checkoutRouter.post(
           .returning();
 
         await tx.insert(orderItems).values(
-          items.map((item) => {
-            if (typeof item.productId === "string" && item.productId.startsWith("custom-")) {
-              return {
-                orderId: createdOrder.id,
-                productId: customProductId as number,
-                quantity: item.quantity,
-                price: customPriceFromVariant(item.variant).toFixed(2),
-              };
-            }
-
-            const product = foundProducts.find((candidate) => candidate.id === item.productId)!;
-            return {
-              orderId: createdOrder.id,
-              productId: item.productId as number,
-              quantity: item.quantity,
-              price: product.price,
-            };
-          })
+          pricedItems.map(({ item, unitPrice, variant }) => ({
+            orderId: createdOrder.id,
+            productId:
+              typeof item.productId === "number"
+                ? item.productId
+                : (customProductId as number),
+            quantity: item.quantity,
+            price: unitPrice.toFixed(2),
+            variant,
+          }))
         );
 
         return createdOrder;
@@ -192,19 +265,30 @@ checkoutRouter.post(
       const publicBaseUrl =
         (process.env.SITE_URL || process.env.FRONTEND_URL || "https://trosheen.shop").replace(/\/$/, "");
 
-      const checkout = await createSumupCheckout({
-        amount: totalAmount,
-        orderId: order.id.toString(),
-        successUrl: publicBaseUrl + "/order-confirmation?order_id=" + order.id,
-        callbackUrl: publicBaseUrl + "/api/checkout/webhook",
-      });
+      try {
+        const checkout = await createSumupCheckout({
+          amount: totalAmount,
+          orderId: order.id.toString(),
+          successUrl: publicBaseUrl + "/order-confirmation?order_id=" + order.id,
+          callbackUrl: publicBaseUrl + "/api/checkout/webhook",
+        });
 
-      res.json({
-        orderId: order.id,
-        sessionId: checkout.id,
-        sessionUrl: checkout.hosted_checkout_url,
-      });
-    } catch (error) {
+        return res.json({
+          orderId: order.id,
+          sessionId: checkout.id,
+          sessionUrl: checkout.hosted_checkout_url,
+        });
+      } catch (checkoutError) {
+        await db.delete(orders).where(eq(orders.id, order.id));
+        throw checkoutError;
+      }
+    } catch (error: any) {
+      if (error?.message === "INVALID_CUSTOM_CONFIGURATION") {
+        return res.status(400).json({
+          message: "A custom option is no longer available. Please review the custom piece before checkout.",
+        });
+      }
+
       console.error("SumUp create checkout error:", error);
       next(error);
     }
