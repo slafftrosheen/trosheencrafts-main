@@ -98,7 +98,7 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
                 <SelectItem value="keep">— Оставить как есть —</SelectItem>
                 <SelectItem value="none">Без категории</SelectItem>
                 {categories.map(cat => (
-                  <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name} ({cat.type})</SelectItem>
+                  <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name} ({cat.type === 'photo' ? 'Фото' : cat.type === 'video' ? 'Видео' : '3D'})</SelectItem>
                 ))}
               </SelectContent>
             </Select>
