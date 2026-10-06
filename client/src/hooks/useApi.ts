@@ -27,7 +27,7 @@ export interface Product {
 export function useProducts(options?: Partial<UseQueryOptions<Product[], ApiClientError>>) {
   return useQuery<Product[], ApiClientError>({
     queryKey: ['products'],
-    queryFn: () => apiClient.get<Product[]>('/products'),
+    queryFn: () => apiClient.get<Product[]>('/products', { params: { limit: 100 } }),
     staleTime: 5 * 60 * 1000,
     ...options,
   });
