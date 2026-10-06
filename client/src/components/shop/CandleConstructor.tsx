@@ -82,7 +82,7 @@ export function CandleConstructor() {
 
     addItem({
       id: customId,
-      name: 'Custom Crafted Candle',
+      name: t('constructor.custom_product_name'),
       price: totalPrice,
       image: shape.imageUrl || '',
       variant: variantStr,
