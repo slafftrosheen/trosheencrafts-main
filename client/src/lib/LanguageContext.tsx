@@ -696,6 +696,7 @@ export const translations: Translations = {
   "constructor.included": { en: "Included", lv: "Iekļauts", ru: "Включено", pl: "W cenie", uk: "Включено" },
   "constructor.free": { en: "Included", lv: "Iekļauts", ru: "Включено", pl: "W cenie", uk: "Включено" },
   "constructor.custom_request": { en: "Your custom request", lv: "Jūsu individuālais pieprasījums", ru: "Ваш индивидуальный запрос", pl: "Twoje indywidualne życzenie", uk: "Ваш індивідуальний запит" },
+  "constructor.custom_product_name": { en: "Custom Crafted Candle", lv: "Individuāli veidota svece", ru: "Свеча по индивидуальному дизайну", pl: "Świeca wykonana na zamówienie", uk: "Свічка за індивідуальним дизайном" },
   "constructor.custom_placeholder": { en: "e.g. Deep emerald green with copper speckles...", lv: "piem., dziļi smaragdzaļš ar vara akcentiem...", ru: "например, глубокий изумрудный с медными вкраплениями...", pl: "np. głęboka szmaragdowa zieleń z miedzianymi drobinkami...", uk: "наприклад, насичений смарагдовий із мідними вкрапленнями..." },
   // Admin
   "admin.dashboard": { en: "Dashboard", lv: "Informācijas panelis", ru: "Панель управления", pl: "Pulpit nawigacyjny", uk: "Панель управління" },
