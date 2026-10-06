@@ -713,6 +713,16 @@ export const translations: Translations = {
   "footer.newsletter_title": { en: "Subscribers", lv: "Abonenti", ru: "Подписчики", pl: "Subskrybenci", uk: "Підписники" },
   "admin.logout": { en: "Logout", lv: "Izrakstīties", ru: "Выйти", pl: "Wyloguj", uk: "Вийти" },
   "admin.login_title": { en: "Admin Portal", lv: "Administratora portāls", ru: "Портал администратора", pl: "Portal administratora", uk: "Портал адміністратора" },
+  "admin.entry_deleted": { en: "Entry deleted", lv: "Ieraksts dzēsts", ru: "Запись удалена", pl: "Wpis usunięty", uk: "Запис видалено" },
+  "admin.delete_error": { en: "Failed to delete", lv: "Neizdevās dzēst", ru: "Не удалось удалить", pl: "Nie udało się usunąć", uk: "Не вдалося видалити" },
+  "admin.blog.write": { en: "Write entry", lv: "Rakstīt ierakstu", ru: "Новая запись", pl: "Napisz wpis", uk: "Новий запис" },
+  "admin.common.save": { en: "Save", lv: "Saglabāt", ru: "Сохранить", pl: "Zapisz", uk: "Зберегти" },
+  "admin.common.showing": { en: "Showing", lv: "Parādīts", ru: "Показано", pl: "Wyświetlono", uk: "Показано" },
+  "admin.common.of": { en: "of", lv: "no", ru: "из", pl: "z", uk: "з" },
+  "common.create": { en: "Create", lv: "Izveidot", ru: "Создать", pl: "Utwórz", uk: "Створити" },
+  "common.update": { en: "Update", lv: "Atjaunināt", ru: "Обновить", pl: "Aktualizuj", uk: "Оновити" },
+  "common.prev": { en: "Previous", lv: "Iepriekšējā", ru: "Назад", pl: "Poprzednia", uk: "Назад" },
+  "common.next": { en: "Next", lv: "Nākamā", ru: "Далее", pl: "Dalej", uk: "Далі" },
 
 };
 
