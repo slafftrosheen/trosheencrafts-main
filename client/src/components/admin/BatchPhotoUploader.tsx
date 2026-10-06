@@ -69,7 +69,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
         file,
         preview: URL.createObjectURL(file),
         title: title.charAt(0).toUpperCase() + title.slice(1),
-        slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        slug: title.normalize('NFKC').toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, ''),
         status: 'idle',
         progress: 0
       };
@@ -106,7 +106,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
       } : i));
     } catch (error) {
       setPendingItems(prev => prev.map(i => i.id === id ? { ...i, status: 'error', progress: 0 } : i));
-      toast.error(`Failed to upload ${item.file.name}`);
+      toast.error(`Не удалось загрузить ${item.file.name}`);
     }
   };
 
@@ -121,19 +121,19 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
     mutationFn: (data: { items: any[], autoName: boolean }) => apiClient.post('/gallery/admin/items/batch', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryItems'] });
-      toast.success(`Successfully saved ${pendingItems.length} photos to gallery`);
+      toast.success(`Сохранено фотографий в галерею: ${pendingItems.length}`);
       onOpenChange(false);
       setPendingItems([]);
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to save items to gallery');
+      toast.error(error.message || 'Не удалось сохранить элементы в галерею');
     }
   });
 
   const handleSaveAll = () => {
     const readyItems = pendingItems.filter(i => i.status === 'success' && i.url);
     if (readyItems.length === 0) {
-      toast.error('No successfully uploaded photos to save');
+      toast.error('Нет успешно загруженных фотографий для сохранения');
       return;
     }
 
@@ -162,25 +162,25 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
             <div>
               <DialogTitle className="text-3xl font-serif font-bold flex items-center gap-3">
                 <Images className="text-primary w-8 h-8" />
-                Batch Photo Upload
+                Пакетная загрузка фото
               </DialogTitle>
               <DialogDescription className="text-muted-foreground mt-1">
-                Upload multiple photos at once and organize them into your gallery.
+                Загрузите несколько фотографий сразу и распределите их по галерее.
               </DialogDescription>
             </div>
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2 bg-primary/5 px-4 py-2 rounded-xl border border-primary/10">
                 <Switch id="auto-name" checked={autoName} onCheckedChange={setAutoName} />
-                <Label htmlFor="auto-name" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Auto-name</Label>
+                <Label htmlFor="auto-name" className="text-[10px] font-black uppercase tracking-widest cursor-pointer">Автоназвание</Label>
               </div>
               <div className="flex flex-col items-end gap-1">
-                <Label className="text-[10px] font-black uppercase tracking-widest text-primary/60">Common Category</Label>
+                <Label className="text-[10px] font-black uppercase tracking-widest text-primary/60">Общая категория</Label>
                 <Select value={commonCategoryId} onValueChange={setCommonCategoryId}>
                   <SelectTrigger className="w-48 h-10 rounded-xl bg-background/50 border-2">
-                    <SelectValue placeholder="Select category" />
+                    <SelectValue placeholder="Выберите категорию" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">No Category</SelectItem>
+                    <SelectItem value="none">Без категории</SelectItem>
                     {categories.filter(c => c.type === 'photo').map(cat => (
                       <SelectItem key={cat.id} value={cat.id.toString()}>{cat.name}</SelectItem>
                     ))}
@@ -193,7 +193,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
                 variant="outline"
                 className="rounded-xl h-10 border-2 border-primary/20 hover:border-primary/40"
               >
-                <Plus className="w-4 h-4 mr-2" /> Add More
+                <Plus className="w-4 h-4 mr-2" /> Добавить ещё
               </Button>
             </div>
           </div>
@@ -218,8 +218,8 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
                 <Upload className="w-8 h-8" />
               </div>
               <div className="text-center">
-                <p className="text-lg font-bold">Drop photos here or click to browse</p>
-                <p className="text-sm text-muted-foreground">Support for JPEG, PNG and WebP up to 10MB per file</p>
+                <p className="text-lg font-bold">Перетащите фотографии сюда или нажмите для выбора</p>
+                <p className="text-sm text-muted-foreground">JPEG, PNG и WebP до 10 МБ на файл</p>
               </div>
             </div>
           ) : (
@@ -234,7 +234,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
                     className="group relative bg-background/50 rounded-2xl border-2 border-border/40 overflow-hidden flex flex-col"
                   >
                     <div className="aspect-[4/3] relative">
-                      <img src={item.preview} className="w-full h-full object-cover" alt="Preview" />
+                      <img src={item.preview} className="w-full h-full object-cover" alt="Предпросмотр" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <Button 
                           variant="destructive" 
@@ -250,7 +250,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
                       {item.status === 'uploading' && (
                         <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
                           <Loader2 className="w-8 h-8 animate-spin text-primary mb-2" />
-                          <p className="text-xs font-black uppercase tracking-widest">{item.progress}% Uploading</p>
+                          <p className="text-xs font-black uppercase tracking-widest">{item.progress}% Загружается</p>
                           <div className="w-full bg-muted rounded-full h-1.5 mt-3 overflow-hidden">
                             <motion.div 
                               className="bg-primary h-full"
@@ -279,7 +279,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
                         value={item.title} 
                         onChange={(e) => setPendingItems(prev => prev.map(i => i.id === item.id ? { ...i, title: e.target.value } : i))}
                         className="h-9 rounded-lg border-2 text-sm font-bold"
-                        placeholder="Photo Title"
+                        placeholder="Название фотографии"
                       />
                     </div>
                   </motion.div>
@@ -299,7 +299,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
             }}
             className="rounded-xl h-12 px-6"
           >
-            Cancel
+            Отмена
           </Button>
           
           <div className="flex gap-3">
@@ -310,7 +310,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
                 className="rounded-xl h-12 px-8 font-bold bg-primary/10 text-primary hover:bg-primary/20 border-2 border-primary/20"
               >
                 {someUploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
-                Upload Files
+                Загрузить файлы
               </Button>
             )}
             
@@ -320,7 +320,7 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
               className="rounded-xl h-12 px-10 font-bold shadow-xl shadow-primary/20"
             >
               {saveMutation.isPending ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CheckCircle2 className="mr-2 h-4 w-4" />}
-              Save to Gallery ({pendingItems.filter(i => i.status === 'success').length})
+              Сохранить в галерею ({pendingItems.filter(i => i.status === 'success').length})
             </Button>
           </div>
         </DialogFooter>
