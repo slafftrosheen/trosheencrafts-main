@@ -81,7 +81,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
               className="rounded-xl"
             >
               <Upload className="h-4 w-4 mr-2" />
-              Change
+              Заменить
             </Button>
             {onRemove && (
               <Button
@@ -95,7 +95,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
                 className="rounded-xl"
               >
                 <X className="h-4 w-4 mr-2" />
-                Remove
+                Удалить
               </Button>
             )}
           </div>
