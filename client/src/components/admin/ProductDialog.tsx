@@ -24,7 +24,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 const productSchema = z.object({
   name: z.string().min(1, "Укажите название"),
   description: z.string().min(1, "Введите описание"),
-  price: z.coerce.number().positive(),
+  price: z.coerce.number().positive("Цена должна быть больше нуля"),
   category: z.string().min(1, "Укажите категорию"),
   image: z.string().optional(),
   stock: z.coerce.number().int().min(0).default(1),
