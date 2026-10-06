@@ -69,7 +69,7 @@ export function ShoppingCartComponent() {
                       </div>
                       <button
                         type="button"
-                        className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-destructive"
+                        className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-destructive"
                         onClick={() => removeItem(item.id, item.variant)}
                         aria-label="Remove item"
                       >
@@ -81,7 +81,7 @@ export function ShoppingCartComponent() {
                       <div className="flex items-center rounded-full border border-border">
                         <button
                           type="button"
-                          className="p-2 text-muted-foreground hover:text-foreground"
+                          className="flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
                           onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
                           aria-label="Decrease quantity"
                         >
@@ -90,7 +90,7 @@ export function ShoppingCartComponent() {
                         <span className="min-w-7 text-center text-xs font-semibold">{item.quantity}</span>
                         <button
                           type="button"
-                          className="p-2 text-muted-foreground hover:text-foreground"
+                          className="flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-foreground"
                           onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant)}
                           aria-label="Increase quantity"
                         >
