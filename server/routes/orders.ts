@@ -32,6 +32,7 @@ ordersRouter.get("/", authMiddleware, async (req, res, next) => {
         productId: orderItems.productId,
         quantity: orderItems.quantity,
         price: orderItems.price,
+        variant: orderItems.variant,
         productName: products.name,
         productSlug: products.slug,
       })
