@@ -52,8 +52,11 @@ export default function ProductDetail() {
   const images: string[] = product.images?.length ? product.images : product.image ? [product.image] : [];
   const selectedImage = images[selectedImageIndex] || images[0] || "";
 
+  const availableStock = Math.max(0, Number(product.stock ?? 0));
+
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i += 1) {
+    const safeQuantity = Math.min(quantity, availableStock || quantity);
+    for (let i = 0; i < safeQuantity; i += 1) {
       addItem({
         id: product.id,
         name,
@@ -159,7 +162,8 @@ export default function ProductDetail() {
                 <button
                   type="button"
                   className="px-4 text-muted-foreground hover:text-foreground"
-                  onClick={() => setQuantity((value) => value + 1)}
+                  onClick={() => setQuantity((value) => Math.min(value + 1, availableStock || value + 1))}
+                  disabled={availableStock > 0 && quantity >= availableStock}
                   aria-label="Increase quantity"
                 >
                   <Plus className="h-4 w-4" />
@@ -169,13 +173,19 @@ export default function ProductDetail() {
               <Button
                 size="lg"
                 onClick={handleAddToCart}
-                disabled={product.inStock === false}
+                disabled={product.inStock === false || availableStock === 0}
                 className="flex-1"
               >
                 <ShoppingCart className="h-4 w-4" />
                 {t("product.add_to_cart")}
               </Button>
             </div>
+
+            {availableStock > 0 && availableStock <= 4 && (
+              <p className="mt-3 text-sm font-semibold text-accent">
+                Only {availableStock} left in stock
+              </p>
+            )}
 
             <div className="surface-muted mt-8 p-5">
               <p className="text-sm leading-6 text-muted-foreground">
