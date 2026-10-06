@@ -55,7 +55,7 @@ export function CandleConstructor() {
 
   if (!mounted || isLoading || !shape || !finish || !wax || !aroma) {
     return (
-      <div className="w-full bg-background min-h-[500px] flex flex-col items-center justify-center rounded-[2.5rem] border border-border/40 shadow-2xl concrete-shadow">
+      <div className="w-full bg-background min-h-[500px] flex flex-col items-center justify-center rounded-3xl border border-border shadow-sm">
         <Loader2 className="w-12 h-12 animate-spin text-primary opacity-50 mb-4" />
         <p className="text-muted-foreground font-serif text-lg">{t('constructor.loading')}</p>
       </div>
@@ -100,7 +100,7 @@ export function CandleConstructor() {
   };
 
   return (
-    <div className="w-full bg-background min-h-screen relative flex flex-col md:flex-row rounded-[2.5rem] overflow-hidden border border-border/40 shadow-2xl concrete-shadow">
+    <div className="w-full bg-background min-h-screen relative flex flex-col md:flex-row rounded-3xl overflow-hidden border border-border shadow-sm">
       
       {/* LEFT: Sticky Immersive Visualizer */}
       <div className="md:w-1/2 md:sticky md:top-0 md:h-[calc(100vh-8rem)] min-h-[450px] relative bg-muted/30 overflow-hidden flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-border/40">
@@ -115,10 +115,10 @@ export function CandleConstructor() {
           <Button 
             variant="outline" 
             size="sm" 
-            className="rounded-full bg-background/50 backdrop-blur"
+            className="bg-background/90 backdrop-blur"
             onClick={() => setShow3D(!show3D)}
           >
-            {show3D ? 'View 2D' : 'View 3D'}
+            {show3D ? t('constructor.view_2d') : t('constructor.view_3d')}
           </Button>
         </div>
 
@@ -157,17 +157,17 @@ export function CandleConstructor() {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 glass px-6 py-4 rounded-3xl border border-white/10 shadow-lg flex flex-col items-center w-[90%] max-w-sm"
+          className="absolute bottom-6 left-1/2 w-[calc(100%-3rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-border bg-background/95 px-5 py-4 shadow-lg backdrop-blur flex flex-col items-center"
         >
           <div className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-2">{t('constructor.review_design')}</div>
           <div className="w-full space-y-1.5 text-sm font-medium">
-            <div className="flex justify-between"><span>Vessel</span> <span className="text-foreground">{getTranslatedName(shape)}</span></div>
-            <div className="flex justify-between"><span>Finish</span> <span className="text-foreground">{getTranslatedName(finish)}</span></div>
-            <div className="flex justify-between"><span>Material</span> <span className="text-foreground">{getTranslatedName(wax)} & {getTranslatedName(aroma)}</span></div>
+            <div className="flex justify-between gap-4"><span className="text-muted-foreground">{t("constructor.vessel")}</span><span className="text-right text-foreground">{getTranslatedName(shape)}</span></div>
+            <div className="flex justify-between gap-4"><span className="text-muted-foreground">{t("constructor.finish")}</span><span className="text-right text-foreground">{getTranslatedName(finish)}</span></div>
+            <div className="flex justify-between gap-4"><span className="text-muted-foreground">{t("constructor.material")}</span><span className="text-right text-foreground">{getTranslatedName(wax)} · {getTranslatedName(aroma)}</span></div>
           </div>
           <div className="w-full h-px bg-border/50 my-3" />
           <div className="w-full flex justify-between items-center text-lg font-serif">
-            <span className="text-muted-foreground">Total</span>
+            <span className="text-muted-foreground">{t("constructor.total")}</span>
             <span className="text-primary font-bold">€{totalPrice.toFixed(2)}</span>
           </div>
         </motion.div>
@@ -192,14 +192,14 @@ export function CandleConstructor() {
                     key={s.id}
                     onClick={() => setShape(s)}
                     className={cn(
-                      "relative group p-4 rounded-3xl border transition-all duration-300 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                      "relative group p-4 rounded-2xl border transition-colors duration-200 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                       isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
                     )}
                   >
                     {isActive && (
                       <motion.div 
                         layoutId="activeShape"
-                        className="absolute inset-0 rounded-3xl border-2 border-primary bg-primary/5 -z-10"
+                        className="absolute inset-0 rounded-2xl border-2 border-primary bg-primary/5 -z-10"
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
@@ -210,7 +210,7 @@ export function CandleConstructor() {
                     </div>
                     <span className="font-medium text-sm leading-tight text-foreground">{getTranslatedName(s)}</span>
                     <span className="text-muted-foreground text-xs mt-1 font-bold">
-                      {sPrice > 0 ? `+€${sPrice.toFixed(2)}` : 'Included'}
+                      {sPrice > 0 ? `+€${sPrice.toFixed(2)}` : t('constructor.included')}
                     </span>
                   </button>
                 );
@@ -233,14 +233,14 @@ export function CandleConstructor() {
                     key={f.id}
                     onClick={() => setFinish(f)}
                     className={cn(
-                      "relative group p-4 rounded-3xl border transition-all duration-300 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
+                      "relative group p-4 rounded-2xl border transition-colors duration-200 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
                       isActive ? "border-transparent" : "border-border/40 hover:border-border hover:bg-muted/10"
                     )}
                   >
                     {isActive && (
                       <motion.div 
                         layoutId="activeFinish"
-                        className="absolute inset-0 rounded-3xl border-2 border-primary bg-primary/5 -z-10"
+                        className="absolute inset-0 rounded-2xl border-2 border-primary bg-primary/5 -z-10"
                         transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                       />
                     )}
@@ -258,7 +258,7 @@ export function CandleConstructor() {
                     
                     <span className="font-medium text-sm leading-tight text-foreground">{getTranslatedName(f)}</span>
                     <span className="text-muted-foreground text-xs mt-1 font-bold">
-                      {fPrice > 0 ? `+€${fPrice.toFixed(2)}` : 'Included'}
+                      {fPrice > 0 ? `+€${fPrice.toFixed(2)}` : t('constructor.included')}
                     </span>
                   </button>
                 );
@@ -275,9 +275,9 @@ export function CandleConstructor() {
                 >
                   <div className="bg-primary/5 p-5 rounded-2xl border border-primary/20 relative">
                     <Info className="w-5 h-5 text-primary absolute top-5 right-5 opacity-50" />
-                    <label className="text-sm font-bold text-primary block mb-2">Your Custom Request:</label>
+                    <label className="text-sm font-bold text-primary block mb-2">{t('constructor.custom_request')}:</label>
                     <Textarea 
-                      placeholder="e.g., Deep emerald green with copper speckles..."
+                      placeholder={t('constructor.custom_placeholder')}
                       value={customDescription}
                       onChange={(e) => setCustomDescription(e.target.value)}
                       className="resize-none bg-background/80 focus-visible:ring-primary/50 border-border/50 h-24"
@@ -321,7 +321,7 @@ export function CandleConstructor() {
                       <div className="text-xs text-muted-foreground mt-1">{getTranslatedDesc(w)}</div>
                     </div>
                     <span className="font-bold text-sm bg-background px-3 py-1 rounded-full border border-border/50">
-                      {wPrice > 0 ? `+€${wPrice.toFixed(2)}` : 'Free'}
+                      {wPrice > 0 ? `+€${wPrice.toFixed(2)}` : t('constructor.free')}
                     </span>
                   </button>
                 );
@@ -358,7 +358,7 @@ export function CandleConstructor() {
                       {getTranslatedName(a)}
                     </span>
                     <span className="text-xs font-bold text-muted-foreground">
-                      {aPrice > 0 ? `+€${aPrice.toFixed(2)}` : 'Free'}
+                      {aPrice > 0 ? `+€${aPrice.toFixed(2)}` : t('constructor.free')}
                     </span>
                   </button>
                 );
@@ -379,7 +379,7 @@ export function CandleConstructor() {
         >
           <Button 
             size="lg" 
-            className="rounded-full h-14 px-8 shadow-[0_10px_40px_-10px_rgba(var(--primary),0.5)] hover:shadow-[0_15px_50px_-10px_rgba(var(--primary),0.6)] transition-all hover:scale-105 active:scale-95 group" 
+            className="h-14 px-7 shadow-lg group" 
             onClick={handleAddToCart}
           >
             <span className="flex items-center gap-3 text-lg font-bold">
