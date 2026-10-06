@@ -281,7 +281,7 @@ export default function ConstructorConfig() {
                 <Input 
                   value={formData.key} 
                   onChange={e => setFormData({...formData, key: e.target.value})} 
-                  placeholder="e.g., white-stone"
+                  placeholder="например: white-stone"
                   required
                 />
               </div>
@@ -302,7 +302,7 @@ export default function ConstructorConfig() {
                 <Input 
                   value={formData.imageUrl || ''} 
                   onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
-                  placeholder="e.g. /images/vessel.png"
+                  placeholder="например: /images/vessel.png"
                   required
                 />
               </div>
@@ -315,7 +315,7 @@ export default function ConstructorConfig() {
                   <Input 
                     value={formData.color || ''} 
                     onChange={e => setFormData({...formData, color: e.target.value})} 
-                    placeholder="#ffffff or linear-gradient(...)"
+                    placeholder="#ffffff или linear-gradient(...)"
                   />
                 </div>
                 <div className="space-y-2">
