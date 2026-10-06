@@ -21,7 +21,7 @@ export function DualFileUploader({
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <Label className="mb-2 block">
-          {type === '3d' ? '3D Model File' : type === 'video' ? 'Video File' : 'Main Image'}
+          {type === '3d' ? 'Файл 3D-модели' : type === 'video' ? 'Видео-файл' : 'Основное изображение'}
         </Label>
         <FileUploader
           type={type === '3d' ? '3d' : type === 'video' ? 'video' : 'photo'}
@@ -34,7 +34,7 @@ export function DualFileUploader({
 
       <div>
         <Label className="mb-2 block">
-          Thumbnail Image <span className="text-muted-foreground">(optional)</span>
+          Превью <span className="text-muted-foreground">(необязательно)</span>
         </Label>
         <FileUploader
           type="photo"
@@ -44,7 +44,7 @@ export function DualFileUploader({
           maxSizeMB={10}
         />
         <p className="text-xs text-muted-foreground mt-2">
-          Recommended: Square image, at least 800x800px
+          Рекомендуется: квадратное изображение не менее 800×800 px
         </p>
       </div>
     </div>
