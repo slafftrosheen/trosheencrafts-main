@@ -66,7 +66,7 @@ export default function AdminBlog() {
         {isLoading ? (
           <div className="flex justify-center py-20"><Spinner size="lg" /></div>
         ) : (
-          <Card className="rounded-[2.5rem] border-2 border-border/40 overflow-hidden bg-card/40 shadow-xl">
+          <Card className="overflow-hidden border-border bg-card shadow-sm">
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
