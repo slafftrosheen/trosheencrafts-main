@@ -77,12 +77,12 @@ export default function ContactPage() {
 
           <div className="mt-12 grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:gap-16">
             <div>
-              <p className="eyebrow">From Daugavpils</p>
+              <p className="eyebrow">{t("contact.origin")}</p>
               <h2 className="mt-4 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-                Tell us what you want to make.
+                {t("contact.make_title")}
               </h2>
               <p className="mt-5 text-base leading-8 text-muted-foreground">
-                Questions about a piece, a custom order or the workshop are all welcome. We answer as a family workshop, not a call centre.
+                {t("contact.make_desc")}
               </p>
             </div>
             <div className="surface p-5 sm:p-7 md:p-9">
