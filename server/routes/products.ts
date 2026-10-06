@@ -48,7 +48,8 @@ productsRouter.get(
       let query = db.select().from(products);
       const conditions = [];
       
-      if (!req.isAuthenticated()) {
+      const isAdmin = req.isAuthenticated() && (req.user as any)?.role === 'admin';
+      if (!isAdmin) {
         conditions.push(eq(products.published, true));
       }
       
@@ -120,7 +121,8 @@ productsRouter.get(
         .where(eq(products.id, id))
         .limit(1);
 
-      if (!product || (product.published === false && !req.isAuthenticated())) {
+      const isAdmin = req.isAuthenticated() && (req.user as any)?.role === 'admin';
+      if (!product || (product.published === false && !isAdmin)) {
         return res.status(404).json({ message: 'Product not found' });
       }
 
