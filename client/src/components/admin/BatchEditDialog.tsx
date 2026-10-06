@@ -33,8 +33,8 @@ interface BatchEditDialogProps {
 export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: BatchEditDialogProps) {
   const queryClient = useQueryClient();
   const [categoryId, setCategoryId] = useState<string>('keep');
-  const [published, setОпубликовано] = useState<'keep' | 'true' | 'false'>('keep');
-  const [featured, setИзбранное] = useState<'keep' | 'true' | 'false'>('keep');
+  const [published, setPublished] = useState<'keep' | 'true' | 'false'>('keep');
+  const [featured, setFeatured] = useState<'keep' | 'true' | 'false'>('keep');
   const [regenerateSlugs, setRegenerateSlugs] = useState(false);
 
   const { data: categories = [] } = useQuery({
