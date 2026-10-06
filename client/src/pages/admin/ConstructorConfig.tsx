@@ -174,7 +174,7 @@ export default function ConstructorConfig() {
               <div>
                 <h4 className="font-bold">{option.nameTranslations.en} <span className="text-muted-foreground text-sm font-normal">({option.key})</span></h4>
                 <div className="flex gap-2 mt-1">
-                  <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${option.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                  <span className={`text-[11px] uppercase font-semibold px-2 py-0.5 rounded-full ${option.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {option.active ? 'Active' : 'Inactive'}
                   </span>
                   <span className="text-xs text-muted-foreground font-medium">+{option.price}€</span>
@@ -228,7 +228,7 @@ export default function ConstructorConfig() {
           </TabsTrigger>
         </TabsList>
 
-        <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden relative group">
+        <Card className="overflow-hidden border-border bg-card shadow-sm">
           <CardHeader className="p-8 pb-0 flex flex-row items-center justify-between">
             <div>
               <CardTitle className="font-serif text-2xl capitalize">{activeTab} Options</CardTitle>
