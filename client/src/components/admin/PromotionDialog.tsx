@@ -16,9 +16,9 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 const schema = z.object({
-  title: z.string().min(1, 'Title is required'),
+  title: z.string().min(1, 'Укажите заголовок'),
   description: z.string().optional(),
-  imageUrl: z.string().min(1, 'Image is required'),
+  imageUrl: z.string().min(1, 'Добавьте изображение'),
   videoUrl: z.string().optional(),
   linkUrl: z.string().optional(),
   linkText: z.string().optional(),
@@ -61,12 +61,12 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promotions'] });
-      toast.success(promotion ? 'Promotion updated' : 'Promotion created');
+      toast.success(promotion ? 'Промо-блок обновлён' : 'Промо-блок создан');
       onOpenChange(false);
       reset();
     },
     onError: (error: any) => {
-      toast.error(error.message || 'Failed to save promotion');
+      toast.error(error.message || 'Не удалось сохранить промо-блок');
     }
   });
 
@@ -76,32 +76,32 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl rounded-3xl">
         <DialogHeader>
-          <DialogTitle className="font-serif text-2xl">{promotion ? 'Edit Promotion' : 'Add Promotion'}</DialogTitle>
+          <DialogTitle className="font-serif text-2xl">{promotion ? 'Редактировать промо-блок' : 'Добавить промо-блок'}</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {promotion ? 'Update this promotional banner.' : 'Create a new promotional banner for the home page.'}
+            {promotion ? 'Измените параметры промо-блока.' : 'Создайте новый промо-блок для главной страницы.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="title">Title</Label>
+              <Label htmlFor="title">Заголовок</Label>
               <Input id="title" {...register('title')} />
               {errors.title && <p className="text-destructive text-sm">{errors.title.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="sortOrder">Sort Order</Label>
+              <Label htmlFor="sortOrder">Порядок</Label>
               <Input id="sortOrder" type="number" {...register('sortOrder')} />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Описание</Label>
             <Textarea id="description" {...register('description')} />
           </div>
 
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="imageUrl">Thumbnail Image</Label>
+              <Label htmlFor="imageUrl">Изображение-превью</Label>
               <ImageUpload 
                 value={watch('imageUrl')} 
                 onChange={url => setValue('imageUrl', url)} 
@@ -110,7 +110,7 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
                {errors.imageUrl && <p className="text-destructive text-sm">{errors.imageUrl.message}</p>}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="videoUrl">Background Video (Optional)</Label>
+              <Label htmlFor="videoUrl">Фоновое видео (необязательно)</Label>
               <VideoUpload 
                 value={watch('videoUrl')} 
                 onChange={url => setValue('videoUrl', url)} 
@@ -121,12 +121,12 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
 
           <div className="grid grid-cols-2 gap-4">
              <div className="space-y-2">
-              <Label htmlFor="linkUrl">Link URL</Label>
+              <Label htmlFor="linkUrl">URL ссылки</Label>
               <Input id="linkUrl" {...register('linkUrl')} placeholder="/shop/category" />
             </div>
              <div className="space-y-2">
-              <Label htmlFor="linkText">Button Text</Label>
-              <Input id="linkText" {...register('linkText')} placeholder="Explore" />
+              <Label htmlFor="linkText">Текст кнопки</Label>
+              <Input id="linkText" {...register('linkText')} placeholder="Подробнее" />
             </div>
           </div>
           
@@ -136,14 +136,14 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
               checked={watch('active')} 
               onCheckedChange={(c) => setValue('active', c)} 
             />
-            <Label htmlFor="active">Active</Label>
+            <Label htmlFor="active">Активен</Label>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl">Cancel</Button>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-xl">Отмена</Button>
             <Button type="submit" disabled={mutation.isPending} className="rounded-xl">
               {mutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Save
+              Сохранить
             </Button>
           </div>
         </form>
