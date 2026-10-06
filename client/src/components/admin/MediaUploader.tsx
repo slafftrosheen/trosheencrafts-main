@@ -37,7 +37,7 @@ export function MediaUploader({
   maxSizeMB = 50,
   showPreview = true,
   value,
-  label = 'Upload File',
+  label = 'Загрузить файл',
   multiple = false,
   className,
 }: MediaUploaderProps) {
@@ -54,8 +54,8 @@ export function MediaUploader({
       const maxSize = maxSizeMB * 1024 * 1024;
       if (file.size > maxSize) {
         toast({
-          title: 'File too large',
-          description: `Maximum file size is ${maxSizeMB}MB`,
+          title: 'Файл слишком большой',
+          description: `Максимальный размер файла — ${maxSizeMB} МБ`,
           variant: 'destructive',
         });
         return false;
@@ -81,7 +81,7 @@ export function MediaUploader({
         });
 
         if (!response.ok) {
-          throw new Error('Upload failed');
+          throw new Error('Не удалось загрузить файл');
         }
 
         const data = await response.json();
@@ -103,14 +103,14 @@ export function MediaUploader({
         onUploadComplete(uploadedFile.url, uploadedFile);
 
         toast({
-          title: 'Upload successful',
-          description: `${file.name} has been uploaded`,
+          title: 'Файл загружен',
+          description: `${file.name} загружен`,
         });
       } catch (error) {
         console.error('Upload error:', error);
         toast({
-          title: 'Upload failed',
-          description: error instanceof Error ? error.message : 'Failed to upload file',
+          title: 'Ошибка загрузки',
+          description: error instanceof Error ? error.message : 'Не удалось загрузить файл',
           variant: 'destructive',
         });
       } finally {
@@ -121,7 +121,7 @@ export function MediaUploader({
   );
 
   const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ЗаменитьEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files || files.length === 0) return;
 
@@ -220,10 +220,10 @@ export function MediaUploader({
           </div>
           <div>
             <p className="text-sm font-medium mb-1">
-              {dragActive ? 'Drop file here' : `Click to ${label.toLowerCase()} or drag and drop`}
+              {dragActive ? 'Перетащите файл сюда' : `Нажмите, чтобы выбрать файл, или перетащите его сюда`}
             </p>
             <p className="text-xs text-muted-foreground">
-              Max size: {maxSizeMB}MB
+              Макс. размер: {maxSizeMB} МБ
             </p>
           </div>
         </div>
@@ -232,7 +232,7 @@ export function MediaUploader({
           <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-2xl">
             <div className="flex flex-col items-center gap-3">
               <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-medium">Uploading...</p>
+              <p className="text-sm font-medium">Загрузка...</p>
             </div>
           </div>
         )}
@@ -257,7 +257,7 @@ export function MediaUploader({
             <div className="aspect-video w-full">
               <img
                 src={preview}
-                alt="Preview"
+                alt="Предпросмотр"
                 className="w-full h-full object-contain"
               />
             </div>
@@ -267,7 +267,7 @@ export function MediaUploader({
                 {getFileIcon(uploadedFile?.mimetype)}
               </div>
               <p className="text-sm font-medium mb-1">
-                {uploadedFile?.originalName || 'File uploaded'}
+                {uploadedFile?.originalName || 'Файл загружен'}
               </p>
               {uploadedFile && (
                 <p className="text-xs text-muted-foreground">
@@ -276,7 +276,7 @@ export function MediaUploader({
               )}
               <div className="mt-4 flex items-center gap-2 text-xs text-green-600">
                 <Check className="w-4 h-4" />
-                Upload complete
+                Загрузка завершена
               </div>
             </div>
           )}
