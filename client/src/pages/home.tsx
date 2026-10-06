@@ -53,7 +53,7 @@ export default function HomePage() {
 
         <div className="site-container relative flex min-h-[82svh] items-end pb-12 pt-24 sm:pb-16 md:items-center md:py-24">
           <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/15 px-3.5 py-2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/85 backdrop-blur-sm">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/15 px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur-sm">
               <Heart className="h-3.5 w-3.5" />
               {t("hero_location")}
             </div>
@@ -63,7 +63,7 @@ export default function HomePage() {
               <span className="block italic text-[#d9cdbb]">{t("hero_title_2")}</span>
             </h1>
 
-            <p className="mt-7 max-w-2xl text-base leading-relaxed text-white/78 sm:text-lg md:text-xl">
+            <p className="mt-7 max-w-2xl text-base leading-relaxed text-white/90 sm:text-lg md:text-xl">
               {t("hero_subtitle")}
             </p>
 
@@ -92,7 +92,7 @@ export default function HomePage() {
               ].map((stat) => (
                 <div key={stat.label} className="pr-4">
                   <div className="font-serif text-2xl font-semibold sm:text-3xl">{stat.value}</div>
-                  <div className="mt-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white/55 sm:text-[10px]">
+                  <div className="mt-1 text-[11px] font-bold uppercase tracking-[0.1em] text-white/75">
                     {stat.label}
                   </div>
                 </div>
@@ -189,20 +189,20 @@ export default function HomePage() {
       <section className="bg-secondary text-secondary-foreground">
         <div className="site-container section-space grid gap-12 lg:grid-cols-[1.05fr_.95fr] lg:items-center lg:gap-16">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary-foreground/55">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-secondary-foreground/75">
               {t("chapter_philosophy_eyebrow")}
             </p>
             <h2 className="mt-4 font-serif text-[clamp(2.8rem,6vw,5.8rem)] font-semibold leading-[.94] tracking-[-.045em]">
               {t("phil_title")}
             </h2>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-secondary-foreground/70 sm:text-lg">
+            <p className="mt-6 max-w-2xl text-base leading-8 text-secondary-foreground/82 sm:text-lg">
               {t("phil_desc")}
             </p>
             <div className="mt-8 grid max-w-lg grid-cols-2 gap-4">
               <div className="border-t border-white/20 pt-4">
                 <ShieldCheck className="h-5 w-5 text-[#d9cdbb]" />
                 <div className="mt-3 font-serif text-2xl font-semibold">{t("phil_decades")}</div>
-                <p className="mt-1 text-xs uppercase tracking-[0.14em] text-white/45">{t("phil_durability")}</p>
+                <p className="mt-1 text-xs uppercase tracking-[0.12em] text-white/70">{t("phil_durability")}</p>
               </div>
               <div className="border-t border-white/20 pt-4">
                 <Recycle className="h-5 w-5 text-[#d9cdbb]" />
