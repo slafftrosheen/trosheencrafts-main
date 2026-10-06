@@ -6,7 +6,7 @@ import {
   Clock3,
   Euro,
   Package,
-  ОбновитьCw,
+  RefreshCw,
   ShoppingCart,
 } from "lucide-react";
 import {
@@ -106,7 +106,7 @@ export default function Analytics() {
           </p>
         </div>
         <Button variant="outline" onClick={refreshAll}>
-          <ОбновитьCw className="mr-2 h-4 w-4" />
+          <RefreshCw className="mr-2 h-4 w-4" />
           Обновить
         </Button>
       </header>
