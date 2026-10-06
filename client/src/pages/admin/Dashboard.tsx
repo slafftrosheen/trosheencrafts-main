@@ -8,7 +8,7 @@ import {
   Euro,
   Inbox,
   Package,
-  ОбновитьCw,
+  RefreshCw,
   ShoppingCart,
   TrendingUp,
 } from "lucide-react";
@@ -104,7 +104,7 @@ export default function AdminDashboard() {
           </p>
         </div>
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          <ОбновитьCw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+          <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
           Обновить
         </Button>
       </header>
