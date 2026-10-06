@@ -65,7 +65,7 @@ interface GalleryItem {
   featured: boolean;
   published: boolean;
   viewCount: number;
-  likes: number;
+  отметок «Нравится»: number;
   sortOrder: number;
   metadata?: any;
 }
@@ -79,6 +79,14 @@ interface GalleryCategory {
   featured: boolean;
   sortOrder: number;
 }
+
+const slugify = (value: string) =>
+  value
+    .normalize("NFKC")
+    .toLowerCase()
+    .trim()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
 
 function CategoryManager() {
   const { t } = useLanguage();
@@ -104,7 +112,7 @@ function CategoryManager() {
     mutationFn: (data: any) => apiClient.post('/gallery/admin/categories', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryCategories'] });
-      toast({ title: t('admin.category_created') || 'Category created' });
+      toast({ title: t('admin.category_created') || 'Категория создана' });
       setIsDialogOpen(false);
       resetForm();
     },
@@ -115,7 +123,7 @@ function CategoryManager() {
       apiClient.put(`/gallery/admin/categories/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryCategories'] });
-      toast({ title: t('admin.category_updated') || 'Category updated' });
+      toast({ title: t('admin.category_updated') || 'Категория обновлена' });
       setIsDialogOpen(false);
       resetForm();
     },
@@ -125,7 +133,7 @@ function CategoryManager() {
     mutationFn: (id: number) => apiClient.delete(`/gallery/admin/categories/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryCategories'] });
-      toast({ title: t('admin.category_deleted') || 'Category deleted' });
+      toast({ title: t('admin.category_deleted') || 'Категория удалена' });
     },
   });
 
@@ -166,7 +174,7 @@ function CategoryManager() {
     setFormData({
       ...formData,
       name,
-      slug: name.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug: slugify(name),
     });
   };
 
@@ -198,7 +206,7 @@ function CategoryManager() {
                 <TableCell>
                   <Badge variant="outline" className="rounded-full">
                     {cat.type === '3d' ? <Grid3x3 className="w-3 h-3 mr-1" /> : <Images className="w-3 h-3 mr-1" />}
-                    {cat.type === '3d' ? '3D Models' : 'Photos'}
+                    {cat.type === '3d' ? '3D-модели' : 'Фотографии'}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -243,7 +251,7 @@ function CategoryManager() {
               {editingCategory ? t('admin.gallery.edit_category') : t('admin.gallery.add_category')}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              {editingCategory ? 'Update the details of this gallery category.' : 'Create a new category to organize your gallery items.'}
+              {editingCategory ? 'Измените параметры этой категории галереи.' : 'Создайте новую категорию для организации элементов галереи.'}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -355,7 +363,7 @@ function ItemManager() {
     mutationFn: (data: any) => apiClient.post('/gallery/admin/items', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryItems'] });
-      toast({ title: t('admin.gallery.item_created') || 'Item created' });
+      toast({ title: t('admin.gallery.item_created') || 'Элемент создан' });
       setIsDialogOpen(false);
       resetForm();
     },
@@ -366,7 +374,7 @@ function ItemManager() {
       apiClient.put(`/gallery/admin/items/${id}`, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryItems'] });
-      toast({ title: t('admin.gallery.item_updated') || 'Item updated' });
+      toast({ title: t('admin.gallery.item_updated') || 'Элемент обновлён' });
       setIsDialogOpen(false);
       resetForm();
     },
@@ -376,7 +384,7 @@ function ItemManager() {
     mutationFn: (id: number) => apiClient.delete(`/gallery/admin/items/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryItems'] });
-      toast({ title: t('admin.gallery.item_deleted') || 'Item deleted' });
+      toast({ title: t('admin.gallery.item_deleted') || 'Элемент удалён' });
     },
   });
 
@@ -421,7 +429,7 @@ function ItemManager() {
     setFormData({
       ...formData,
       title,
-      slug: title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      slug: slugify(title),
     });
   };
 
@@ -456,12 +464,12 @@ function ItemManager() {
           {selectedIds.length > 0 && (
             <Button onClick={() => setIsBatchEditOpen(true)} className="rounded-full bg-primary/10 text-primary hover:bg-primary/20 border-2 border-primary/20 shadow-lg shadow-primary/5">
               <Settings2 className="w-4 h-4 mr-2" />
-              Batch Edit ({selectedIds.length})
+              Пакетное редактирование ({selectedIds.length})
             </Button>
           )}
           <Button onClick={() => setIsBatchDialogOpen(true)} variant="outline" className="rounded-full border-2">
             <Images className="w-4 h-4 mr-2" />
-            Batch Upload
+            Пакетная загрузка
           </Button>
           <Button onClick={() => setIsDialogOpen(true)} className="rounded-full">
             <Plus className="w-4 h-4 mr-2" />
@@ -511,7 +519,7 @@ function ItemManager() {
                 <TableCell className="font-medium max-w-xs truncate">{item.title}</TableCell>
                 <TableCell>
                   <Badge variant="outline" className="rounded-full">
-                    {item.type === '3d' ? '3D' : item.type === 'video' ? 'Video' : 'Photo'}
+                    {item.type === '3d' ? '3D' : item.type === 'video' ? 'Видео' : 'Фото'}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -528,8 +536,8 @@ function ItemManager() {
                 </TableCell>
                 <TableCell>
                   <div className="text-sm text-muted-foreground">
-                    <div>{item.viewCount} views</div>
-                    <div>{item.likes} likes</div>
+                    <div>{item.viewCount} просмотров</div>
+                    <div>{item.likes} отметок «Нравится»</div>
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
@@ -558,8 +566,8 @@ function ItemManager() {
         {totalPages > 1 && (
           <div className="bg-muted/30 px-8 py-4 flex items-center justify-between border-t border-border/40">
             <p className="text-sm text-muted-foreground font-medium">
-              {t('admin.common.showing') || 'Showing'} <span className="font-bold text-foreground">{(page - 1) * limit + 1}</span>-
-              <span className="font-bold text-foreground">{Math.min(page * limit, total)}</span> {t('admin.common.of') || 'of'} <span className="font-bold text-foreground">{total}</span>
+              {t('admin.common.showing') || 'Показано'} <span className="font-bold text-foreground">{(page - 1) * limit + 1}</span>-
+              <span className="font-bold text-foreground">{Math.min(page * limit, total)}</span> {t('admin.common.of') || 'из'} <span className="font-bold text-foreground">{total}</span>
             </p>
             <div className="flex gap-2">
               <Button 
@@ -572,7 +580,7 @@ function ItemManager() {
                 disabled={page === 1}
                 className="rounded-xl h-9 px-4"
               >
-                <ChevronLeft className="w-4 h-4 mr-1" /> {t('common.prev') || 'Prev'}
+                <ChevronLeft className="w-4 h-4 mr-1" /> {t('common.prev') || 'Назад'}
               </Button>
               <div className="flex items-center px-2 text-sm font-bold">
                 {page} / {totalPages}
@@ -587,7 +595,7 @@ function ItemManager() {
                 disabled={page === totalPages}
                 className="rounded-xl h-9 px-4"
               >
-                {t('common.next') || 'Next'} <ChevronRight className="w-4 h-4 ml-1" />
+                {t('common.next') || 'Далее'} <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             </div>
           </div>
@@ -604,7 +612,7 @@ function ItemManager() {
               {editingItem ? t('admin.gallery.edit_item') : t('admin.gallery.add_item')}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground">
-              {editingItem ? 'Update the details of this gallery piece.' : 'Add a new masterpiece to your gallery showcase.'}
+              {editingItem ? 'Измените параметры этого элемента галереи.' : 'Добавьте новый элемент в галерею.'}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
