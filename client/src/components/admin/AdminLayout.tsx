@@ -33,36 +33,36 @@ interface AdminLayoutProps {
 
 const navigationItems = [
   {
-    label: "Overview",
+    label: "Обзор",
     items: [
-      { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-      { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+      { name: "Главная", href: "/admin", icon: LayoutDashboard },
+      { name: "Аналитика", href: "/admin/analytics", icon: BarChart3 },
     ],
   },
   {
-    label: "Commerce",
+    label: "Магазин",
     items: [
-      { name: "Orders", href: "/admin/orders", icon: ShoppingCart },
-      { name: "Products", href: "/admin/products", icon: Package },
-      { name: "Inventory", href: "/admin/inventory", icon: Package },
-      { name: "Constructor", href: "/admin/constructor", icon: Palette },
-      { name: "Categories", href: "/admin/categories", icon: Tag },
+      { name: "Заказы", href: "/admin/orders", icon: ShoppingCart },
+      { name: "Товары", href: "/admin/products", icon: Package },
+      { name: "Остатки", href: "/admin/inventory", icon: Package },
+      { name: "Конструктор", href: "/admin/constructor", icon: Palette },
+      { name: "Категории", href: "/admin/categories", icon: Tag },
     ],
   },
   {
-    label: "Content",
+    label: "Контент",
     items: [
-      { name: "Journal", href: "/admin/blog", icon: FileText },
-      { name: "Promotions", href: "/admin/promotions", icon: BarChart3 },
-      { name: "Gallery", href: "/admin/gallery", icon: ImageIcon },
+      { name: "Журнал", href: "/admin/blog", icon: FileText },
+      { name: "Промо-блоки", href: "/admin/promotions", icon: BarChart3 },
+      { name: "Галерея", href: "/admin/gallery", icon: ImageIcon },
     ],
   },
   {
-    label: "Audience",
+    label: "Клиенты",
     items: [
-      { name: "Inbox", href: "/admin/messages", icon: Mail },
-      { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
-      { name: "Site settings", href: "/admin/settings", icon: Settings },
+      { name: "Сообщения", href: "/admin/messages", icon: Mail },
+      { name: "Подписчики", href: "/admin/subscribers", icon: Mail },
+      { name: "Настройки сайта", href: "/admin/settings", icon: Settings },
     ],
   },
 ];
@@ -72,6 +72,10 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { t } = useLanguage();
   const { data: user, isLoading: userLoading } = useCurrentUser();
+
+  useEffect(() => {
+    document.documentElement.lang = "ru";
+  }, []);
 
   useEffect(() => {
     if (!userLoading && (!user || user.role !== "admin")) {
@@ -84,7 +88,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   }, [location]);
 
   const initials = useMemo(() => {
-    const source = user?.username || user?.email || "Admin";
+    const source = user?.username || user?.email || "Администратор";
     return source
       .split(/[\s._-]+/)
       .filter(Boolean)
@@ -98,7 +102,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       await apiClient.post("/auth/logout");
       window.location.assign("/admin/login");
     } catch (error: any) {
-      toast.error(error?.message || "Unable to sign out");
+      toast.error(error?.message || "Не удалось выйти из системы");
     }
   };
 
@@ -116,7 +120,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     <div className="min-h-screen bg-background text-foreground">
       {sidebarOpen && (
         <button
-          aria-label="Close admin navigation"
+          aria-label="Закрыть навигацию администратора"
           className="fixed inset-0 z-40 bg-black/40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
@@ -137,7 +141,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <div className="min-w-0 flex-1">
             <p className="truncate font-serif text-lg font-semibold">Trosheen.Crafts</p>
             <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-              Workshop admin
+              Админ-панель
             </p>
           </div>
           <Button
@@ -145,7 +149,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             size="icon"
             className="lg:hidden"
             onClick={() => setSidebarOpen(false)}
-            aria-label="Close navigation"
+            aria-label="Закрыть навигацию"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -196,7 +200,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             href="/"
             className="flex items-center justify-between rounded-xl border border-border px-3 py-2.5 text-sm font-medium hover:bg-muted"
           >
-            View storefront
+            Открыть магазин
             <ExternalLink className="h-4 w-4 text-muted-foreground" />
           </Link>
 
@@ -218,7 +222,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             onClick={handleLogout}
           >
             <LogOut className="mr-2 h-4 w-4" />
-            {t("admin.logout") || "Sign out"}
+            {t("admin.logout") || "Выйти"}
           </Button>
         </div>
       </aside>
@@ -229,11 +233,11 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(true)}
-            aria-label="Open navigation"
+            aria-label="Открыть навигацию"
           >
             <Menu className="h-5 w-5" />
           </Button>
-          <span className="ml-3 font-serif font-semibold">Workshop admin</span>
+          <span className="ml-3 font-serif font-semibold">Админ-панель</span>
         </div>
 
         <main className="mx-auto w-full max-w-[1440px] p-4 sm:p-6 lg:p-8 xl:p-10">
