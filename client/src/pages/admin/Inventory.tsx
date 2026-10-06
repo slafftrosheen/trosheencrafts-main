@@ -57,10 +57,10 @@ export default function Inventory() {
         delete next[variables.id];
         return next;
       });
-      toast.success("Stock updated");
+      toast.success("Остаток обновлён");
     },
     onError: (mutationError: any) => {
-      toast.error(mutationError?.message || "Failed to update stock");
+      toast.error(mutationError?.message || "Не удалось обновить остаток");
     },
   });
 
@@ -81,9 +81,9 @@ export default function Inventory() {
   const outOfStockProducts = products.filter((product) => product.stock === 0);
 
   const getStockStatus = (stock: number) => {
-    if (stock === 0) return { label: "Out of stock", variant: "destructive" as const, icon: AlertCircle };
-    if (stock < 5) return { label: "Low stock", variant: "secondary" as const, icon: AlertCircle };
-    return { label: "In stock", variant: "default" as const, icon: CheckCircle };
+    if (stock === 0) return { label: "Нет в наличии", variant: "destructive" as const, icon: AlertCircle };
+    if (stock < 5) return { label: "Мало на складе", variant: "secondary" as const, icon: AlertCircle };
+    return { label: "В наличии", variant: "default" as const, icon: CheckCircle };
   };
 
   const updateDraft = (id: number, value: string) => {
@@ -97,16 +97,16 @@ export default function Inventory() {
   return (
     <div className="space-y-8">
       <header className="border-b border-border pb-6">
-        <p className="text-sm font-medium text-muted-foreground">Catalogue availability</p>
-        <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Inventory</h1>
-        <p className="mt-2 text-muted-foreground">Monitor stock warnings and make quick quantity corrections.</p>
+        <p className="text-sm font-medium text-muted-foreground">Наличие товаров</p>
+        <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Остатки</h1>
+        <p className="mt-2 text-muted-foreground">Контролируйте остатки и быстро корректируйте количество товара.</p>
       </header>
 
       <section className="grid gap-4 sm:grid-cols-3">
         {[
-          { label: "Products", value: products.length, note: "Loaded from catalogue", icon: Package },
-          { label: "Low stock", value: lowStockProducts.length, note: "1–4 units remaining", icon: AlertCircle },
-          { label: "Out of stock", value: outOfStockProducts.length, note: "Unavailable to fulfill", icon: AlertCircle },
+          { label: "Товары", value: products.length, note: "Загружено из каталога", icon: Package },
+          { label: "Мало на складе", value: lowStockProducts.length, note: "Осталось 1–4 шт.", icon: AlertCircle },
+          { label: "Нет в наличии", value: outOfStockProducts.length, note: "Недоступно для выполнения заказа", icon: AlertCircle },
         ].map((metric) => {
           const Icon = metric.icon;
           return (
@@ -130,7 +130,7 @@ export default function Inventory() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search product or category"
+            placeholder="Поиск по товару или категории"
             className="pl-9"
           />
         </div>
@@ -139,21 +139,21 @@ export default function Inventory() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All stock</SelectItem>
-            <SelectItem value="attention">Needs attention</SelectItem>
-            <SelectItem value="low">Low stock</SelectItem>
-            <SelectItem value="out">Out of stock</SelectItem>
+            <SelectItem value="all">Все остатки</SelectItem>
+            <SelectItem value="attention">Требует внимания</SelectItem>
+            <SelectItem value="low">Мало на складе</SelectItem>
+            <SelectItem value="out">Нет в наличии</SelectItem>
           </SelectContent>
         </Select>
-        <Button variant="outline" onClick={() => refetch()}>Refresh</Button>
+        <Button variant="outline" onClick={() => refetch()}>Обновить</Button>
       </div>
 
       {error ? (
         <Card className="p-8 text-center">
           <AlertCircle className="mx-auto h-8 w-8 text-destructive" />
-          <p className="mt-3 font-semibold">Unable to load inventory</p>
+          <p className="mt-3 font-semibold">Не удалось загрузить остатки</p>
           <p className="mt-1 text-sm text-muted-foreground">{(error as any)?.message}</p>
-          <Button className="mt-4" onClick={() => refetch()}>Try again</Button>
+          <Button className="mt-4" onClick={() => refetch()}>Повторить</Button>
         </Card>
       ) : (
         <Card className="overflow-hidden">
@@ -165,13 +165,13 @@ export default function Inventory() {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="px-6">Product</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Current</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>New stock</TableHead>
-                  <TableHead className="px-6 text-right">Action</TableHead>
+                  <TableHead className="px-6">Товар</TableHead>
+                  <TableHead>Категория</TableHead>
+                  <TableHead>Цена</TableHead>
+                  <TableHead>Сейчас</TableHead>
+                  <TableHead>Статус</TableHead>
+                  <TableHead>Новый остаток</TableHead>
+                  <TableHead className="px-6 text-right">Действие</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -189,7 +189,7 @@ export default function Inventory() {
                         <TableCell className="px-6 font-medium">
                           {product.name}
                           {product.published === false && (
-                            <Badge variant="outline" className="ml-2">Hidden</Badge>
+                            <Badge variant="outline" className="ml-2">Скрыт</Badge>
                           )}
                         </TableCell>
                         <TableCell>{product.category || "—"}</TableCell>
@@ -225,7 +225,7 @@ export default function Inventory() {
                               rowPending
                             }
                           >
-                            {rowPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Update"}
+                            {rowPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Обновить"}
                           </Button>
                         </TableCell>
                       </TableRow>
@@ -234,7 +234,7 @@ export default function Inventory() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={7} className="py-12 text-center text-muted-foreground">
-                      No products match this filter.
+                      Нет товаров, соответствующих фильтру.
                     </TableCell>
                   </TableRow>
                 )}
