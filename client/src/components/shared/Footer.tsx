@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Instagram, Facebook, Youtube, Send, Mail, MapPin, ArrowUpRight } from "lucide-react";
+import { Instagram, Facebook, Youtube, Send, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { BrandAssets } from "@/lib/imageAssets";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
@@ -52,7 +52,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={label}
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:border-foreground/20 hover:bg-muted hover:text-foreground"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -84,6 +84,15 @@ export function Footer() {
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>{config.contact.email}</span>
               </a>
+              {config.contact.phone && (
+                <a
+                  href={"tel:" + config.contact.phone.replace(/\s+/g, "")}
+                  className="flex items-start gap-3 transition-colors hover:text-foreground"
+                >
+                  <Phone className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>{config.contact.phone}</span>
+                </a>
+              )}
               <div className="flex items-start gap-3">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>{config.contact.address}</span>
