@@ -290,9 +290,9 @@ function CategoryManager() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="3d">3D Models</SelectItem>
-                  <SelectItem value="photo">Photos</SelectItem>
-                  <SelectItem value="video">Videos</SelectItem>
+                  <SelectItem value="3d">3D-модели</SelectItem>
+                  <SelectItem value="photo">Фотографии</SelectItem>
+                  <SelectItem value="video">Видео</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -652,9 +652,9 @@ function ItemManager() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="3d">3D Model</SelectItem>
-                    <SelectItem value="photo">Photo</SelectItem>
-                    <SelectItem value="video">Video</SelectItem>
+                    <SelectItem value="3d">3D-модель</SelectItem>
+                    <SelectItem value="photo">Фото</SelectItem>
+                    <SelectItem value="video">Видео</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
