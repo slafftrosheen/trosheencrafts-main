@@ -6,7 +6,7 @@ import {
   Clock3,
   Euro,
   Package,
-  RefreshCw,
+  ОбновитьCw,
   ShoppingCart,
 } from "lucide-react";
 import {
@@ -47,16 +47,16 @@ interface TopProduct {
   totalRevenue: number;
 }
 
-const euro = new Intl.NumberFormat("en", {
+const euro = new Intl.NumberFormat("ru-RU", {
   style: "currency",
   currency: "EUR",
 });
 
 const periods = [
-  { value: "7d", label: "7 days" },
-  { value: "30d", label: "30 days" },
-  { value: "90d", label: "90 days" },
-  { value: "365d", label: "1 year" },
+  { value: "7d", label: "7 дней" },
+  { value: "30d", label: "30 дней" },
+  { value: "90d", label: "90 дней" },
+  { value: "365d", label: "1 год" },
 ];
 
 export default function Analytics() {
@@ -99,15 +99,15 @@ export default function Analytics() {
     <div className="space-y-8">
       <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-sm font-medium text-muted-foreground">Commerce performance</p>
-          <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Analytics</h1>
+          <p className="text-sm font-medium text-muted-foreground">Показатели магазина</p>
+          <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight">Аналитика</h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            Revenue only includes processing, shipped and delivered orders. Pending and cancelled orders are excluded.
+            В выручку входят только заказы в обработке, отправленные и доставленные. Ожидающие и отменённые заказы не учитываются.
           </p>
         </div>
         <Button variant="outline" onClick={refreshAll}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          Refresh
+          <ОбновитьCw className="mr-2 h-4 w-4" />
+          Обновить
         </Button>
       </header>
 
@@ -115,9 +115,9 @@ export default function Analytics() {
         <Card className="border-destructive/40">
           <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
             <AlertTriangle className="h-8 w-8 text-destructive" />
-            <p className="font-semibold">Analytics could not be loaded</p>
-            <p className="text-sm text-muted-foreground">{(error as any)?.message || "Unknown analytics error"}</p>
-            <Button onClick={refreshAll}>Try again</Button>
+            <p className="font-semibold">Не удалось загрузить аналитику</p>
+            <p className="text-sm text-muted-foreground">{(error as any)?.message || "Неизвестная ошибка аналитики"}</p>
+            <Button onClick={refreshAll}>Повторить</Button>
           </CardContent>
         </Card>
       ) : (
@@ -125,27 +125,27 @@ export default function Analytics() {
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
               {
-                label: "Recognized revenue",
+                label: "Учтённая выручка",
                 value: stats ? euro.format(stats.totalRevenue) : "—",
-                note: "All paid lifecycle orders",
+                note: "Все оплаченные заказы на активных этапах",
                 icon: Euro,
               },
               {
-                label: "Orders",
+                label: "Заказы",
                 value: stats?.totalOrders ?? "—",
-                note: `${stats?.pendingOrders || 0} pending`,
+                note: `${stats?.pendingOrders || 0} ожидают`,
                 icon: ShoppingCart,
               },
               {
-                label: "Products",
+                label: "Товары",
                 value: stats?.totalProducts ?? "—",
-                note: `${(stats?.lowStockProducts || 0) + (stats?.outOfStockProducts || 0)} need stock attention`,
+                note: `${(stats?.lowStockProducts || 0) + (stats?.outOfStockProducts || 0)} требуют проверки остатков`,
                 icon: Package,
               },
               {
-                label: "Last 7 days",
+                label: "Последние 7 дней",
                 value: stats?.recentOrders ?? "—",
-                note: "Orders created",
+                note: "Создано заказов",
                 icon: Clock3,
               },
             ].map((metric) => {
@@ -168,9 +168,9 @@ export default function Analytics() {
           <Card>
             <CardHeader className="gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <CardTitle className="font-serif text-2xl">Sales trend</CardTitle>
+                <CardTitle className="font-serif text-2xl">Динамика продаж</CardTitle>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {euro.format(periodRevenue)} across {periodOrders} recognized orders in this period.
+                  {euro.format(periodRevenue)} по {periodOrders} учтённым заказам за выбранный период.
                 </p>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -189,7 +189,7 @@ export default function Analytics() {
             <CardContent>
               {salesQuery.isLoading ? (
                 <div className="flex h-72 items-center justify-center text-sm text-muted-foreground">
-                  Loading sales data…
+                  Загрузка данных о продажах…
                 </div>
               ) : sales.length ? (
                 <div className="h-72 w-full">
@@ -216,8 +216,8 @@ export default function Analytics() {
                         tickFormatter={(value) => `€${value}`}
                       />
                       <Tooltip
-                        formatter={(value: any) => [euro.format(Number(value)), "Revenue"]}
-                        labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                        formatter={(value: any) => [euro.format(Number(value)), "Выручка"]}
+                        labelFormatter={(label) => new Date(label).toLocaleDateString("ru-RU")}
                       />
                       <Area
                         type="monotone"
@@ -231,7 +231,7 @@ export default function Analytics() {
                 </div>
               ) : (
                 <div className="flex h-72 items-center justify-center text-sm text-muted-foreground">
-                  No recognized sales in this period.
+                  За этот период учтённых продаж нет.
                 </div>
               )}
             </CardContent>
@@ -240,8 +240,8 @@ export default function Analytics() {
           <section className="grid gap-6 xl:grid-cols-[1.25fr_0.75fr]">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="font-serif text-2xl">Top products</CardTitle>
-                <Badge variant="secondary">{topProducts.length} shown</Badge>
+                <CardTitle className="font-serif text-2xl">Лидеры продаж</CardTitle>
+                <Badge variant="secondary">{topProducts.length} показано</Badge>
               </CardHeader>
               <CardContent>
                 {topProducts.length ? (
@@ -251,21 +251,21 @@ export default function Analytics() {
                         <span className="text-sm font-semibold text-muted-foreground">{index + 1}</span>
                         <div className="min-w-0">
                           <p className="truncate text-sm font-semibold">{product.productName}</p>
-                          <p className="text-xs text-muted-foreground">{product.totalQuantity} units sold</p>
+                          <p className="text-xs text-muted-foreground">{product.totalQuantity} продано</p>
                         </div>
                         <span className="text-sm font-semibold">{euro.format(product.totalRevenue)}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="py-8 text-center text-sm text-muted-foreground">No product sales yet.</p>
+                  <p className="py-8 text-center text-sm text-muted-foreground">Продаж товаров пока нет.</p>
                 )}
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader>
-                <CardTitle className="font-serif text-2xl">Operations</CardTitle>
+                <CardTitle className="font-serif text-2xl">Операции</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 <Link
@@ -273,8 +273,8 @@ export default function Analytics() {
                   className="flex items-center justify-between rounded-xl border border-border p-4 hover:bg-muted/50"
                 >
                   <span>
-                    <span className="block text-sm font-semibold">Pending orders</span>
-                    <span className="text-xs text-muted-foreground">Review fulfillment queue</span>
+                    <span className="block text-sm font-semibold">Ожидающие заказы</span>
+                    <span className="text-xs text-muted-foreground">Проверить очередь выполнения</span>
                   </span>
                   <strong>{stats?.pendingOrders || 0}</strong>
                 </Link>
@@ -283,8 +283,8 @@ export default function Analytics() {
                   className="flex items-center justify-between rounded-xl border border-border p-4 hover:bg-muted/50"
                 >
                   <span>
-                    <span className="block text-sm font-semibold">Stock warnings</span>
-                    <span className="text-xs text-muted-foreground">Low + unavailable products</span>
+                    <span className="block text-sm font-semibold">Предупреждения по остаткам</span>
+                    <span className="text-xs text-muted-foreground">Мало на складе + отсутствующие товары</span>
                   </span>
                   <strong>{(stats?.lowStockProducts || 0) + (stats?.outOfStockProducts || 0)}</strong>
                 </Link>
@@ -293,8 +293,8 @@ export default function Analytics() {
                   className="flex items-center justify-between rounded-xl border border-border p-4 hover:bg-muted/50"
                 >
                   <span>
-                    <span className="block text-sm font-semibold">Unread messages</span>
-                    <span className="text-xs text-muted-foreground">Customer requests awaiting review</span>
+                    <span className="block text-sm font-semibold">Непрочитанные сообщения</span>
+                    <span className="text-xs text-muted-foreground">Обращения клиентов, ожидающие проверки</span>
                   </span>
                   <strong>{stats?.unreadMessages || 0}</strong>
                 </Link>
