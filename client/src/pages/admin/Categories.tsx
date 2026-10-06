@@ -91,28 +91,28 @@ export default function Categories() {
       if (editingCategory) {
         const slug = editingCategory.toLowerCase().replace(/\s+/g, '-');
         await apiClient.put(`/categories/${slug}`, { name });
-        toast.success(`Category renamed to "${name}"`);
+        toast.success(`Категория переименована в «${name}»`);
       } else {
         await apiClient.post('/categories', { name });
-        toast.success(`Category "${name}" created. Add products to populate it.`);
+        toast.success(`Категория «${name}» создана. Добавьте товары, чтобы она появилась в каталоге.`);
       }
       refetch();
       setIsDialogOpen(false);
       setEditingCategory(null);
     } catch (err: any) {
-      toast.error(err.message || 'Failed to save category');
+      toast.error(err.message || 'Не удалось сохранить категорию');
     }
   };
 
   const handleDelete = async (categoryName: string) => {
-    if (window.confirm(`Delete category "${categoryName}"? All products in this category will become uncategorized.`)) {
+    if (window.confirm(`Удалить категорию «${categoryName}»? Все товары из неё останутся без категории.`)) {
       try {
         const slug = categoryName.toLowerCase().replace(/\s+/g, '-');
         await apiClient.delete(`/categories/${slug}`);
-        toast.success(`Category "${categoryName}" deleted`);
+        toast.success(`Категория «${categoryName}» удалена`);
         refetch();
       } catch (err: any) {
-        toast.error(err.message || 'Failed to delete category');
+        toast.error(err.message || 'Не удалось удалить категорию');
       }
     }
   };
@@ -134,12 +134,12 @@ export default function Categories() {
       <div className="min-h-screen bg-muted/40 p-8">
         <Card className="p-8 text-center rounded-[2.5rem] border-2 border-border/40">
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-red-600 mb-2">Error Loading Categories</h2>
+          <h2 className="text-xl font-bold text-red-600 mb-2">Ошибка загрузки категорий</h2>
           <p className="text-muted-foreground mb-4">
-            {(error as any)?.message || 'Failed to load categories'}
+            {(error as any)?.message || 'Не удалось загрузить категории'}
           </p>
           <Button onClick={() => refetch()} className="rounded-2xl">
-            Try Again
+            Повторить
           </Button>
         </Card>
       </div>
@@ -152,10 +152,10 @@ export default function Categories() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-4xl font-serif font-bold tracking-tight mb-2">
-              Product <span className="text-primary italic">Categories</span>
+              Категории <span className="text-primary italic">товаров</span>
             </h1>
             <p className="text-xl text-muted-foreground">
-              Manage product categories
+              Управление категориями товаров
             </p>
           </div>
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -165,28 +165,28 @@ export default function Categories() {
                 className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/20"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                Add Category
+                Добавить категорию
               </Button>
             </DialogTrigger>
             <DialogContent className="rounded-[2rem] border-2 border-border/40">
               <DialogHeader>
                 <DialogTitle className="font-serif text-2xl">
-                  {editingCategory ? 'Edit Category' : 'Create New Category'}
+                  {editingCategory ? 'Редактировать категорию' : 'Новая категория'}
                 </DialogTitle>
                 <DialogDescription className="text-muted-foreground">
-                  {editingCategory ? 'Update category name.' : 'Add a new category for your artefacts.'}
+                  {editingCategory ? 'Измените название категории.' : 'Добавьте новую категорию для товаров.'}
                 </DialogDescription>
               </DialogHeader>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="name" className="font-bold uppercase tracking-widest text-xs">
-                    Category Name
+                    Название категории
                   </Label>
                   <Input
                     id="name"
                     name="name"
                     required
-                    placeholder="e.g., Planters, Decor"
+                    placeholder="Например: Кашпо, Декор"
                     defaultValue={editingCategory || ''}
                     className="rounded-xl border-2 focus:border-primary/40 h-12"
                   />
@@ -199,10 +199,10 @@ export default function Categories() {
                     onClick={() => setIsDialogOpen(false)}
                     className="rounded-xl"
                   >
-                    Cancel
+                    Отмена
                   </Button>
                   <Button type="submit" className="rounded-xl">
-                    {editingCategory ? 'Update' : 'Create'}
+                    {editingCategory ? 'Обновить' : 'Создать'}
                   </Button>
                 </div>
               </form>
@@ -214,14 +214,14 @@ export default function Categories() {
         <Card className="rounded-xl border-border bg-card shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total Categories
+              Всего категорий
             </CardTitle>
             <Tag className="h-5 w-5 text-primary opacity-60" />
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold font-serif">{categoriesWithCount.length}</div>
             <p className="text-xs text-muted-foreground mt-1">
-              Categories are auto-generated from products
+              Категории формируются на основе товаров
             </p>
           </CardContent>
         </Card>
@@ -236,17 +236,17 @@ export default function Categories() {
             <Table>
               <TableHeader className="bg-muted/50">
                 <TableRow>
-                  <TableHead className="px-6">Category Name</TableHead>
+                  <TableHead className="px-6">Название категории</TableHead>
                   <TableHead>Slug</TableHead>
-                  <TableHead>Products</TableHead>
-                  <TableHead className="text-right px-6">Actions</TableHead>
+                  <TableHead>Товары</TableHead>
+                  <TableHead className="text-right px-6">Действия</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {categoriesWithCount.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-muted-foreground py-12">
-                      No categories found. Add products with categories to auto-generate.
+                      Категории не найдены. Добавьте товары с категориями, чтобы они появились автоматически.
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -254,7 +254,7 @@ export default function Categories() {
                     <TableRow key={category.slug} className="hover:bg-muted/30">
                       <TableCell className="px-6 font-medium">{category.name}</TableCell>
                       <TableCell className="text-muted-foreground">{category.slug}</TableCell>
-                      <TableCell>{category.count} products</TableCell>
+                      <TableCell>{category.count} товаров</TableCell>
                       <TableCell className="text-right px-6">
                         <Button
                           variant="ghost"
@@ -286,11 +286,9 @@ export default function Categories() {
 
         {/* Help Section */}
         <Card className="rounded-xl border-border bg-card shadow-sm p-6">
-          <h3 className="font-serif text-xl font-bold mb-3">How Categories Work</h3>
+          <h3 className="font-serif text-xl font-bold mb-3">Как работают категории</h3>
           <p className="text-muted-foreground text-sm">
-            Categories are automatically generated from the products in your catalog. 
-            To add a new category, create a product and assign it to the desired category name. 
-            Categories with no products will be automatically removed.
+            Категории автоматически формируются из товаров каталога. Чтобы добавить новую категорию, создайте товар и укажите нужное название категории. Категории без товаров удаляются автоматически.
           </p>
         </Card>
       </div>
