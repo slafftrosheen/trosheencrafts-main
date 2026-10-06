@@ -211,7 +211,7 @@ export default function Categories() {
         </div>
 
         {/* Category Stats */}
-        <Card className="rounded-[2rem] border-2 border-border/40 bg-card/40 shadow-xl">
+        <Card className="rounded-xl border-border bg-card shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               Total Categories
@@ -227,7 +227,7 @@ export default function Categories() {
         </Card>
 
         {/* Categories Table */}
-        <Card className="rounded-[2.5rem] border-2 border-border/40 overflow-hidden bg-card/40 shadow-xl">
+        <Card className="overflow-hidden border-border bg-card shadow-sm">
           {isLoading ? (
             <div className="flex items-center justify-center p-8">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -285,7 +285,7 @@ export default function Categories() {
         </Card>
 
         {/* Help Section */}
-        <Card className="rounded-[2rem] border-2 border-border/40 bg-card/40 shadow-xl p-6">
+        <Card className="rounded-xl border-border bg-card shadow-sm p-6">
           <h3 className="font-serif text-xl font-bold mb-3">How Categories Work</h3>
           <p className="text-muted-foreground text-sm">
             Categories are automatically generated from the products in your catalog. 
