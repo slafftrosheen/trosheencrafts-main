@@ -39,7 +39,7 @@ export function MobileNavigation() {
             alt="Trosheen.Crafts"
             className="h-10 w-10 object-contain"
           />
-          <span className="font-serif text-base font-semibold tracking-tight">
+          <span className="hidden font-serif text-base font-semibold tracking-tight min-[390px]:inline">
             Trosheen.Crafts
           </span>
         </Link>
