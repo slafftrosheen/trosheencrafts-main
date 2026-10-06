@@ -73,9 +73,9 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['siteConfig'] });
       queryClient.invalidateQueries({ queryKey: ['adminSiteConfig'] });
-      toast.success(t('admin.settings_saved') || 'Contact settings saved');
+      toast.success(t('admin.settings_saved') || 'Контактные данные сохранены');
     },
-    onError: (error: any) => toast.error(error.message || 'Failed to update contact'),
+    onError: (error: any) => toast.error(error.message || 'Не удалось обновить контактные данные'),
   });
 
   const socialMutation = useMutation({
@@ -83,9 +83,9 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['siteConfig'] });
       queryClient.invalidateQueries({ queryKey: ['adminSiteConfig'] });
-      toast.success(t('admin.settings_saved') || 'Social settings saved');
+      toast.success(t('admin.settings_saved') || 'Ссылки на соцсети сохранены');
     },
-    onError: (error: any) => toast.error(error.message || 'Failed to update social'),
+    onError: (error: any) => toast.error(error.message || 'Не удалось обновить ссылки на соцсети'),
   });
 
   const hoursMutation = useMutation({
@@ -93,9 +93,9 @@ export default function Settings() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['siteConfig'] });
       queryClient.invalidateQueries({ queryKey: ['adminSiteConfig'] });
-      toast.success(t('admin.settings_saved') || 'Business hours saved');
+      toast.success(t('admin.settings_saved') || 'Часы работы сохранены');
     },
-    onError: (error: any) => toast.error(error.message || 'Failed to update hours'),
+    onError: (error: any) => toast.error(error.message || 'Не удалось обновить часы работы'),
   });
 
   const handleSaveContact = (e: React.FormEvent) => {
@@ -129,10 +129,10 @@ export default function Settings() {
     <div className="mx-auto max-w-4xl space-y-8">
         <header className="border-b border-border pb-6">
           <h1 className="font-serif text-4xl font-semibold tracking-tight">
-            {t('admin.site_config') || 'Site Config'} <span className="text-primary italic">&amp; {t('nav.settings') || 'Settings'}</span>
+            {t('admin.site_config') || 'Настройки сайта'} <span className="text-primary italic">&amp; {t('nav.settings') || 'Настройки'}</span>
           </h1>
           <p className="mt-2 text-muted-foreground">
-            Manage your store configuration, contact info, and social links
+            Управляйте контактами, социальными сетями и основными параметрами сайта.
           </p>
         </header>
 
@@ -141,17 +141,17 @@ export default function Settings() {
           <CardHeader className="p-6 pb-2">
             <CardTitle className="font-serif text-2xl flex items-center gap-2">
               <Mail className="w-6 h-6 text-primary" />
-              {t('admin.contact_info') || 'Contact Info'}
+              {t('admin.contact_info') || 'Контактная информация'}
             </CardTitle>
             <CardDescription className="font-medium">
-              This information is displayed across all website pages
+              Эти данные отображаются на страницах сайта.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <form onSubmit={handleSaveContact} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
-                  <Mail className="w-3 h-3" /> Email Address
+                  <Mail className="w-3 h-3" /> Email
                 </Label>
                 <Input
                   id="email"
@@ -165,7 +165,7 @@ export default function Settings() {
 
               <div className="space-y-2">
                 <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
-                  <Phone className="w-3 h-3" /> Phone Number
+                  <Phone className="w-3 h-3" /> Телефон
                 </Label>
                 <Input
                   id="phone"
@@ -179,13 +179,13 @@ export default function Settings() {
 
               <div className="space-y-2">
                 <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
-                  <MapPin className="w-3 h-3" /> Address / Location
+                  <MapPin className="w-3 h-3" /> Адрес / местоположение
                 </Label>
                 <Input
                   id="address"
                   value={contactForm.address}
                   onChange={(e) => setContactForm({ ...contactForm, address: e.target.value })}
-                  placeholder="Daugavpils, Latvia"
+                  placeholder="Даугавпилс, Латвия"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
@@ -200,10 +200,10 @@ export default function Settings() {
                 {contactMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    Сохранение...
                   </>
                 ) : (
-                  t('admin.save_changes') || 'Save Changes'
+                  t('admin.save_changes') || 'Сохранить изменения'
                 )}
               </Button>
             </form>
@@ -215,10 +215,10 @@ export default function Settings() {
           <CardHeader className="p-6 pb-2">
             <CardTitle className="font-serif text-2xl flex items-center gap-2">
               <Instagram className="w-6 h-6 text-primary" />
-              {t('admin.social_links') || 'Social Links'}
+              {t('admin.social_links') || 'Социальные сети'}
             </CardTitle>
             <CardDescription className="font-medium">
-              Social media links displayed in footer and contact pages
+              Ссылки на социальные сети в футере и на странице контактов.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
@@ -318,17 +318,17 @@ export default function Settings() {
           <CardHeader className="p-6 pb-2">
             <CardTitle className="font-serif text-2xl flex items-center gap-2">
               <Clock className="w-6 h-6 text-primary" />
-              {t('admin.business_hours') || 'Business Hours'}
+              {t('admin.business_hours') || 'Часы работы'}
             </CardTitle>
             <CardDescription className="font-medium">
-              Your workshop hours displayed on the website
+              Часы работы мастерской, отображаемые на сайте.
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6">
             <form onSubmit={handleSaveHours} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="monFri" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
-                  <Clock className="w-3 h-3" /> Monday - Friday
+                  <Clock className="w-3 h-3" /> Понедельник — пятница
                 </Label>
                 <Input
                   id="monFri"
@@ -341,13 +341,13 @@ export default function Settings() {
 
               <div className="space-y-2">
                 <Label htmlFor="satSun" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
-                  <Clock className="w-3 h-3" /> Saturday - Sunday
+                  <Clock className="w-3 h-3" /> Суббота — воскресенье
                 </Label>
                 <Input
                   id="satSun"
                   value={hoursForm.satSun}
                   onChange={(e) => setHoursForm({ ...hoursForm, satSun: e.target.value })}
-                  placeholder="Family Time"
+                  placeholder="Выходной / по договорённости"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
