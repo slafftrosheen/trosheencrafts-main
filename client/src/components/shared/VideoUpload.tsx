@@ -7,8 +7,8 @@ import { cn } from '@/lib/utils';
 
 interface VideoUploadProps {
   value?: string;
-  onChange: (url: string) => void;
-  onRemove?: () => void;
+  onЗаменить: (url: string) => void;
+  onУдалить?: () => void;
   className?: string;
   maxSizeMB?: number;
 }
@@ -23,7 +23,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
     if (!file) return;
 
     if (file.size > maxSizeMB * 1024 * 1024) {
-      toast.error(`Video too large. Maximum size is ${maxSizeMB}MB.`);
+      toast.error(`Видео слишком большое. Максимальный размер — ${maxSizeMB} МБ.`);
       return;
     }
 
@@ -34,10 +34,10 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
         setProgress(Math.round(p));
       });
       onChange(result.url);
-      toast.success('Video uploaded successfully');
+      toast.success('Видео загружено');
     } catch (error: any) {
       console.error('Upload failed:', error);
-      toast.error(error.message || 'Failed to upload video');
+      toast.error(error.message || 'Не удалось загрузить видео');
     } finally {
       setUploading(false);
     }
@@ -120,7 +120,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
           ) : (
             <>
               <Play className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm font-medium">Upload Video (MP4/WebM)</span>
+              <span className="text-sm font-medium">Загрузить видео (MP4/WebM)</span>
             </>
           )}
         </button>
