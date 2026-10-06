@@ -86,6 +86,13 @@ export function CandleConstructor() {
       price: totalPrice,
       image: shape.imageUrl || '',
       variant: variantStr,
+      customConfiguration: {
+        vesselId: shape.id,
+        finishId: finish.id,
+        waxId: wax.id,
+        aromaId: aroma.id,
+        customDescription: customDescription.trim() || undefined,
+      },
     });
     
     toast.success(t('constructor.step_ready'));
