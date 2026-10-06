@@ -1,9 +1,9 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "wouter";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Lock, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Loader2, Lock, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,6 +30,12 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
   const totalPrice = getTotalPrice();
+
+  useEffect(() => {
+    if (items.length === 0) {
+      navigate("/shop");
+    }
+  }, [items.length, navigate]);
 
   const {
     register,
@@ -64,16 +70,20 @@ export default function CheckoutPage() {
     }
   };
 
-  if (items.length === 0) {
-    navigate("/shop");
-    return null;
-  }
+  if (items.length === 0) return null;
 
   const fieldClass = "h-12 rounded-xl border-border bg-card px-4";
 
   return (
     <div className="page-shell">
       <div className="site-container">
+        <Link
+          href="/cart"
+          className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground hover:text-foreground"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          {t("cart.basket")}
+        </Link>
         <p className="eyebrow">{t("checkout.title")}</p>
         <h1 className="display-title mt-4">{t("checkout.title")}</h1>
 
