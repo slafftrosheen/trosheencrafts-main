@@ -81,6 +81,7 @@ export const orderItems = pgTable('order_items', {
   productId: integer('product_id').notNull().references(() => products.id),
   quantity: integer('quantity').notNull(),
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
+  variant: text('variant'),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 }, (table) => ({
   orderIdIdx: index('order_items_order_id_idx').on(table.orderId),
