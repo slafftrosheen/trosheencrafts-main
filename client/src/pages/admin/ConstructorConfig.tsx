@@ -41,6 +41,27 @@ interface ConstructorOption {
   sortOrder: number;
 }
 
+const optionTypeLabels: Record<string, string> = {
+  vessel: "Сосуды",
+  finish: "Отделка",
+  wax: "Воск",
+  aroma: "Ароматы",
+};
+
+const optionTypeSingular: Record<string, string> = {
+  vessel: "сосуд",
+  finish: "вариант отделки",
+  wax: "вариант воска",
+  aroma: "аромат",
+};
+
+const optionTypeGenitive: Record<string, string> = {
+  vessel: "сосудов",
+  finish: "вариантов отделки",
+  wax: "вариантов воска",
+  aroma: "ароматов",
+};
+
 export default function ConstructorConfig() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('finish');
@@ -70,10 +91,10 @@ export default function ConstructorConfig() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminConstructorOptions'] });
       queryClient.invalidateQueries({ queryKey: ['constructorOptions'] });
-      toast.success('Option created successfully');
+      toast.success('Опция создана');
       setIsDialogOpen(false);
     },
-    onError: (error: any) => toast.error(error.message || 'Failed to create option'),
+    onError: (error: any) => toast.error(error.message || 'Не удалось создать опцию'),
   });
 
   const updateMutation = useMutation({
@@ -82,10 +103,10 @@ export default function ConstructorConfig() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminConstructorOptions'] });
       queryClient.invalidateQueries({ queryKey: ['constructorOptions'] });
-      toast.success('Option updated successfully');
+      toast.success('Опция обновлена');
       setIsDialogOpen(false);
     },
-    onError: (error: any) => toast.error(error.message || 'Failed to update option'),
+    onError: (error: any) => toast.error(error.message || 'Не удалось обновить опцию'),
   });
 
   const deleteMutation = useMutation({
@@ -93,9 +114,9 @@ export default function ConstructorConfig() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminConstructorOptions'] });
       queryClient.invalidateQueries({ queryKey: ['constructorOptions'] });
-      toast.success('Option deleted successfully');
+      toast.success('Опция удалена');
     },
-    onError: (error: any) => toast.error(error.message || 'Failed to delete option'),
+    onError: (error: any) => toast.error(error.message || 'Не удалось удалить опцию'),
   });
 
   const openDialog = (type: string, option?: ConstructorOption) => {
@@ -143,10 +164,10 @@ export default function ConstructorConfig() {
     if (filteredOptions.length === 0) {
       return (
         <div className="text-center p-12 bg-muted/20 rounded-2xl border border-dashed border-border">
-          <p className="text-muted-foreground mb-4">No {type} options configured yet.</p>
+          <p className="text-muted-foreground mb-4">Пока нет настроенных {optionTypeGenitive[type] || type}.</p>
           <Button onClick={() => openDialog(type)}>
             <Plus className="w-4 h-4 mr-2" />
-            Add First {type.charAt(0).toUpperCase() + type.slice(1)}
+            Добавить {optionTypeSingular[type] || type}
           </Button>
         </div>
       );
@@ -175,7 +196,7 @@ export default function ConstructorConfig() {
                 <h4 className="font-bold">{option.nameTranslations.en} <span className="text-muted-foreground text-sm font-normal">({option.key})</span></h4>
                 <div className="flex gap-2 mt-1">
                   <span className={`text-[11px] uppercase font-semibold px-2 py-0.5 rounded-full ${option.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                    {option.active ? 'Active' : 'Inactive'}
+                    {option.active ? 'Активна' : 'Отключена'}
                   </span>
                   <span className="text-xs text-muted-foreground font-medium">+{option.price}€</span>
                 </div>
@@ -186,7 +207,7 @@ export default function ConstructorConfig() {
                 <Edit className="w-4 h-4" />
               </Button>
               <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-600 hover:bg-red-50" onClick={() => {
-                if (window.confirm('Are you sure you want to delete this option?')) {
+                if (window.confirm('Удалить эту опцию?')) {
                   deleteMutation.mutate(option.id);
                 }
               }}>
@@ -204,10 +225,10 @@ export default function ConstructorConfig() {
       <header className="flex justify-between items-center">
         <div>
           <h1 className="text-4xl font-serif font-bold tracking-tight mb-2">
-            Constructor <span className="text-primary italic">Configuration</span>
+            Настройки <span className="text-primary italic">конструктора</span>
           </h1>
           <p className="text-muted-foreground font-medium">
-            Manage finishes, waxes, and aromas for the custom candle builder
+            Управляйте сосудами, отделкой, воском и ароматами для конструктора свечей.
           </p>
         </div>
       </header>
@@ -231,13 +252,13 @@ export default function ConstructorConfig() {
         <Card className="overflow-hidden border-border bg-card shadow-sm">
           <CardHeader className="p-8 pb-0 flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="font-serif text-2xl capitalize">{activeTab} Options</CardTitle>
+              <CardTitle className="font-serif text-2xl capitalize">{optionTypeLabels[activeTab] || activeTab}</CardTitle>
               <CardDescription className="font-medium">
-                Configure the available {activeTab}s and their translations
+                Настройте доступные {optionTypeGenitive[activeTab] || activeTab} и переводы.
               </CardDescription>
             </div>
             <Button onClick={() => openDialog(activeTab)} className="rounded-xl shadow-lg shadow-primary/20">
-              <Plus className="w-4 h-4 mr-2" /> Add {activeTab}
+              <Plus className="w-4 h-4 mr-2" /> Добавить {optionTypeSingular[activeTab] || activeTab}
             </Button>
           </CardHeader>
           <CardContent className="p-8">
@@ -250,13 +271,13 @@ export default function ConstructorConfig() {
         <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto rounded-3xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-2xl">
-              {editingOption ? 'Edit Option' : 'Add Option'}
+              {editingOption ? 'Редактировать опцию' : 'Добавить опцию'}
             </DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-6 py-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Internal Key (Unique)</Label>
+                <Label>Внутренний ключ (уникальный)</Label>
                 <Input 
                   value={formData.key} 
                   onChange={e => setFormData({...formData, key: e.target.value})} 
@@ -265,7 +286,7 @@ export default function ConstructorConfig() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Price Surcharge (€)</Label>
+                <Label>Доплата (€)</Label>
                 <Input 
                   type="number" step="0.01" 
                   value={formData.price} 
@@ -277,7 +298,7 @@ export default function ConstructorConfig() {
             
             {formData.type === 'vessel' && (
               <div className="space-y-2 p-4 bg-muted/30 rounded-2xl border border-border">
-                <Label>Image URL</Label>
+                <Label>URL изображения</Label>
                 <Input 
                   value={formData.imageUrl || ''} 
                   onChange={e => setFormData({...formData, imageUrl: e.target.value})} 
@@ -290,7 +311,7 @@ export default function ConstructorConfig() {
             {formData.type === 'finish' && (
               <div className="grid grid-cols-2 gap-4 p-4 bg-muted/30 rounded-2xl border border-border">
                 <div className="space-y-2">
-                  <Label>Color (Hex or CSS)</Label>
+                  <Label>Цвет (Hex или CSS)</Label>
                   <Input 
                     value={formData.color || ''} 
                     onChange={e => setFormData({...formData, color: e.target.value})} 
@@ -298,7 +319,7 @@ export default function ConstructorConfig() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Border Color (Optional)</Label>
+                  <Label>Цвет границы (необязательно)</Label>
                   <Input 
                     value={formData.border || ''} 
                     onChange={e => setFormData({...formData, border: e.target.value})} 
@@ -309,7 +330,7 @@ export default function ConstructorConfig() {
             )}
 
             <div className="space-y-4">
-              <h3 className="font-bold border-b pb-2">Name Translations</h3>
+              <h3 className="font-bold border-b pb-2">Переводы названия</h3>
               {['en', 'lv', 'ru', 'pl', 'uk'].map(lang => (
                 <div key={`name-${lang}`} className="grid grid-cols-[50px_1fr] items-center gap-2">
                   <Label className="uppercase font-bold text-muted-foreground">{lang}</Label>
@@ -320,14 +341,14 @@ export default function ConstructorConfig() {
                       nameTranslations: { ...formData.nameTranslations!, [lang]: e.target.value }
                     })} 
                     required={lang === 'en'}
-                    placeholder={`Name in ${lang.toUpperCase()}`}
+                    placeholder={`Название на ${lang.toUpperCase()}`}
                   />
                 </div>
               ))}
             </div>
 
             <div className="space-y-4">
-              <h3 className="font-bold border-b pb-2">Description Translations (Optional)</h3>
+              <h3 className="font-bold border-b pb-2">Переводы описания (необязательно)</h3>
               {['en', 'lv', 'ru', 'pl', 'uk'].map(lang => (
                 <div key={`desc-${lang}`} className="grid grid-cols-[50px_1fr] items-center gap-2">
                   <Label className="uppercase font-bold text-muted-foreground">{lang}</Label>
@@ -337,7 +358,7 @@ export default function ConstructorConfig() {
                       ...formData, 
                       descTranslations: { ...formData.descTranslations!, [lang]: e.target.value }
                     })} 
-                    placeholder={`Description in ${lang.toUpperCase()}`}
+                    placeholder={`Описание на ${lang.toUpperCase()}`}
                   />
                 </div>
               ))}
@@ -349,14 +370,14 @@ export default function ConstructorConfig() {
                 checked={formData.active} 
                 onCheckedChange={checked => setFormData({...formData, active: checked})} 
               />
-              <Label htmlFor="active" className="font-bold cursor-pointer">Option is Active and visible to customers</Label>
+              <Label htmlFor="active" className="font-bold cursor-pointer">Опция активна и видна покупателям</Label>
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">Cancel</Button>
+              <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)} className="rounded-xl">Отмена</Button>
               <Button type="submit" className="rounded-xl shadow-lg shadow-primary/20" disabled={createMutation.isPending || updateMutation.isPending}>
                 {(createMutation.isPending || updateMutation.isPending) && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Save Option
+                Сохранить опцию
               </Button>
             </DialogFooter>
           </form>
