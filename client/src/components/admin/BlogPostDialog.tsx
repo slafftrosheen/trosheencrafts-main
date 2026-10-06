@@ -23,12 +23,12 @@ import { toast } from 'sonner';
 import { useLanguage } from '@/lib/LanguageContext';
 
 const blogPostSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  slug: z.string().min(1, 'Slug is required'),
-  content: z.string().min(1, 'Content is required'),
-  excerpt: z.string().min(1, 'Excerpt is required'),
+  title: z.string().min(1, 'Укажите заголовок'),
+  slug: z.string().min(1, 'Укажите slug'),
+  content: z.string().min(1, 'Введите текст'),
+  excerpt: z.string().min(1, 'Введите краткое описание'),
   image: z.string().optional(),
-  author: z.string().min(1, 'Author is required'),
+  author: z.string().min(1, 'Укажите автора'),
   published: z.boolean().default(false),
 });
 
@@ -48,14 +48,19 @@ export function BlogPostDialog({ open, onOpenChange, post }: { open: boolean, on
 
   useEffect(() => {
     if (!isEditing && title) {
-      const slug = title.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
+      const slug = title
+        .normalize("NFKC")
+        .toLowerCase()
+        .trim()
+        .replace(/[^\p{L}\p{N}]+/gu, "-")
+        .replace(/^-+|-+$/g, "");
       setValue('slug', slug);
     }
   }, [title, isEditing, setValue]);
 
   useEffect(() => {
     if (post) reset({ ...post, published: !!post.publishedAt });
-    else reset({ title: '', slug: '', content: '', excerpt: '', image: '', author: 'Admin', published: false });
+    else reset({ title: '', slug: '', content: '', excerpt: '', image: '', author: 'Администратор', published: false });
   }, [post, reset]);
 
   const mutation = useMutation({
@@ -76,45 +81,45 @@ export function BlogPostDialog({ open, onOpenChange, post }: { open: boolean, on
         <DialogHeader>
           <DialogTitle className="text-3xl font-serif font-bold">{isEditing ? t("admin.common.update") : t("admin.blog.write")}</DialogTitle>
           <DialogDescription className="text-muted-foreground">
-            {isEditing ? 'Update the content of your journal entry.' : 'Draft a new story for the artisan workshop journal.'}
+            {isEditing ? 'Обновите содержимое записи журнала.' : 'Создайте новую запись для журнала мастерской.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(data => mutation.mutate(data))} className="space-y-8">
           <div className="grid grid-cols-3 gap-8">
             <div className="col-span-2 space-y-6">
               <div className="space-y-2">
-                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">{t("admin.products.table.name")}</Label>
+                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Заголовок</Label>
                 <Input {...register('title')} className="rounded-xl border-2 h-12 text-lg font-bold" />
               </div>
               <div className="space-y-2">
-                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">{t("chapter_legacy_eyebrow")}</Label>
+                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Краткое описание</Label>
                 <Textarea {...register('excerpt')} className="rounded-xl border-2 min-h-[80px]" />
               </div>
             </div>
             <div className="space-y-2">
-              <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">{t("admin.sidebar.media")}</Label>
+              <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Изображение</Label>
               <ImageUpload value={watch('image')} onChange={url => setValue('image', url)} onRemove={() => setValue('image', '')} />
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">{t("admin.sidebar.content")}</Label>
+            <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Текст записи</Label>
             <Textarea {...register('content')} className="rounded-2xl border-2 font-mono text-sm min-h-[300px] p-6" />
           </div>
 
           <div className="flex items-center justify-between p-6 bg-muted/40 rounded-3xl border-2 border-border/40">
             <div className="flex gap-12">
               <div className="space-y-2">
-                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Slug</Label>
+                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Slug (URL)</Label>
                 <Input {...register('slug')} className="bg-transparent border-0 border-b-2 rounded-none h-8 w-48 font-mono text-xs" />
               </div>
               <div className="space-y-2">
-                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">{t("admin.products.table.category")}</Label>
+                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Автор</Label>
                 <Input {...register('author')} className="bg-transparent border-0 border-b-2 rounded-none h-8 w-32 font-bold text-xs" />
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Label className="font-bold">{t("admin.products.table.status")}</Label>
+              <Label className="font-bold">Опубликовано</Label>
               <Switch checked={watch('published')} onCheckedChange={v => setValue('published', v)} />
             </div>
           </div>
