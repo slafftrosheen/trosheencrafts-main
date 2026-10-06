@@ -33,7 +33,7 @@ export function ProductCard({ id, name, price, image, category, isHandmade }: Pr
           )}
 
           {isHandmade && (
-            <span className="absolute left-4 top-4 rounded-full bg-background/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-foreground backdrop-blur">
+            <span className="absolute left-4 top-4 rounded-full bg-background/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-foreground backdrop-blur">
               {t("product_handmade_badge")}
             </span>
           )}
@@ -41,7 +41,7 @@ export function ProductCard({ id, name, price, image, category, isHandmade }: Pr
 
         <div className="pt-4">
           <div className="flex items-center justify-between gap-4">
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">
               {category}
             </p>
             <ArrowUpRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
