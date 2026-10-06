@@ -183,7 +183,7 @@ export default function ProductDetail() {
 
             {availableStock > 0 && availableStock <= 4 && (
               <p className="mt-3 text-sm font-semibold text-accent">
-                Only {availableStock} left in stock
+                {t("product.only_left").replace("{count}", String(availableStock))}
               </p>
             )}
 
