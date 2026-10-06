@@ -17,6 +17,7 @@ export interface CartItem {
   image?: string;
   variant?: string;
   customConfiguration?: CustomConfiguration;
+  maxStock?: number;
 }
 
 interface CartState {
@@ -44,7 +45,12 @@ export const useCartStore = create<CartState>()(
             return {
               items: state.items.map((i) =>
                 i.id === item.id && i.variant === item.variant
-                  ? { ...i, quantity: i.quantity + 1 }
+                  ? {
+                      ...i,
+                      quantity: i.maxStock
+                        ? Math.min(i.quantity + 1, i.maxStock)
+                        : i.quantity + 1,
+                    }
                   : i
               ),
             };
@@ -72,7 +78,14 @@ export const useCartStore = create<CartState>()(
 
         set((state) => ({
           items: state.items.map((item) =>
-            item.id === id && item.variant === variant ? { ...item, quantity } : item
+            item.id === id && item.variant === variant
+              ? {
+                  ...item,
+                  quantity: item.maxStock
+                    ? Math.min(quantity, item.maxStock)
+                    : quantity,
+                }
+              : item
           ),
         }));
       },
