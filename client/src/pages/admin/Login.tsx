@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LockKeyhole, Loader2 } from "lucide-react";
@@ -17,6 +17,10 @@ export default function AdminLogin() {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
   const [formData, setFormData] = useState({ email: "", password: "" });
+
+  useEffect(() => {
+    document.documentElement.lang = "ru";
+  }, []);
 
   const loginMutation = useMutation({
     mutationFn: (data: typeof formData) => apiClient.post<User>("/auth/login", data),
@@ -43,7 +47,7 @@ export default function AdminLogin() {
           <div>
             <p className="font-serif text-xl font-semibold">Trosheen.Crafts</p>
             <p className="text-xs font-medium uppercase tracking-[0.16em] text-muted-foreground">
-              Workshop admin
+              Админ-панель
             </p>
           </div>
         </div>
@@ -93,7 +97,7 @@ export default function AdminLogin() {
         </Card>
 
         <p className="mt-5 text-center text-xs text-muted-foreground">
-          Administrative access only · trosheen.shop
+          Только для администраторов · trosheen.shop
         </p>
       </div>
     </div>
