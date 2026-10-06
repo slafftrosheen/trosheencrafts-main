@@ -115,7 +115,7 @@ export default function Settings() {
 
   if (userLoading || configLoading) {
     return (
-      <div className="min-h-screen bg-muted/40 flex items-center justify-center">
+      <div className="flex min-h-[50vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
       </div>
     );
@@ -126,20 +126,19 @@ export default function Settings() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/40 p-8">
-      <div className="max-w-4xl mx-auto space-y-8">
-        <header>
-          <h1 className="text-4xl font-serif font-bold tracking-tight mb-2">
+    <div className="mx-auto max-w-4xl space-y-8">
+        <header className="border-b border-border pb-6">
+          <h1 className="font-serif text-4xl font-semibold tracking-tight">
             {t('admin.site_config') || 'Site Config'} <span className="text-primary italic">&amp; {t('nav.settings') || 'Settings'}</span>
           </h1>
-          <p className="text-xl text-muted-foreground font-medium">
+          <p className="mt-2 text-muted-foreground">
             Manage your store configuration, contact info, and social links
           </p>
         </header>
 
         {/* Contact Information */}
-        <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden relative group hover:border-primary/20 transition-all">
-          <CardHeader className="p-8 pb-0">
+        <Card className="overflow-hidden border-border bg-card shadow-sm">
+          <CardHeader className="p-6 pb-2">
             <CardTitle className="font-serif text-2xl flex items-center gap-2">
               <Mail className="w-6 h-6 text-primary" />
               {t('admin.contact_info') || 'Contact Info'}
@@ -148,10 +147,10 @@ export default function Settings() {
               This information is displayed across all website pages
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-6">
             <form onSubmit={handleSaveContact} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="email" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Mail className="w-3 h-3" /> Email Address
                 </Label>
                 <Input
@@ -165,7 +164,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="phone" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Phone className="w-3 h-3" /> Phone Number
                 </Label>
                 <Input
@@ -179,7 +178,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="address" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="address" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <MapPin className="w-3 h-3" /> Address / Location
                 </Label>
                 <Input
@@ -191,12 +190,12 @@ export default function Settings() {
                 />
               </div>
 
-              <Separator className="my-6 opacity-40" />
+              <Separator className="my-6" />
 
               <Button
                 type="submit"
                 disabled={contactMutation.isPending}
-                className="rounded-2xl h-12 px-8 font-bold shadow-lg shadow-primary/20"
+                className="h-11 px-6"
               >
                 {contactMutation.isPending ? (
                   <>
@@ -212,8 +211,8 @@ export default function Settings() {
         </Card>
 
         {/* Social Links */}
-        <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden relative group hover:border-primary/20 transition-all">
-          <CardHeader className="p-8 pb-0">
+        <Card className="overflow-hidden border-border bg-card shadow-sm">
+          <CardHeader className="p-6 pb-2">
             <CardTitle className="font-serif text-2xl flex items-center gap-2">
               <Instagram className="w-6 h-6 text-primary" />
               {t('admin.social_links') || 'Social Links'}
@@ -222,10 +221,10 @@ export default function Settings() {
               Social media links displayed in footer and contact pages
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-6">
             <form onSubmit={handleSaveSocial} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="facebook" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="facebook" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Facebook className="w-3 h-3" /> Facebook
                 </Label>
                 <Input
@@ -239,7 +238,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="instagram" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="instagram" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Instagram className="w-3 h-3" /> Instagram
                 </Label>
                 <Input
@@ -253,7 +252,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="twitter" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="twitter" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Twitter className="w-3 h-3" /> Twitter / X
                 </Label>
                 <Input
@@ -267,7 +266,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="youtube" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="youtube" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Youtube className="w-3 h-3" /> YouTube
                 </Label>
                 <Input
@@ -281,7 +280,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="telegram" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="telegram" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Send className="w-3 h-3" /> Telegram
                 </Label>
                 <Input
@@ -294,12 +293,12 @@ export default function Settings() {
                 />
               </div>
 
-              <Separator className="my-6 opacity-40" />
+              <Separator className="my-6" />
 
               <Button
                 type="submit"
                 disabled={socialMutation.isPending}
-                className="rounded-2xl h-12 px-8 font-bold shadow-lg shadow-primary/20"
+                className="h-11 px-6"
               >
                 {socialMutation.isPending ? (
                   <>
@@ -315,8 +314,8 @@ export default function Settings() {
         </Card>
 
         {/* Business Hours */}
-        <Card className="rounded-[2.5rem] border-2 border-border/40 bg-card/40 shadow-xl overflow-hidden relative group hover:border-primary/20 transition-all">
-          <CardHeader className="p-8 pb-0">
+        <Card className="overflow-hidden border-border bg-card shadow-sm">
+          <CardHeader className="p-6 pb-2">
             <CardTitle className="font-serif text-2xl flex items-center gap-2">
               <Clock className="w-6 h-6 text-primary" />
               {t('admin.business_hours') || 'Business Hours'}
@@ -325,10 +324,10 @@ export default function Settings() {
               Your workshop hours displayed on the website
             </CardDescription>
           </CardHeader>
-          <CardContent className="p-8">
+          <CardContent className="p-6">
             <form onSubmit={handleSaveHours} className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="monFri" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="monFri" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" /> Monday - Friday
                 </Label>
                 <Input
@@ -341,7 +340,7 @@ export default function Settings() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="satSun" className="font-bold uppercase tracking-widest text-[10px] ml-1 flex items-center gap-2">
+                <Label htmlFor="satSun" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
                   <Clock className="w-3 h-3" /> Saturday - Sunday
                 </Label>
                 <Input
@@ -353,12 +352,12 @@ export default function Settings() {
                 />
               </div>
 
-              <Separator className="my-6 opacity-40" />
+              <Separator className="my-6" />
 
               <Button
                 type="submit"
                 disabled={hoursMutation.isPending}
-                className="rounded-2xl h-12 px-8 font-bold shadow-lg shadow-primary/20"
+                className="h-11 px-6"
               >
                 {hoursMutation.isPending ? (
                   <>
@@ -372,7 +371,6 @@ export default function Settings() {
             </form>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }
