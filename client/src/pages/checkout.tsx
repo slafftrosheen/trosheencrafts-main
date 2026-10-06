@@ -53,6 +53,7 @@ export default function CheckoutPage() {
           productId: item.id,
           quantity: item.quantity,
           variant: item.variant,
+          customConfiguration: item.customConfiguration,
         })),
         shippingAddress: data,
         email: data.email,
