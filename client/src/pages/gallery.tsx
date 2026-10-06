@@ -201,7 +201,7 @@ export default function GalleryPage() {
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
                           />
                         )}
-                        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em] backdrop-blur">
+                        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.1em] backdrop-blur">
                           <TypeIcon type={item.type} />
                           {item.type === "3d" ? "Interactive 3D" : item.type}
                         </span>
