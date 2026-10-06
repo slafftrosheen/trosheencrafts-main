@@ -1,13 +1,14 @@
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
+import { ru } from "date-fns/locale";
 import {
   AlertTriangle,
   ArrowRight,
   Euro,
   Inbox,
   Package,
-  RefreshCw,
+  ОбновитьCw,
   ShoppingCart,
   TrendingUp,
 } from "lucide-react";
@@ -38,7 +39,7 @@ interface ActivityItem {
   createdAt: string;
 }
 
-const euro = new Intl.NumberFormat("en", {
+const euro = new Intl.NumberFormat("ru-RU", {
   style: "currency",
   currency: "EUR",
 });
@@ -62,30 +63,30 @@ export default function AdminDashboard() {
 
   const attention = [
     {
-      label: "Pending orders",
+      label: "Ожидающие заказы",
       count: stats?.pendingOrders || 0,
       href: "/admin/orders",
-      note: "Orders waiting for review or payment confirmation",
+      note: "Заказы, ожидающие проверки или подтверждения оплаты",
     },
     {
-      label: "Low / out of stock",
+      label: "Мало / нет в наличии",
       count: (stats?.lowStockProducts || 0) + (stats?.outOfStockProducts || 0),
       href: "/admin/inventory",
-      note: "Catalogue items that need stock attention",
+      note: "Позиции каталога, требующие проверки остатков",
     },
     {
-      label: "Unread messages",
+      label: "Непрочитанные сообщения",
       count: stats?.unreadMessages || 0,
       href: "/admin/messages",
-      note: "Customer and withdrawal requests waiting for review",
+      note: "Обращения клиентов и заявления на отказ, ожидающие проверки",
     },
   ];
 
   const quickActions = [
-    { label: "Manage orders", href: "/admin/orders" },
-    { label: "Add or edit products", href: "/admin/products" },
-    { label: "Update homepage promotions", href: "/admin/promotions" },
-    { label: "Edit site settings", href: "/admin/settings" },
+    { label: "Управление заказами", href: "/admin/orders" },
+    { label: "Добавить или изменить товары", href: "/admin/products" },
+    { label: "Изменить промо-блоки главной страницы", href: "/admin/promotions" },
+    { label: "Настройки сайта", href: "/admin/settings" },
   ];
 
   return (
@@ -93,18 +94,18 @@ export default function AdminDashboard() {
       <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium text-muted-foreground">
-            {user?.username ? `Signed in as ${user.username}` : "Workshop operations"}
+            {user?.username ? `Выполнен вход: ${user.username}` : "Управление мастерской"}
           </p>
           <h1 className="mt-1 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">
-            Admin overview
+            Обзор админ-панели
           </h1>
           <p className="mt-2 max-w-2xl text-muted-foreground">
-            Orders, stock, messages and content that need attention right now.
+            Заказы, остатки, сообщения и контент, требующие внимания прямо сейчас.
           </p>
         </div>
         <Button variant="outline" onClick={() => refetch()} disabled={isFetching}>
-          <RefreshCw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
-          Refresh
+          <ОбновитьCw className={`mr-2 h-4 w-4 ${isFetching ? "animate-spin" : ""}`} />
+          Обновить
         </Button>
       </header>
 
@@ -113,12 +114,12 @@ export default function AdminDashboard() {
           <CardContent className="flex flex-col items-center gap-3 py-10 text-center">
             <AlertTriangle className="h-8 w-8 text-destructive" />
             <div>
-              <p className="font-semibold">Could not load admin overview</p>
+              <p className="font-semibold">Не удалось загрузить обзор админ-панели</p>
               <p className="text-sm text-muted-foreground">
-                {(error as any)?.message || "The admin API did not respond."}
+                {(error as any)?.message || "Сервер админ-панели не ответил."}
               </p>
             </div>
-            <Button onClick={() => refetch()}>Try again</Button>
+            <Button onClick={() => refetch()}>Повторить</Button>
           </CardContent>
         </Card>
       ) : (
@@ -126,27 +127,27 @@ export default function AdminDashboard() {
           <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             {[
               {
-                label: "Recognized revenue",
+                label: "Учтённая выручка",
                 value: stats ? euro.format(stats.totalRevenue) : "—",
-                note: "Processing, shipped and delivered",
+                note: "В обработке, отправленные и доставленные",
                 icon: Euro,
               },
               {
-                label: "All orders",
+                label: "Все заказы",
                 value: stats?.totalOrders ?? "—",
-                note: `${stats?.recentOrders || 0} created in the last 7 days`,
+                note: `${stats?.recentOrders || 0} создано за последние 7 дней`,
                 icon: ShoppingCart,
               },
               {
-                label: "Products",
+                label: "Товары",
                 value: stats?.totalProducts ?? "—",
-                note: `${stats?.outOfStockProducts || 0} currently out of stock`,
+                note: `${stats?.outOfStockProducts || 0} сейчас отсутствуют`,
                 icon: Package,
               },
               {
-                label: "Open customer work",
+                label: "Открытые обращения",
                 value: (stats?.pendingOrders || 0) + (stats?.unreadMessages || 0),
-                note: "Pending orders + unread messages",
+                note: "Ожидающие заказы + непрочитанные сообщения",
                 icon: TrendingUp,
               },
             ].map((metric) => {
@@ -173,7 +174,7 @@ export default function AdminDashboard() {
           <section className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
             <Card>
               <CardHeader>
-                <CardTitle className="font-serif text-2xl">Needs attention</CardTitle>
+                <CardTitle className="font-serif text-2xl">Требует внимания</CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {attention.map((item) => (
@@ -197,7 +198,7 @@ export default function AdminDashboard() {
 
             <Card>
               <CardHeader>
-                <CardTitle className="font-serif text-2xl">Quick actions</CardTitle>
+                <CardTitle className="font-serif text-2xl">Быстрые действия</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                 {quickActions.map((action) => (
@@ -216,12 +217,12 @@ export default function AdminDashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="font-serif text-2xl">Recent activity</CardTitle>
-              <Badge variant="secondary">{data?.activity?.length || 0} events</Badge>
+              <CardTitle className="font-serif text-2xl">Последняя активность</CardTitle>
+              <Badge variant="secondary">{data?.activity?.length || 0} событий</Badge>
             </CardHeader>
             <CardContent>
               {isLoading ? (
-                <div className="py-8 text-sm text-muted-foreground">Loading recent activity…</div>
+                <div className="py-8 text-sm text-muted-foreground">Загрузка активности…</div>
               ) : data?.activity?.length ? (
                 <div className="divide-y divide-border">
                   {data.activity.map((item) => (
@@ -240,7 +241,7 @@ export default function AdminDashboard() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-medium">{item.description}</p>
                         <p className="mt-1 text-xs text-muted-foreground">
-                          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(item.createdAt), { addSuffix: true, locale: ru })}
                         </p>
                       </div>
                       {typeof item.amount === "number" && (
@@ -251,7 +252,7 @@ export default function AdminDashboard() {
                 </div>
               ) : (
                 <p className="py-8 text-center text-sm text-muted-foreground">
-                  No recent activity yet.
+                  Недавней активности пока нет.
                 </p>
               )}
             </CardContent>
