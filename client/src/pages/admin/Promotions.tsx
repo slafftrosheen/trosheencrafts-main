@@ -35,7 +35,7 @@ export default function AdminPromotions() {
     if (config?.value?.heading) {
       setHeading(config.value.heading);
     } else {
-      setHeading('Featured Collections');
+      setHeading('Избранные коллекции');
     }
   }, [config]);
 
@@ -43,9 +43,9 @@ export default function AdminPromotions() {
     mutationFn: (newHeading: string) => apiClient.put('/site-config/admin/promotional-gallery', { heading: newHeading }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-config-gallery'] });
-      toast.success('Gallery settings updated');
+      toast.success('Настройки блока обновлены');
     },
-    onError: () => toast.error('Failed to update settings'),
+    onError: () => toast.error('Не удалось обновить настройки'),
   });
 
   const { data: promotions = [], isLoading } = useQuery({
@@ -57,13 +57,13 @@ export default function AdminPromotions() {
     mutationFn: (id: number) => apiClient.delete(`/promotions/${id}`),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['promotions'] });
-      toast.success('Promotion deleted');
+      toast.success('Промо-блок удалён');
     },
-    onError: () => toast.error('Failed to delete promotion'),
+    onError: () => toast.error('Не удалось удалить промо-блок'),
   });
 
   const handleDelete = (id: number) => {
-    if (window.confirm('Delete this promotion?')) {
+    if (window.confirm('Удалить этот промо-блок?')) {
       deleteMutation.mutate(id);
     }
   };
@@ -77,24 +77,24 @@ export default function AdminPromotions() {
     <div className="space-y-8">
       <header className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-serif font-bold">Promotions</h1>
-          <p className="text-muted-foreground">Manage homepage slider content</p>
+          <h1 className="text-3xl font-serif font-bold">Промо-блоки</h1>
+          <p className="text-muted-foreground">Управление промо-контентом главной страницы</p>
         </div>
         <Button onClick={() => { setEditingPromo(null); setDialogOpen(true); }} className="rounded-2xl h-12 px-6 font-bold shadow-lg shadow-primary/20">
-          <Plus size={20} className="mr-2" /> Add Promotion
+          <Plus size={20} className="mr-2" /> Добавить промо
         </Button>
       </header>
 
       <Card className="p-6 mb-8 rounded-xl border-border bg-card shadow-sm">
-        <h3 className="font-serif text-lg font-bold mb-4">Gallery Settings</h3>
+        <h3 className="font-serif text-lg font-bold mb-4">Настройки промо-раздела</h3>
         <div className="flex gap-4 items-end">
           <div className="flex-1 space-y-2">
-            <Label htmlFor="galleryHeading">Section Heading</Label>
+            <Label htmlFor="galleryHeading">Заголовок раздела</Label>
             <Input 
               id="galleryHeading" 
               value={heading} 
               onChange={(e) => setHeading(e.target.value)} 
-              placeholder="Featured Collections"
+              placeholder="Избранные коллекции"
               className="rounded-xl"
             />
           </div>
@@ -104,7 +104,7 @@ export default function AdminPromotions() {
             className="rounded-xl"
           >
             {updateConfigMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Settings
+            Сохранить настройки
           </Button>
         </div>
       </Card>
@@ -116,18 +116,18 @@ export default function AdminPromotions() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="px-8">Title</TableHead>
-                <TableHead>Link</TableHead>
-                <TableHead>Active</TableHead>
-                <TableHead>Order</TableHead>
-                <TableHead className="text-right px-8">Actions</TableHead>
+                <TableHead className="px-8">Заголовок</TableHead>
+                <TableHead>Ссылка</TableHead>
+                <TableHead>Статус</TableHead>
+                <TableHead>Порядок</TableHead>
+                <TableHead className="text-right px-8">Действия</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {promotions.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center text-muted-foreground py-12">
-                    No promotions found. Create one to display on the homepage.
+                    Промо-блоков пока нет. Создайте первый для главной страницы.
                   </TableCell>
                 </TableRow>
               ) : (
@@ -144,7 +144,7 @@ export default function AdminPromotions() {
                     <TableCell className="text-xs font-mono">{promo.linkUrl || '-'}</TableCell>
                     <TableCell>
                       <span className={cn("px-2 py-1 rounded-full text-xs font-bold", promo.active ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700")}>
-                        {promo.active ? 'Active' : 'Hidden'}
+                        {promo.active ? 'Активен' : 'Скрыт'}
                       </span>
                     </TableCell>
                     <TableCell>{promo.sortOrder}</TableCell>
