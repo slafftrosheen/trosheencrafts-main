@@ -6,8 +6,8 @@ import { cn } from '@/lib/utils';
 
 interface ImageUploadProps {
   value?: string;
-  onChange: (url: string) => void;
-  onRemove?: () => void;
+  onЗаменить: (url: string) => void;
+  onУдалить?: () => void;
   className?: string;
 }
 
@@ -44,7 +44,7 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
         <div className="relative group aspect-square rounded-2xl overflow-hidden border-2 border-border/40">
           <img
             src={value}
-            alt="Uploaded"
+            alt="Загруженное изображение"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -92,7 +92,7 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
           ) : (
             <>
               <Upload className="h-8 w-8 text-muted-foreground" />
-              <span className="text-sm font-medium">Upload Image</span>
+              <span className="text-sm font-medium">Загрузить изображение</span>
             </>
           )}
         </button>
