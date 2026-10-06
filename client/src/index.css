@@ -52,7 +52,7 @@
   --popover: 42 28% 98%;
   --popover-foreground: 28 18% 12%;
   --muted: 38 17% 91%;
-  --muted-foreground: 28 9% 42%;
+  --muted-foreground: 28 9% 38%;
   --primary: 151 30% 24%;
   --primary-foreground: 42 35% 98%;
   --secondary: 26 15% 16%;
@@ -94,7 +94,7 @@
   --popover: 28 12% 12%;
   --popover-foreground: 42 24% 93%;
   --muted: 30 10% 16%;
-  --muted-foreground: 38 10% 66%;
+  --muted-foreground: 38 10% 72%;
   --primary: 151 31% 46%;
   --primary-foreground: 28 13% 9%;
   --secondary: 42 24% 93%;
@@ -126,6 +126,17 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
     min-width: 320px;
+    line-height: 1.5;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
   }
 
   body,
@@ -166,10 +177,10 @@
   }
 
   .eyebrow {
-    font-size: 0.72rem;
-    line-height: 1;
+    font-size: 0.75rem;
+    line-height: 1.2;
     font-weight: 800;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: hsl(var(--primary));
   }
@@ -200,7 +211,7 @@
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
     border-radius: 1.5rem;
-    box-shadow: 0 18px 50px -36px rgba(36, 28, 20, 0.35);
+    box-shadow: 0 16px 42px -30px rgba(36, 28, 20, 0.32);
   }
 
   .surface-muted {
