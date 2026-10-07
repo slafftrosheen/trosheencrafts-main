@@ -305,7 +305,7 @@ export default function Settings() {
                     Saving...
                   </>
                 ) : (
-                  t('admin.save_changes') || 'Save Changes'
+                  t('admin.save_changes') || 'Сохранить изменения'
                 )}
               </Button>
             </form>
@@ -364,7 +364,7 @@ export default function Settings() {
                     Saving...
                   </>
                 ) : (
-                  t('admin.save_changes') || 'Save Changes'
+                  t('admin.save_changes') || 'Сохранить изменения'
                 )}
               </Button>
             </form>
