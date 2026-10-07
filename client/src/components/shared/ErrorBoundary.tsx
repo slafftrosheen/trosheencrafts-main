@@ -79,12 +79,12 @@ export class ErrorBoundary extends Component<Props, State> {
         }
       : {
           multipleTitle: 'Multiple Errors Detected',
-          multipleDescription: '{copy.multipleDescription}',
-          persistentDescription: '{copy.persistentDescription}',
+          multipleDescription: 'The application has encountered multiple errors. Please reload the page.',
+          persistentDescription: 'If this problem persists, please clear your browser cache or contact support.',
           reload: 'Reload Page',
           home: 'Go Home',
           errorTitle: 'Something Went Wrong',
-          errorDescription: '{copy.errorDescription}',
+          errorDescription: 'An unexpected error occurred. You can try again or return to the home page.',
           details: 'Error Details (Development Only)',
           retry: 'Try Again',
         };
@@ -106,12 +106,12 @@ export class ErrorBoundary extends Component<Props, State> {
                   <CardTitle className="text-2xl font-serif">{copy.multipleTitle}</CardTitle>
                 </div>
                 <CardDescription>
-                  The application has encountered multiple errors. Please reload the page.
+                  {copy.multipleDescription}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  If this problem persists, please clear your browser cache or contact support.
+                  {copy.persistentDescription}
                 </p>
               </CardContent>
               <CardFooter className="flex gap-2">
@@ -139,7 +139,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 <CardTitle className="font-serif text-xl">{copy.errorTitle}</CardTitle>
               </div>
               <CardDescription>
-                An unexpected error occurred. You can try again or return to the home page.
+                {copy.errorDescription}
               </CardDescription>
             </CardHeader>
 
@@ -169,7 +169,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </Button>
               <Button onClick={this.handleGoHome} variant="outline" className="flex-1 rounded-xl font-bold">
                 <Home className="mr-2 h-4 w-4" />
-                Go Home
+                {copy.home}
               </Button>
             </CardFooter>
           </Card>
