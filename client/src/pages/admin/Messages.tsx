@@ -23,7 +23,7 @@ import {
 import { apiClient } from "@/lib/apiClient";
 import { Spinner } from "@/components/shared/LoadingStates";
 import { toast } from "sonner";
-import { useLanguage } from "@/lib/LanguageContext";
+import { adminT as t } from "@/lib/adminI18n";
 
 type MessageStatus = "new" | "read" | "resolved";
 
@@ -45,7 +45,6 @@ const statusVariant: Record<MessageStatus, "default" | "secondary" | "outline"> 
 
 export default function AdminMessages() {
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [expandedId, setExpandedId] = useState<number | null>(null);
