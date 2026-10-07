@@ -62,6 +62,15 @@ const optionTypeGenitive: Record<string, string> = {
   aroma: "ароматов",
 };
 
+const translationLanguages = ['en', 'lv', 'ru', 'pl', 'uk'] as const;
+const languageLabels: Record<(typeof translationLanguages)[number], string> = {
+  en: 'Английский',
+  lv: 'Латышский',
+  ru: 'Русский',
+  pl: 'Польский',
+  uk: 'Украинский',
+};
+
 export default function ConstructorConfig() {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('finish');
@@ -193,7 +202,7 @@ export default function ConstructorConfig() {
                 />
               )}
               <div>
-                <h4 className="font-bold">{option.nameTranslations.en} <span className="text-muted-foreground text-sm font-normal">({option.key})</span></h4>
+                <h4 className="font-bold">{option.nameTranslations.ru || option.nameTranslations.en || option.key} <span className="text-muted-foreground text-sm font-normal">({option.key})</span></h4>
                 <div className="flex gap-2 mt-1">
                   <span className={`text-[11px] uppercase font-semibold px-2 py-0.5 rounded-full ${option.active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                     {option.active ? 'Активна' : 'Отключена'}
@@ -331,9 +340,9 @@ export default function ConstructorConfig() {
 
             <div className="space-y-4">
               <h3 className="font-bold border-b pb-2">Переводы названия</h3>
-              {['en', 'lv', 'ru', 'pl', 'uk'].map(lang => (
-                <div key={`name-${lang}`} className="grid grid-cols-[50px_1fr] items-center gap-2">
-                  <Label className="uppercase font-bold text-muted-foreground">{lang}</Label>
+              {translationLanguages.map(lang => (
+                <div key={`name-${lang}`} className="grid grid-cols-[120px_1fr] items-center gap-2">
+                  <Label className="font-bold text-muted-foreground">{languageLabels[lang]}</Label>
                   <Input 
                     value={formData.nameTranslations?.[lang as keyof NameTranslations] || ''} 
                     onChange={e => setFormData({
@@ -341,7 +350,7 @@ export default function ConstructorConfig() {
                       nameTranslations: { ...formData.nameTranslations!, [lang]: e.target.value }
                     })} 
                     required={lang === 'en'}
-                    placeholder={`Название на ${lang.toUpperCase()}`}
+                    placeholder={`Название — ${languageLabels[lang]}`}
                   />
                 </div>
               ))}
@@ -349,16 +358,16 @@ export default function ConstructorConfig() {
 
             <div className="space-y-4">
               <h3 className="font-bold border-b pb-2">Переводы описания (необязательно)</h3>
-              {['en', 'lv', 'ru', 'pl', 'uk'].map(lang => (
-                <div key={`desc-${lang}`} className="grid grid-cols-[50px_1fr] items-center gap-2">
-                  <Label className="uppercase font-bold text-muted-foreground">{lang}</Label>
+              {translationLanguages.map(lang => (
+                <div key={`desc-${lang}`} className="grid grid-cols-[120px_1fr] items-center gap-2">
+                  <Label className="font-bold text-muted-foreground">{languageLabels[lang]}</Label>
                   <Input 
                     value={formData.descTranslations?.[lang as keyof DescTranslations] || ''} 
                     onChange={e => setFormData({
                       ...formData, 
                       descTranslations: { ...formData.descTranslations!, [lang]: e.target.value }
                     })} 
-                    placeholder={`Описание на ${lang.toUpperCase()}`}
+                    placeholder={`Описание — ${languageLabels[lang]}`}
                   />
                 </div>
               ))}
