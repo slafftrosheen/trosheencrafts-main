@@ -143,7 +143,7 @@ export function BatchEditDialog({ open, onOpenChange, selectedIds, onSuccess }: 
             <div className="space-y-0.5">
               <Label htmlFor="regen-slugs" className="font-bold flex items-center gap-2 cursor-pointer">
                 <RefreshCcw className="w-4 h-4 text-primary" />
-                Пересоздать slug
+                Пересоздать URL-идентификатор
               </Label>
               <p className="text-[10px] text-muted-foreground font-medium">Синхронизировать URL с названиями</p>
             </div>

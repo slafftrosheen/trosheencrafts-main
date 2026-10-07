@@ -292,7 +292,7 @@ export function MediaUploader({
                 size="sm"
                 className="rounded-full flex-shrink-0"
               >
-                Change
+                Заменить
               </Button>
             </div>
           </div>

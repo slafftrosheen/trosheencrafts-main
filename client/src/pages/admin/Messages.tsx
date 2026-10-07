@@ -135,7 +135,7 @@ export default function AdminMessages() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по отправителю, email, теме или сообщению"
+            placeholder="Поиск по отправителю, эл. почте, теме или сообщению"
             className="pl-9"
           />
         </div>

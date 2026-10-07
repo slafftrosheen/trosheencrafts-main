@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
@@ -45,8 +45,11 @@ const AdminNewsletterSubscribers = lazy(() => import("@/pages/admin/NewsletterSu
 const AdminConstructor = lazy(() => import("@/pages/admin/ConstructorConfig"));
 
 function Router() {
+  const [location] = useLocation();
+  const loadingText = location.startsWith("/admin") ? "Загрузка..." : undefined;
+
   return (
-    <Suspense fallback={<PageLoader />}>
+    <Suspense fallback={<PageLoader text={loadingText} />}>
       <Switch>
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin"><AdminLayout><AdminDashboard /></AdminLayout></Route>

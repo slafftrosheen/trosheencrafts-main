@@ -91,7 +91,7 @@ export default function NewsletterSubscribersPage() {
     const url = window.URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `newsletter-subscribers-${new Date().toISOString().split("T")[0]}.csv`;
+    anchor.download = `podpischiki-rassylki-${new Date().toISOString().split("T")[0]}.csv`;
     anchor.click();
     window.URL.revokeObjectURL(url);
   };
@@ -134,7 +134,7 @@ export default function NewsletterSubscribersPage() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по email или источнику"
+            placeholder="Поиск по эл. почте или источнику"
             className="pl-9"
           />
         </div>

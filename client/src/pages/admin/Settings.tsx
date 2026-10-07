@@ -150,7 +150,7 @@ export default function Settings() {
             <form onSubmit={handleSaveContact} className="space-y-6">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground flex items-center gap-2">
-                  <Mail className="w-3 h-3" /> Email
+                  <Mail className="w-3 h-3" /> Эл. почта
                 </Label>
                 <Input
                   id="email"
@@ -231,7 +231,7 @@ export default function Settings() {
                   type="url"
                   value={socialForm.facebook}
                   onChange={(e) => setSocialForm({ ...socialForm, facebook: e.target.value })}
-                  placeholder="https://facebook.com/yourpage"
+                  placeholder="https://facebook.com/trosheencrafts"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
@@ -245,7 +245,7 @@ export default function Settings() {
                   type="url"
                   value={socialForm.instagram}
                   onChange={(e) => setSocialForm({ ...socialForm, instagram: e.target.value })}
-                  placeholder="https://instagram.com/yourhandle"
+                  placeholder="https://instagram.com/trosheencrafts"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
@@ -259,7 +259,7 @@ export default function Settings() {
                   type="url"
                   value={socialForm.twitter}
                   onChange={(e) => setSocialForm({ ...socialForm, twitter: e.target.value })}
-                  placeholder="https://twitter.com/yourhandle"
+                  placeholder="https://x.com/trosheencrafts"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
@@ -273,7 +273,7 @@ export default function Settings() {
                   type="url"
                   value={socialForm.youtube}
                   onChange={(e) => setSocialForm({ ...socialForm, youtube: e.target.value })}
-                  placeholder="https://youtube.com/@yourchannel"
+                  placeholder="https://youtube.com/@trosheencrafts"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
@@ -287,7 +287,7 @@ export default function Settings() {
                   type="url"
                   value={socialForm.telegram}
                   onChange={(e) => setSocialForm({ ...socialForm, telegram: e.target.value })}
-                  placeholder="https://t.me/yourchannel"
+                  placeholder="https://t.me/trosheencrafts"
                   className="rounded-xl border-2 focus:border-primary/40 h-12"
                 />
               </div>
@@ -302,7 +302,7 @@ export default function Settings() {
                 {socialMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    Сохранение...
                   </>
                 ) : (
                   t('admin.save_changes') || 'Сохранить изменения'
@@ -361,7 +361,7 @@ export default function Settings() {
                 {hoursMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Saving...
+                    Сохранение...
                   </>
                 ) : (
                   t('admin.save_changes') || 'Сохранить изменения'
