@@ -698,32 +698,6 @@ export const translations: Translations = {
   "constructor.custom_request": { en: "Your custom request", lv: "Jūsu individuālais pieprasījums", ru: "Ваш индивидуальный запрос", pl: "Twoje indywidualne życzenie", uk: "Ваш індивідуальний запит" },
   "constructor.custom_product_name": { en: "Custom Crafted Candle", lv: "Individuāli veidota svece", ru: "Свеча по индивидуальному дизайну", pl: "Świeca wykonana na zamówienie", uk: "Свічка за індивідуальним дизайном" },
   "constructor.custom_placeholder": { en: "e.g. Deep emerald green with copper speckles...", lv: "piem., dziļi smaragdzaļš ar vara akcentiem...", ru: "например, глубокий изумрудный с медными вкраплениями...", pl: "np. głęboka szmaragdowa zieleń z miedzianymi drobinkami...", uk: "наприклад, насичений смарагдовий із мідними вкрапленнями..." },
-  // Admin
-  "admin.dashboard": { en: "Dashboard", lv: "Informācijas panelis", ru: "Панель управления", pl: "Pulpit nawigacyjny", uk: "Панель управління" },
-  "admin.analytics_title": { en: "Analytics", lv: "Analītika", ru: "Аналитика", pl: "Analityka", uk: "Аналітика" },
-  "admin.orders": { en: "Orders", lv: "Pasūtījumi", ru: "Заказы", pl: "Zamówienia", uk: "Замовлення" },
-  "admin.products": { en: "Products", lv: "Produkti", ru: "Продукты", pl: "Produkty", uk: "Продукти" },
-  "admin.constructor": { en: "Constructor", lv: "Konstruktors", ru: "Конструктор", pl: "Konstruktor", uk: "Конструктор" },
-  "admin.category": { en: "Categories", lv: "Kategorijas", ru: "Категории", pl: "Kategorie", uk: "Категорії" },
-  "admin.blog": { en: "Blog", lv: "Emuārs", ru: "Блог", pl: "Blog", uk: "Блог" },
-  "admin.promotions": { en: "Promotions", lv: "Akcijas", ru: "Акции", pl: "Promocje", uk: "Акції" },
-  "admin.gallery.title": { en: "Gallery", lv: "Galerija", ru: "Галерея", pl: "Galeria", uk: "Галерея" },
-  "admin.messages": { en: "Messages", lv: "Ziņas", ru: "Сообщения", pl: "Wiadomości", uk: "Повідомлення" },
-  "admin.customer": { en: "Customers", lv: "Klienti", ru: "Клиенты", pl: "Klienci", uk: "Клієнти" },
-  "footer.newsletter_title": { en: "Subscribers", lv: "Abonenti", ru: "Подписчики", pl: "Subskrybenci", uk: "Підписники" },
-  "admin.logout": { en: "Logout", lv: "Izrakstīties", ru: "Выйти", pl: "Wyloguj", uk: "Вийти" },
-  "admin.login_title": { en: "Admin Portal", lv: "Administratora portāls", ru: "Портал администратора", pl: "Portal administratora", uk: "Портал адміністратора" },
-  "admin.entry_deleted": { en: "Entry deleted", lv: "Ieraksts dzēsts", ru: "Запись удалена", pl: "Wpis usunięty", uk: "Запис видалено" },
-  "admin.delete_error": { en: "Failed to delete", lv: "Neizdevās dzēst", ru: "Не удалось удалить", pl: "Nie udało się usunąć", uk: "Не вдалося видалити" },
-  "admin.blog.write": { en: "Write entry", lv: "Rakstīt ierakstu", ru: "Новая запись", pl: "Napisz wpis", uk: "Новий запис" },
-  "admin.common.save": { en: "Save", lv: "Saglabāt", ru: "Сохранить", pl: "Zapisz", uk: "Зберегти" },
-  "admin.common.showing": { en: "Showing", lv: "Parādīts", ru: "Показано", pl: "Wyświetlono", uk: "Показано" },
-  "admin.common.of": { en: "of", lv: "no", ru: "из", pl: "z", uk: "з" },
-  "common.create": { en: "Create", lv: "Izveidot", ru: "Создать", pl: "Utwórz", uk: "Створити" },
-  "common.update": { en: "Update", lv: "Atjaunināt", ru: "Обновить", pl: "Aktualizuj", uk: "Оновити" },
-  "common.prev": { en: "Previous", lv: "Iepriekšējā", ru: "Назад", pl: "Poprzednia", uk: "Назад" },
-  "common.next": { en: "Next", lv: "Nākamā", ru: "Далее", pl: "Dalej", uk: "Далі" },
-
 };
 
 interface LanguageContextType {
