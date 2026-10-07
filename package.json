@@ -8,7 +8,7 @@
     "dev": "NODE_ENV=development tsx server/index.ts",
     "build": "npm run check-assets && vite build && tsx scripts/build.ts",
     "start": "NODE_ENV=production node dist/index.cjs",
-    "migrate": "tsx scripts/migrate.ts",
+    "migrate": "node scripts/migrate.cjs",
     "seed": "tsx server/db/seed.ts",
     "check-assets": "tsx scripts/generate-asset-manifest.ts",
     "db:generate": "drizzle-kit generate",

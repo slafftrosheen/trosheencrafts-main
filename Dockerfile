@@ -2,6 +2,8 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+ENV NODE_OPTIONS=--max-old-space-size=1536
+
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
@@ -28,10 +30,11 @@ RUN npm ci --only=production --legacy-peer-deps
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
+COPY scripts/migrate.cjs ./scripts/migrate.cjs
+COPY migrations ./migrations
 
 # Create non-root user
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodejs -u 1001
+RUN addgroup -g 1001 -S nodejs && adduser -S nodejs -u 1001
 
 USER nodejs
 

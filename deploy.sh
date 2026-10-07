@@ -1,4 +1,8 @@
 #!/bin/bash
+# Trosheen Crafts deploy: pull, rebuild, migrate, verify.
+set -e
+
+cd "$(dirname "$0")"
 
 echo "🚀 Deploying Trosheen Crafts..."
 
@@ -6,17 +10,17 @@ echo "🚀 Deploying Trosheen Crafts..."
 git pull origin main
 
 # Build and restart containers
-docker-compose down
-docker-compose build --no-cache
-docker-compose up -d
+docker compose down
+docker compose build
+docker compose up -d
 
 # Wait for containers to start
 sleep 10
 
-# Run database migrations
-docker-compose exec -T app npm run db:push
+# Apply pending database migrations (tracked in _migrations table)
+docker compose exec -T app node scripts/migrate.cjs
 
 # Check health
-curl -f http://localhost:5000/api/health || exit 1
+curl -f http://localhost:5000/api/health
 
 echo "✅ Deployment successful!"
