@@ -19,7 +19,7 @@ import { Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
-import { useLanguage } from "@/lib/LanguageContext";
+import { adminT as t } from "@/lib/adminI18n";
 
 const productSchema = z.object({
   name: z.string().min(1, "Укажите название"),
@@ -43,7 +43,6 @@ export function ProductDialog({
   product?: any;
 }) {
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
   const isEditing = !!product;
 
   const {
