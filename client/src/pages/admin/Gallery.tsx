@@ -45,7 +45,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { useLanguage } from '@/lib/LanguageContext';
+import { adminT as t } from "@/lib/adminI18n";
 import { DualFileUploader } from '@/components/admin/DualFileUploader';
 import { BatchPhotoUploader } from '@/components/admin/BatchPhotoUploader';
 import { BatchEditDialog } from '@/components/admin/BatchEditDialog';
@@ -89,7 +89,6 @@ const slugify = (value: string) =>
     .replace(/^-+|-+$/g, "");
 
 function CategoryManager() {
-  const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -332,7 +331,6 @@ function CategoryManager() {
 }
 
 function ItemManager() {
-  const { t } = useLanguage();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -767,7 +765,6 @@ function ItemManager() {
 }
 
 export default function AdminGalleryPage() {
-  const { t } = useLanguage();
 
   return (
     <div className="space-y-8">

@@ -77,7 +77,7 @@ export default function NewsletterSubscribersPage() {
 
   const exportSubscribers = () => {
     const rows = [
-      ["Email", "Дата подписки", "Источник", "Статус"],
+      ["Эл. почта", "Дата подписки", "Источник", "Статус"],
       ...visibleSubscribers.map((subscriber) => [
         subscriber.email,
         new Date(subscriber.subscribedAt).toISOString(),
@@ -166,7 +166,7 @@ export default function NewsletterSubscribersPage() {
           <Table>
             <TableHeader className="bg-muted/50">
               <TableRow>
-                <TableHead className="px-6">Email</TableHead>
+                <TableHead className="px-6">Эл. почта</TableHead>
                 <TableHead>Подписан</TableHead>
                 <TableHead>Источник</TableHead>
                 <TableHead>Статус</TableHead>

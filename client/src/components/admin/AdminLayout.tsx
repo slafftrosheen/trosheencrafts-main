@@ -20,7 +20,7 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useLanguage } from "@/lib/LanguageContext";
+import { adminT as t } from "@/lib/adminI18n";
 import { cn } from "@/lib/utils";
 import { BrandAssets } from "@/lib/imageAssets";
 import { useCurrentUser } from "@/hooks/useApi";
@@ -70,7 +70,6 @@ const navigationItems = [
 export function AdminLayout({ children }: AdminLayoutProps) {
   const [location, navigate] = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useLanguage();
   const { data: user, isLoading: userLoading } = useCurrentUser();
 
   useEffect(() => {

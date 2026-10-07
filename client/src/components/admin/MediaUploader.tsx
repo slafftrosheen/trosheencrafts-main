@@ -107,7 +107,7 @@ export function MediaUploader({
           description: `${file.name} загружен`,
         });
       } catch (error) {
-        console.error('Upload error:', error);
+        console.error('Ошибка загрузки:', error);
         toast({
           title: 'Ошибка загрузки',
           description: error instanceof Error ? error.message : 'Не удалось загрузить файл',

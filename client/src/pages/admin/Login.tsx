@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useLanguage } from "@/lib/LanguageContext";
+import { adminT as t } from "@/lib/adminI18n";
 import { BrandAssets } from "@/lib/imageAssets";
 import { apiClient } from "@/lib/apiClient";
 import type { User } from "@/hooks/useApi";
@@ -15,7 +15,6 @@ import type { User } from "@/hooks/useApi";
 export default function AdminLogin() {
   const [, setLocation] = useLocation();
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
   const [formData, setFormData] = useState({ email: "", password: "" });
 
   useEffect(() => {

@@ -20,7 +20,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
 
-import { useLanguage } from '@/lib/LanguageContext';
+import { adminT as t } from "@/lib/adminI18n";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, 'Укажите заголовок'),
@@ -36,7 +36,6 @@ type BlogPostFormData = z.infer<typeof blogPostSchema>;
 
 export function BlogPostDialog({ open, onOpenChange, post }: { open: boolean, onOpenChange: (open: boolean) => void, post?: any }) {
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
   const isEditing = !!post;
 
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<BlogPostFormData>({
