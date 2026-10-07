@@ -229,7 +229,7 @@ export default function AdminMessages() {
                         </Button>
                       )}
                       <a
-                        href={`mailto:${message.email}?subject=${encodeURIComponent("Re: " + message.subject)}`}
+                        href={`mailto:${message.email}?subject=${encodeURIComponent("Ответ: " + message.subject)}`}
                       >
                         <Button size="sm" variant="outline">
                           <Mail className="mr-2 h-3.5 w-3.5" />
