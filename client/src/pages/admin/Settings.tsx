@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/useApi';
-import { useLanguage } from '@/lib/LanguageContext';
+import { adminT as t } from "@/lib/adminI18n";
 import { apiClient } from '@/lib/apiClient';
 import { Loader2, Mail, Phone, MapPin, Facebook, Instagram, Youtube, Send, Twitter, Clock } from 'lucide-react';
 
@@ -31,7 +31,6 @@ interface SiteConfig {
 }
 
 export default function Settings() {
-  const { t } = useLanguage();
   const { data: user, isLoading: userLoading } = useCurrentUser();
   const queryClient = useQueryClient();
 
