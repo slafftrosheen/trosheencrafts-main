@@ -237,7 +237,7 @@ export default function Categories() {
               <TableHeader className="bg-muted/50">
                 <TableRow>
                   <TableHead className="px-6">Название категории</TableHead>
-                  <TableHead>Slug (URL)</TableHead>
+                  <TableHead>URL-идентификатор</TableHead>
                   <TableHead>Товары</TableHead>
                   <TableHead className="text-right px-6">Действия</TableHead>
                 </TableRow>
