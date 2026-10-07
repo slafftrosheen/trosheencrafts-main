@@ -60,10 +60,35 @@ export class ErrorBoundary extends Component<Props, State> {
   };
 
   private handleGoHome = () => {
-    window.location.href = '/';
+    window.location.href = window.location.pathname.startsWith('/admin') ? '/admin' : '/';
   };
 
   public render() {
+    const isAdmin = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+    const copy = isAdmin
+      ? {
+          multipleTitle: 'Обнаружено несколько ошибок',
+          multipleDescription: 'В приложении произошло несколько ошибок. Перезагрузите страницу.',
+          persistentDescription: 'Если проблема повторяется, очистите кэш браузера или обратитесь к администратору.',
+          reload: 'Перезагрузить страницу',
+          home: 'В админ-панель',
+          errorTitle: 'Произошла ошибка',
+          errorDescription: 'Возникла непредвиденная ошибка. Попробуйте ещё раз или вернитесь в админ-панель.',
+          details: 'Подробности ошибки (только для разработки)',
+          retry: 'Попробовать снова',
+        }
+      : {
+          multipleTitle: 'Multiple Errors Detected',
+          multipleDescription: 'The application has encountered multiple errors. Please reload the page.',
+          persistentDescription: 'If this problem persists, please clear your browser cache or contact support.',
+          reload: 'Reload Page',
+          home: 'Go Home',
+          errorTitle: 'Something Went Wrong',
+          errorDescription: 'An unexpected error occurred. You can try again or return to the home page.',
+          details: 'Error Details (Development Only)',
+          retry: 'Try Again',
+        };
+
     if (this.state.hasError) {
       // Use custom fallback if provided
       if (this.props.fallback) {
@@ -78,25 +103,25 @@ export class ErrorBoundary extends Component<Props, State> {
               <CardHeader>
                 <div className="flex items-center gap-3 text-destructive mb-2">
                   <AlertTriangle className="h-8 w-8" />
-                  <CardTitle className="text-2xl font-serif">Multiple Errors Detected</CardTitle>
+                  <CardTitle className="text-2xl font-serif">{copy.multipleTitle}</CardTitle>
                 </div>
                 <CardDescription>
-                  The application has encountered multiple errors. Please reload the page.
+                  {copy.multipleDescription}
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  If this problem persists, please clear your browser cache or contact support.
+                  {copy.persistentDescription}
                 </p>
               </CardContent>
               <CardFooter className="flex gap-2">
                 <Button onClick={this.handleReload} className="flex-1 rounded-xl font-bold">
                   <RefreshCw className="mr-2 h-4 w-4" />
-                  Reload Page
+                  {copy.reload}
                 </Button>
                 <Button onClick={this.handleGoHome} variant="outline" className="flex-1 rounded-xl font-bold">
                   <Home className="mr-2 h-4 w-4" />
-                  Go Home
+                  {copy.home}
                 </Button>
               </CardFooter>
             </Card>
@@ -111,10 +136,10 @@ export class ErrorBoundary extends Component<Props, State> {
             <CardHeader>
               <div className="flex items-center gap-3 text-destructive mb-2">
                 <AlertTriangle className="h-6 w-6" />
-                <CardTitle className="font-serif text-xl">Something Went Wrong</CardTitle>
+                <CardTitle className="font-serif text-xl">{copy.errorTitle}</CardTitle>
               </div>
               <CardDescription>
-                An unexpected error occurred. You can try again or return to the home page.
+                {copy.errorDescription}
               </CardDescription>
             </CardHeader>
 
@@ -122,7 +147,7 @@ export class ErrorBoundary extends Component<Props, State> {
               <CardContent>
                 <details className="text-sm">
                   <summary className="cursor-pointer font-semibold mb-2">
-                    Error Details (Development Only)
+                    {copy.details}
                   </summary>
                   <div className="p-3 bg-muted rounded-md overflow-auto border">
                     <p className="font-mono text-xs text-destructive mb-2">
@@ -140,11 +165,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <CardFooter className="flex gap-2">
               <Button onClick={this.handleReset} className="flex-1 rounded-xl font-bold">
-                Try Again
+                {copy.retry}
               </Button>
               <Button onClick={this.handleGoHome} variant="outline" className="flex-1 rounded-xl font-bold">
                 <Home className="mr-2 h-4 w-4" />
-                Go Home
+                {copy.home}
               </Button>
             </CardFooter>
           </Card>
