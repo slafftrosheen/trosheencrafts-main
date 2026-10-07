@@ -236,16 +236,16 @@ export default function ConstructorConfig() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="bg-card border border-border p-1 rounded-2xl mb-8 flex w-full max-w-2xl">
           <TabsTrigger value="vessel" className="flex-1 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-            <Package className="w-4 h-4" /> Vessels
+            <Package className="w-4 h-4" /> Сосуды
           </TabsTrigger>
           <TabsTrigger value="finish" className="flex-1 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-            <Sparkles className="w-4 h-4" /> Finishes
+            <Sparkles className="w-4 h-4" /> Отделка
           </TabsTrigger>
           <TabsTrigger value="wax" className="flex-1 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-            <Droplets className="w-4 h-4" /> Waxes
+            <Droplets className="w-4 h-4" /> Воск
           </TabsTrigger>
           <TabsTrigger value="aroma" className="flex-1 rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground gap-2">
-            <Wind className="w-4 h-4" /> Aromas
+            <Wind className="w-4 h-4" /> Ароматы
           </TabsTrigger>
         </TabsList>
 
