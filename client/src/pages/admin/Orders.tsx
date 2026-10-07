@@ -191,7 +191,7 @@ export default function AdminOrders() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по заказу, клиенту, email, адресу или товару"
+            placeholder="Поиск по заказу, клиенту, эл. почте, адресу или товару"
             className="pl-9"
           />
         </div>
