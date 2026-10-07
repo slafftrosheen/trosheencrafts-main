@@ -32,7 +32,7 @@ import {
 import { apiClient } from "@/lib/apiClient";
 import { Spinner } from "@/components/shared/LoadingStates";
 import { toast } from "sonner";
-import { useLanguage } from "@/lib/LanguageContext";
+import { adminT as t } from "@/lib/adminI18n";
 
 type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
 
@@ -86,7 +86,6 @@ const statusLabels: Record<OrderStatus, string> = {
 
 export default function AdminOrders() {
   const queryClient = useQueryClient();
-  const { t } = useLanguage();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [expandedOrderId, setExpandedOrderId] = useState<number | null>(null);
