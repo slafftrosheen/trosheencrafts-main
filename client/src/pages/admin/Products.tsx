@@ -14,7 +14,7 @@ import { useProducts } from "@/hooks/useApi";
 import { ProductDialog } from "@/components/admin/ProductDialog";
 import { Spinner } from "@/components/shared/LoadingStates";
 import { cn } from "@/lib/utils";
-import { useLanguage } from "@/lib/LanguageContext";
+import { adminT as t } from "@/lib/adminI18n";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
@@ -26,7 +26,6 @@ export default function AdminProducts() {
     retry: 3,
     retryDelay: 1000,
   });
-  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
