@@ -343,7 +343,7 @@ export default function AdminOrders() {
                             <div>
                               <h3 className="text-sm font-semibold">Доставка</h3>
                               <div className="mt-3 rounded-xl border border-border bg-background p-4">
-                                <p className="font-medium">{order.shippingAddress?.name || "Guest"}</p>
+                                <p className="font-medium">{order.shippingAddress?.name || "Гость"}</p>
                                 <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">
                                   {formatAddress(order) || "Адрес доставки не сохранён"}
                                 </p>
@@ -355,7 +355,7 @@ export default function AdminOrders() {
                                     </Button>
                                   )}
                                   {order.shippingAddress?.email && (
-                                    <a href={`mailto:${order.shippingAddress.email}?subject=Order%20%23${order.id}%20%E2%80%94%20Trosheen.Crafts`}>
+                                    <a href={`mailto:${order.shippingAddress.email}?subject=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%23${order.id}%20%E2%80%94%20Trosheen.Crafts`}>
                                       <Button size="sm" variant="outline">
                                         <Mail className="mr-2 h-3.5 w-3.5" />
                                         Написать клиенту
