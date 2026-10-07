@@ -16,13 +16,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiClient } from '@/lib/apiClient';
 import { BlogPostDialog } from '@/components/admin/BlogPostDialog';
 import { Spinner } from '@/components/shared/LoadingStates';
-import { useLanguage } from '@/lib/LanguageContext';
+import { adminT as t } from "@/lib/adminI18n";
 import { toast } from 'sonner';
 
 export default function AdminBlog() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<any>(null);
-  const { t } = useLanguage();
   const queryClient = useQueryClient();
 
   const { data: posts = [], isLoading } = useQuery({
