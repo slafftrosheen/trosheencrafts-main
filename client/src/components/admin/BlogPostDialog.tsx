@@ -24,7 +24,7 @@ import { adminT as t } from "@/lib/adminI18n";
 
 const blogPostSchema = z.object({
   title: z.string().min(1, 'Укажите заголовок'),
-  slug: z.string().min(1, 'Укажите slug'),
+  slug: z.string().min(1, 'Укажите URL-идентификатор'),
   content: z.string().min(1, 'Введите текст'),
   excerpt: z.string().min(1, 'Введите краткое описание'),
   image: z.string().optional(),
@@ -109,7 +109,7 @@ export function BlogPostDialog({ open, onOpenChange, post }: { open: boolean, on
           <div className="flex items-center justify-between p-6 bg-muted/40 rounded-3xl border-2 border-border/40">
             <div className="flex gap-12">
               <div className="space-y-2">
-                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">Slug (URL)</Label>
+                <Label className="font-bold uppercase tracking-widest text-[10px] ml-1">URL-идентификатор</Label>
                 <Input {...register('slug')} className="bg-transparent border-0 border-b-2 rounded-none h-8 w-48 font-mono text-xs" />
               </div>
               <div className="space-y-2">
