@@ -2,7 +2,8 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { siteConfig } from '../db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
+import { HOMEPAGE_IMAGE_SLOTS, type HomepageImageSlot, type HomepageImages } from '../../shared/homepageMedia';
 import { validateRequest } from '../middleware/validation';
 import { adminAuthMiddleware } from '../middleware/auth';
 
@@ -71,6 +72,76 @@ siteConfigRouter.get('/', async (req, res, next) => {
     next(error);
   }
 });
+
+/**
+ * GET /api/site-config/homepage-images
+ * Public, only named slots; bundled images remain as fallbacks until migration.
+ */
+siteConfigRouter.get('/homepage-images', async (_req, res, next) => {
+  try {
+    const config = await getConfigByKey('homepageImages');
+    const source = (config?.value || {}) as Record<string, unknown>;
+    const images: HomepageImages = {};
+    for (const { key } of HOMEPAGE_IMAGE_SLOTS) {
+      if (typeof source[key] === 'string' && source[key]) images[key] = source[key];
+    }
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(images);
+  } catch (error) {
+    next(error);
+  }
+});
+
+const homepageImageUpdateSchema = z.object({
+  body: z.object({
+    slot: z.enum(HOMEPAGE_IMAGE_SLOTS.map(({ key }) => key) as [HomepageImageSlot, ...HomepageImageSlot[]]),
+    url: z.string().url().max(2048).nullable(),
+  }).strict(),
+});
+
+function validR2ImageUrl(value: string): boolean {
+  const publicUrl = process.env.R2_PUBLIC_URL;
+  if (!publicUrl || publicUrl.includes('xxxxx')) return false;
+  try {
+    const base = new URL(publicUrl.replace(/\/+$/, '') + '/');
+    const image = new URL(value);
+    if (image.origin !== base.origin || image.username || image.password ||
+        image.search || image.hash || !image.pathname.startsWith(base.pathname)) return false;
+    const key = image.pathname.slice(base.pathname.length);
+    return /^(homepage|images|gallery)\/[A-Za-z0-9/_-]+\.(webp|jpg|jpeg|png|gif)$/i.test(key);
+  } catch {
+    return false;
+  }
+}
+
+/** Atomic JSONB patch: editing one image never overwrites other slots. */
+siteConfigRouter.put(
+  '/admin/homepage-images',
+  adminAuthMiddleware,
+  validateRequest(homepageImageUpdateSchema),
+  async (req, res, next) => {
+    try {
+      const { slot, url } = req.body as { slot: HomepageImageSlot; url: string | null };
+      if (url !== null && !validR2ImageUrl(url)) {
+        return res.status(400).json({ message: 'Image must be a public URL from the configured Cloudflare R2 bucket.' });
+      }
+      const patch = { [slot]: url };
+      const [record] = await db.insert(siteConfig)
+        .values({ key: 'homepageImages', value: patch })
+        .onConflictDoUpdate({
+          target: siteConfig.key,
+          set: {
+            value: sql`COALESCE(${siteConfig.value}, '{}'::jsonb) || ${JSON.stringify(patch)}::jsonb`,
+            updatedAt: new Date(),
+          },
+        })
+        .returning();
+      res.json({ slot, url, updatedAt: record.updatedAt });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 /**
  * GET /api/site-config/:key

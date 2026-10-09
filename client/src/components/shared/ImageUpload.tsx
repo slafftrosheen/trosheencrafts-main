@@ -34,7 +34,7 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/webp"
         onChange={handleFileSelect}
         className="hidden"
         disabled={uploading}

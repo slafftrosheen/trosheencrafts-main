@@ -43,6 +43,7 @@ const AdminGallery = lazy(() => import("@/pages/admin/Gallery"));
 const AdminPromotions = lazy(() => import("@/pages/admin/Promotions"));
 const AdminNewsletterSubscribers = lazy(() => import("@/pages/admin/NewsletterSubscribers"));
 const AdminConstructor = lazy(() => import("@/pages/admin/ConstructorConfig"));
+const AdminHomepageMedia = lazy(() => import("@/pages/admin/HomepageMedia"));
 
 function Router() {
   const [location] = useLocation();
@@ -54,6 +55,7 @@ function Router() {
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin"><AdminLayout><AdminDashboard /></AdminLayout></Route>
         <Route path="/admin/promotions"><AdminLayout><AdminPromotions /></AdminLayout></Route>
+        <Route path="/admin/homepage-media"><AdminLayout><AdminHomepageMedia /></AdminLayout></Route>
         <Route path="/admin/subscribers"><AdminLayout><AdminNewsletterSubscribers /></AdminLayout></Route>
         <Route path="/admin/products"><AdminLayout><AdminProducts /></AdminLayout></Route>
         <Route path="/admin/constructor"><AdminLayout><AdminConstructor /></AdminLayout></Route>

@@ -39,7 +39,7 @@ export async function uploadToR2(
 
   await upload.done();
 
-  return `${R2_PUBLIC_URL}/${key}`;
+  return `${R2_PUBLIC_URL.replace(/\/+$/, '')}/${key}`;
 }
 
 /**

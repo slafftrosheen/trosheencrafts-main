@@ -2,7 +2,10 @@ import { Link } from "wouter";
 import { ArrowRight, Heart, Recycle, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
-import { HeroPhotos, ScrollStoryPhotos, WorkshopTourPhotos, BrandAssets } from "@/lib/imageAssets";
+import { useHomepageImages } from "@/hooks/useHomepageImages";
+import { DEFAULT_HOMEPAGE_IMAGES } from "@/lib/homepageImages";
+import type { HomepageImageSlot } from "../../../shared/homepageMedia";
+import type { SyntheticEvent } from "react";
 import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
 import { PromotionalGallery } from "@/components/PromotionalGallery";
 
@@ -11,40 +14,52 @@ const chapters = [
     id: "heritage",
     eyebrowKey: "chapter_heritage_eyebrow",
     titleKey: "chapter_heritage_title",
-    image: ScrollStoryPhotos.chapter1_heritage,
+    slot: "storyHeritage",
     bodyKey: "chapter_heritage_body_1",
   },
   {
     id: "makers",
     eyebrowKey: "chapter_makers_eyebrow",
     titleKey: "chapter_makers_title",
-    image: ScrollStoryPhotos.chapter3_crafting,
+    slot: "storyMakers",
     bodyKey: "chapter_makers_body_1",
   },
   {
     id: "legacy",
     eyebrowKey: "chapter_legacy_eyebrow",
     titleKey: "chapter_legacy_title",
-    image: ScrollStoryPhotos.chapter4_family,
+    slot: "storyLegacy",
     bodyKey: "chapter_legacy_body_1",
   },
   {
     id: "philosophy",
     eyebrowKey: "chapter_philosophy_eyebrow",
     titleKey: "chapter_philosophy_title",
-    image: ScrollStoryPhotos.chapter5_mastery,
+    slot: "storyPhilosophy",
     bodyKey: "chapter_philosophy_body_1",
   },
 ] as const;
 
+// A stale/deleted CDN object must not leave a blank hero or story card.
+function onHomepageImageError(slot: HomepageImageSlot) {
+  return (event: SyntheticEvent<HTMLImageElement>) => {
+    const fallback = DEFAULT_HOMEPAGE_IMAGES[slot];
+    if (event.currentTarget.src !== new URL(fallback, document.baseURI).href) {
+      event.currentTarget.src = fallback;
+    }
+  };
+}
+
 export default function HomePage() {
   const { t } = useLanguage();
+  const { image } = useHomepageImages();
 
   return (
     <div className="bg-background">
       <section className="relative min-h-[82svh] overflow-hidden bg-secondary text-white">
         <img
-          src={HeroPhotos.main}
+          src={image("hero")}
+          onError={onHomepageImageError("hero")}
           alt="Trosheen family workshop"
           className="absolute inset-0 h-full w-full object-cover"
         />
@@ -126,7 +141,8 @@ export default function HomePage() {
                   <article key={chapter.id} className={index % 2 === 1 ? "sm:mt-12" : ""}>
                     <div className="aspect-[4/3] overflow-hidden rounded-3xl bg-muted">
                       <img
-                        src={chapter.image}
+                        src={image(chapter.slot)}
+                        onError={onHomepageImageError(chapter.slot)}
                         alt={t(chapter.titleKey)}
                         loading="lazy"
                         className="h-full w-full object-cover"
@@ -151,7 +167,8 @@ export default function HomePage() {
         <div className="site-container section-space grid gap-10 lg:grid-cols-2 lg:items-center lg:gap-16">
           <div className="aspect-[5/4] overflow-hidden rounded-3xl bg-muted">
             <img
-              src={WorkshopTourPhotos.materialsArea}
+              src={image("materials")}
+              onError={onHomepageImageError("materials")}
               alt="Materials in the Trosheen workshop"
               loading="lazy"
               className="h-full w-full object-cover"
@@ -213,7 +230,8 @@ export default function HomePage() {
           </div>
           <div className="aspect-square overflow-hidden rounded-3xl">
             <img
-              src={WorkshopTourPhotos.castingStation}
+              src={image("craftsmanship")}
+              onError={onHomepageImageError("craftsmanship")}
               alt="Hand casting in the workshop"
               loading="lazy"
               className="h-full w-full object-cover"
@@ -227,7 +245,8 @@ export default function HomePage() {
           <article className="surface overflow-hidden">
             <div className="aspect-[16/10] overflow-hidden bg-muted">
               <img
-                src={WorkshopTourPhotos.completedPieces}
+                src={image("shopFeature")}
+                onError={onHomepageImageError("shopFeature")}
                 alt="Finished Trosheen pieces"
                 loading="lazy"
                 className="h-full w-full object-cover"
@@ -251,7 +270,8 @@ export default function HomePage() {
           <article className="surface overflow-hidden">
             <div className="aspect-[16/10] overflow-hidden bg-muted">
               <img
-                src={BrandAssets.teamPortrait}
+                src={image("familyFeature")}
+                onError={onHomepageImageError("familyFeature")}
                 alt="Trosheen family"
                 loading="lazy"
                 className="h-full w-full object-cover"

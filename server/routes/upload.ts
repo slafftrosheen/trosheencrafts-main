@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
+import sharp from 'sharp';
 import { uploadToR2, deleteFromR2, generateFilename } from '../lib/r2';
 import { adminAuthMiddleware } from '../middleware/auth';
 import { uploadLimiter } from '../middleware/rateLimiter';
@@ -35,6 +36,61 @@ const upload = multer({
     }
   },
 });
+
+/**
+ * Hardened image-only uploader shared by homepage, product and promotional media.
+ * Everything is stored in the EXISTING R2 bucket, never on instance disk.
+ */
+const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 12 * 1024 * 1024, files: 1 },
+  fileFilter: (_req, file, cb) => {
+    if (['image/jpeg', 'image/png', 'image/webp'].includes(file.mimetype)) cb(null, true);
+    else cb(new Error('Use a JPEG, PNG or WebP image (maximum 12 MB).'));
+  },
+});
+
+for (const [route, folder] of [
+  ['/image', 'images'],
+  ['/homepage-image', 'homepage'],
+] as const) {
+  uploadRouter.post(
+    route,
+    adminAuthMiddleware,
+    uploadLimiter,
+    imageUpload.single('file'),
+    async (req, res, next) => {
+      try {
+        if (!req.file) return res.status(400).json({ message: 'No image uploaded.' });
+        if (!process.env.R2_ACCOUNT_ID || !process.env.R2_ACCESS_KEY_ID ||
+            !process.env.R2_SECRET_ACCESS_KEY || !process.env.R2_PUBLIC_URL ||
+            !process.env.R2_BUCKET_NAME) {
+          return res.status(503).json({ message: 'Cloudflare R2 is not configured.' });
+        }
+
+        // Decode the real file, reject mismatched content types and oversized pixels.
+        const image = sharp(req.file.buffer, { limitInputPixels: 40_000_000, failOn: 'error' });
+        const metadata = await image.metadata();
+        if (!['jpeg', 'png', 'webp'].includes(metadata.format || '')) {
+          return res.status(400).json({ message: 'Unsupported image content.' });
+        }
+
+        const output = await image
+          .rotate()
+          .resize({ width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true })
+          .webp({ quality: 85, effort: 5 })
+          .toBuffer();
+
+        const filename = generateFilename('image.webp');
+        const url = await uploadToR2(output, filename, 'image/webp', folder);
+        return res.json({ success: true, url, filename, size: output.length, contentType: 'image/webp' });
+      } catch (error) {
+        console.error('R2 image upload failed:', error);
+        next(error);
+      }
+    }
+  );
+}
 
 /**
  * Upload single file to R2

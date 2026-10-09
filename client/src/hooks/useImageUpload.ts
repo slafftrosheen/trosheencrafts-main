@@ -13,7 +13,7 @@ export function useImageUpload() {
   const uploadImage = async (file: File): Promise<UploadResult | null> => {
     try {
       setUploading(true);
-      const result = await apiClient.uploadFile('/uploads/image', file);
+      const result = await apiClient.uploadFile('/upload/image', file);
       toast.success('Image uploaded successfully');
       return result as any;
     } catch (error) {
