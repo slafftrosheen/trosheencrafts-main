@@ -34,7 +34,7 @@ import { Spinner } from "@/components/shared/LoadingStates";
 import { toast } from "sonner";
 import { adminT as t } from "@/lib/adminI18n";
 
-type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "cancelled";
+type OrderStatus = "pending" | "payment_review" | "processing" | "shipped" | "delivered" | "cancelled";
 
 interface OrderItem {
   id: number;
@@ -66,18 +66,20 @@ interface AdminOrder {
 
 const statusVariants: Record<OrderStatus, "secondary" | "default" | "destructive" | "outline"> = {
   pending: "secondary",
+  payment_review: "destructive",
   processing: "default",
   shipped: "outline",
   delivered: "default",
   cancelled: "destructive",
 };
 
-const statuses: OrderStatus[] = ["pending", "processing", "shipped", "delivered", "cancelled"];
+const statuses: OrderStatus[] = ["pending", "payment_review", "processing", "shipped", "delivered", "cancelled"];
 const revenueStatuses = new Set<OrderStatus>(["processing", "shipped", "delivered"]);
 const euro = new Intl.NumberFormat("ru-RU", { style: "currency", currency: "EUR" });
 
 const statusLabels: Record<OrderStatus, string> = {
   pending: "Ожидает",
+  payment_review: "Оплачено — проверить наличие!",
   processing: "В обработке",
   shipped: "Отправлен",
   delivered: "Доставлен",
@@ -138,7 +140,7 @@ export default function AdminOrders() {
     .filter((order) => revenueStatuses.has(order.status))
     .reduce((sum, order) => sum + Number(order.totalAmount || 0), 0);
 
-  const pendingCount = orders.filter((order) => order.status === "pending").length;
+  const pendingCount = orders.filter((order) => order.status === "pending" || order.status === "payment_review").length;
   const activeCount = orders.filter((order) => ["processing", "shipped"].includes(order.status)).length;
   const deliveredCount = orders.filter((order) => order.status === "delivered").length;
 

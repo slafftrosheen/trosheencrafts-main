@@ -49,8 +49,8 @@ export const useCartStore = create<CartState>()(
                 return {
                   ...i,
                   maxStock,
-                  quantity: maxStock
-                    ? Math.min(i.quantity + 1, maxStock)
+                  quantity: maxStock !== undefined
+                    ? Math.min(i.quantity + 1, Math.max(0, maxStock))
                     : i.quantity + 1,
                 };
               }),
@@ -82,8 +82,8 @@ export const useCartStore = create<CartState>()(
             item.id === id && item.variant === variant
               ? {
                   ...item,
-                  quantity: item.maxStock
-                    ? Math.min(quantity, item.maxStock)
+                  quantity: item.maxStock !== undefined
+                    ? Math.min(quantity, Math.max(0, item.maxStock))
                     : quantity,
                 }
               : item

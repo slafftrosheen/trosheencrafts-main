@@ -53,9 +53,17 @@ export default function ProductDetail() {
   const selectedImage = images[selectedImageIndex] || images[0] || "";
 
   const availableStock = Math.max(0, Number(product.stock ?? 0));
-
+  const description = typeof product.description === "string" ? product.description : product.description?.[language] || product.description?.en || "";
   const handleAddToCart = () => {
-    const safeQuantity = Math.min(quantity, availableStock || quantity);
+    // Read the live basket, not a stale render closure.
+    const cartQuantity = useCartStore.getState().items
+      .filter((item) => item.id === product.id)
+      .reduce((sum, item) => sum + item.quantity, 0);
+    const safeQuantity = Math.max(0, Math.min(quantity, availableStock - cartQuantity));
+    if (safeQuantity === 0) {
+      toast.error(t("product.stock_limit"));
+      return;
+    }
     for (let i = 0; i < safeQuantity; i += 1) {
       addItem({
         id: product.id,
@@ -65,7 +73,9 @@ export default function ProductDetail() {
         maxStock: availableStock,
       });
     }
-    toast.success(t("product.added_to_cart"));
+    toast.success(t("product.added_to_cart"), {
+      action: { label: t("constructor.view_cart"), onClick: () => window.location.assign("/cart") },
+    });
   };
 
   return (
@@ -99,16 +109,17 @@ export default function ProductDetail() {
 
             {images.length > 1 && (
               <div className="mt-4 grid grid-cols-5 gap-3">
-                {images.slice(0, 5).map((image, index) => (
+                {images.map((image, index) => (
                   <button
                     key={image + index}
                     type="button"
                     onClick={() => setSelectedImageIndex(index)}
                     className={cn(
-                      "aspect-square overflow-hidden rounded-xl border bg-muted transition-colors",
+                      "aspect-square min-h-11 overflow-hidden rounded-xl border bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-primary",
                       selectedImageIndex === index ? "border-primary" : "border-transparent hover:border-border"
                     )}
-                    aria-label={"View image " + (index + 1)}
+                    aria-label={t("product.view_image") + " " + (index + 1)}
+                    aria-pressed={selectedImageIndex === index}
                   >
                     <OptimizedImage src={image} alt="" className="h-full w-full object-cover" />
                   </button>
@@ -135,7 +146,7 @@ export default function ProductDetail() {
             </div>
 
             <div className="mt-5">
-              {product.inStock !== false ? (
+              {availableStock > 0 ? (
                 <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
                   <Check className="h-4 w-4" />
                   {t("product.in_stock")}
@@ -145,27 +156,28 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {product.description && (
-              <p className="mt-7 text-base leading-8 text-muted-foreground sm:text-lg">{product.description}</p>
+            {description && (
+              <p className="mt-7 whitespace-pre-line text-base leading-8 text-muted-foreground sm:text-lg">{description}</p>
             )}
 
             <div className="mt-8 flex gap-3">
               <div className="flex h-12 items-center rounded-full border border-border bg-card">
                 <button
                   type="button"
-                  className="px-4 text-muted-foreground hover:text-foreground"
+                  className="min-h-11 min-w-11 px-4 text-muted-foreground hover:text-foreground disabled:opacity-40"
                   onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                  aria-label="Decrease quantity"
+                  aria-label={t("product.decrease_quantity")}
+                  disabled={quantity <= 1}
                 >
                   <Minus className="h-4 w-4" />
                 </button>
                 <span className="min-w-8 text-center text-sm font-semibold">{quantity}</span>
                 <button
                   type="button"
-                  className="px-4 text-muted-foreground hover:text-foreground"
-                  onClick={() => setQuantity((value) => Math.min(value + 1, availableStock || value + 1))}
-                  disabled={availableStock > 0 && quantity >= availableStock}
-                  aria-label="Increase quantity"
+                  className="min-h-11 min-w-11 px-4 text-muted-foreground hover:text-foreground disabled:opacity-40"
+                  onClick={() => setQuantity((value) => Math.min(value + 1, availableStock))}
+                  disabled={availableStock === 0 || quantity >= availableStock}
+                  aria-label={t("product.increase_quantity")}
                 >
                   <Plus className="h-4 w-4" />
                 </button>
@@ -174,7 +186,7 @@ export default function ProductDetail() {
               <Button
                 size="lg"
                 onClick={handleAddToCart}
-                disabled={product.inStock === false || availableStock === 0}
+                disabled={availableStock === 0}
                 className="flex-1"
               >
                 <ShoppingCart className="h-4 w-4" />

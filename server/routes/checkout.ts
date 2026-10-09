@@ -1,12 +1,43 @@
 import { Router, Request } from "express";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
 import { db } from "../db";
 import { constructorOptions, orders, orderItems, products } from "../db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { validateRequest } from "../middleware/validation";
 import { createSumupCheckout, verifySumupCheckout } from "../lib/sumup";
 
 export const checkoutRouter = Router();
+
+// Opaque, order-scoped token: status can be checked after the hosted payment redirect,
+// without exposing personal order data or accepting a guessed order ID.
+const statusToken = (orderId: number) =>
+  createHmac("sha256", process.env.SESSION_SECRET || "")
+    .update("trosheen-checkout:" + orderId)
+    .digest("hex");
+
+checkoutRouter.get("/status/:id", async (req, res, next) => {
+  try {
+    const id = Number(req.params.id);
+    const token = String(req.query.token || "");
+    if (!Number.isSafeInteger(id) || id <= 0 || !/^[a-f0-9]{64}$/.test(token)) {
+      return res.status(400).json({ message: "Invalid order status request." });
+    }
+    const actual = Buffer.from(token, "hex");
+    const expected = Buffer.from(statusToken(id), "hex");
+    if (!timingSafeEqual(actual, expected)) {
+      return res.status(404).json({ message: "Order not found." });
+    }
+    const [order] = await db.select({ status: orders.status }).from(orders)
+      .where(eq(orders.id, id)).limit(1);
+    if (!order) return res.status(404).json({ message: "Order not found." });
+    res.setHeader("Cache-Control", "no-store");
+    return res.json({ status: order.status });
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 interface CustomConfiguration {
   vesselId: number;
@@ -99,23 +130,23 @@ checkoutRouter.post(
         return res.status(400).json({ message: "Some pieces were not found." });
       }
 
+      // Validate cumulative quantities across all lines for the same product.
+      const requestedQuantities = new Map<number, number>();
       for (const item of items) {
         if (typeof item.productId === "string" && !item.productId.startsWith("custom-")) {
           return res.status(400).json({ message: "A selected piece is not valid." });
         }
-
         if (typeof item.productId !== "number") continue;
-
         const product = foundProducts.find((candidate) => candidate.id === item.productId);
         if (!product || product.published === false) {
           return res.status(400).json({ message: "A selected piece is not available." });
         }
-
-        const stock = Number(product.stock ?? 0);
-        if (stock < item.quantity) {
-          return res.status(400).json({
-            message: product.name + " does not have enough stock for that quantity.",
-          });
+        requestedQuantities.set(item.productId, (requestedQuantities.get(item.productId) || 0) + item.quantity);
+      }
+      for (const [productId, quantity] of requestedQuantities) {
+        const product = foundProducts.find((candidate) => candidate.id === productId)!;
+        if (Number(product.stock ?? 0) < quantity) {
+          return res.status(400).json({ message: product.name + " does not have enough stock for that quantity." });
         }
       }
 
@@ -269,7 +300,7 @@ checkoutRouter.post(
         const checkout = await createSumupCheckout({
           amount: totalAmount,
           orderId: order.id.toString(),
-          successUrl: publicBaseUrl + "/order-confirmation?order_id=" + order.id,
+          successUrl: publicBaseUrl + "/order-confirmation?order_id=" + order.id + "&token=" + statusToken(order.id),
           callbackUrl: publicBaseUrl + "/api/checkout/webhook",
         });
 
@@ -311,49 +342,47 @@ checkoutRouter.post("/webhook", async (req, res, next) => {
     }
 
     if (checkout.status === "PAID") {
-      await db.transaction(async (tx) => {
-        const [existingOrder] = await tx
-          .select()
-          .from(orders)
-          .where(eq(orders.id, orderId))
-          .limit(1);
+      try {
+        await db.transaction(async (tx) => {
+          // Claim order once; concurrent webhook deliveries cannot decrement twice.
+          const [claimedOrder] = await tx
+            .update(orders)
+            .set({ status: "payment_confirming", paymentMethodId: checkoutId, updatedAt: new Date() })
+            .where(and(eq(orders.id, orderId), eq(orders.status, "pending")))
+            .returning({ id: orders.id });
 
-        if (!existingOrder || existingOrder.status !== "pending") {
-          return;
-        }
+          if (!claimedOrder) return;
 
-        const items = await tx
-          .select()
-          .from(orderItems)
-          .where(eq(orderItems.orderId, orderId));
+          const items = await tx.select().from(orderItems).where(eq(orderItems.orderId, orderId));
+          const quantityByProduct = new Map<number, number>();
+          for (const item of items) {
+            const [product] = await tx.select().from(products).where(eq(products.id, item.productId)).limit(1);
+            if (!product || product.slug === "custom-candle-builder") continue;
+            quantityByProduct.set(item.productId, (quantityByProduct.get(item.productId) || 0) + item.quantity);
+          }
 
-        await tx
-          .update(orders)
-          .set({
-            status: "processing",
-            paymentMethodId: checkoutId,
-            updatedAt: new Date(),
-          })
-          .where(eq(orders.id, orderId));
+          for (const [productId, quantity] of quantityByProduct) {
+            // Atomic decrement prevents competing paid orders from overselling.
+            const [updated] = await tx
+              .update(products)
+              .set({ stock: sql`${products.stock} - ${quantity}`, updatedAt: new Date() })
+              .where(and(eq(products.id, productId), gte(products.stock, quantity)))
+              .returning({ id: products.id });
+            if (!updated) throw new Error("PAID_STOCK_CONFLICT");
+          }
 
-        for (const item of items) {
-          const [product] = await tx
-            .select()
-            .from(products)
-            .where(eq(products.id, item.productId))
-            .limit(1);
-
-          if (!product || product.slug === "custom-candle-builder") continue;
-
-          await tx
-            .update(products)
-            .set({
-              stock: Math.max(0, Number(product.stock ?? 0) - item.quantity),
-              updatedAt: new Date(),
-            })
-            .where(eq(products.id, item.productId));
-        }
-      });
+          await tx.update(orders)
+            .set({ status: "processing", updatedAt: new Date() })
+            .where(eq(orders.id, orderId));
+        });
+      } catch (error: any) {
+        if (error?.message !== "PAID_STOCK_CONFLICT") throw error;
+        // Paid already: retain order for staff rather than oversell or lose payment.
+        console.error("Paid order needs manual stock resolution:", orderId, checkoutId);
+        await db.update(orders)
+          .set({ status: "payment_review", paymentMethodId: checkoutId, updatedAt: new Date() })
+          .where(and(eq(orders.id, orderId), eq(orders.status, "pending")));
+      }
     }
 
     res.status(200).json({ received: true });

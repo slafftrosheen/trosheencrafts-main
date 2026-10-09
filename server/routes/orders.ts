@@ -63,7 +63,7 @@ const statusSchema = z.object({
     id: z.coerce.number().int().positive(),
   }),
   body: z.object({
-    status: z.enum(["pending", "processing", "shipped", "delivered", "cancelled"]),
+    status: z.enum(["pending", "payment_review", "processing", "shipped", "delivered", "cancelled"]),
   }),
 });
 

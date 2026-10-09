@@ -10,6 +10,7 @@ export default function CartPage() {
   const { items, removeItem, updateQuantity, getTotalPrice } = useCartStore();
   const { t } = useLanguage();
   const totalPrice = getTotalPrice();
+  const hasStockIssue = items.some((item) => item.maxStock !== undefined && item.quantity > item.maxStock);
 
   if (items.length === 0) {
     return (
@@ -58,7 +59,7 @@ export default function CartPage() {
                       type="button"
                       onClick={() => removeItem(item.id, item.variant)}
                       className="rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
-                      aria-label="Remove item"
+                      aria-label={t("cart.remove_item")}
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>
@@ -68,18 +69,19 @@ export default function CartPage() {
                     <div className="flex items-center rounded-full border border-border">
                       <button
                         type="button"
-                        className="p-2.5 text-muted-foreground hover:text-foreground"
+                        className="min-h-11 min-w-11 p-2.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
                         onClick={() => updateQuantity(item.id, item.quantity - 1, item.variant)}
-                        aria-label="Decrease quantity"
+                        aria-label={t("product.decrease_quantity")}
                       >
                         <Minus className="h-3.5 w-3.5" />
                       </button>
                       <span className="min-w-8 text-center text-sm font-semibold">{item.quantity}</span>
                       <button
                         type="button"
-                        className="p-2.5 text-muted-foreground hover:text-foreground"
+                        className="min-h-11 min-w-11 p-2.5 text-muted-foreground hover:text-foreground disabled:opacity-40"
                         onClick={() => updateQuantity(item.id, item.quantity + 1, item.variant)}
-                        aria-label="Increase quantity"
+                        aria-label={t("product.increase_quantity")}
+                        disabled={item.maxStock !== undefined && item.quantity >= item.maxStock}
                       >
                         <Plus className="h-3.5 w-3.5" />
                       </button>
@@ -112,7 +114,9 @@ export default function CartPage() {
                 </span>
                 <span className="font-serif text-3xl font-semibold">€{totalPrice.toFixed(2)}</span>
               </div>
-              <Button size="lg" className="mt-7 w-full" onClick={() => navigate("/checkout")}>
+              <p className="mt-5 text-xs leading-relaxed text-muted-foreground">{t("cart.stock_confirm")}</p>
+              {hasStockIssue && <p className="mt-3 text-sm font-semibold text-destructive" role="alert">{t("cart.stock_issue")}</p>}
+              <Button size="lg" className="mt-7 w-full" disabled={hasStockIssue} onClick={() => navigate("/checkout")}>
                 {t("cart.checkout")}
                 <ArrowRight className="h-4 w-4" />
               </Button>

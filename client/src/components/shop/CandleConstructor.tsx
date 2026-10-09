@@ -1,17 +1,17 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useCartStore } from '@/lib/stores/cartStore';
 import { Button } from '@/components/ui/button';
-import { Check, ShoppingBag, Info, Loader2 } from 'lucide-react';
+import { Check, ShoppingBag, Info, Loader2, RefreshCw, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { OptimizedImage } from '@/components/shared/OptimizedImage';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { apiClient } from '@/lib/apiClient';
 
-import { CandlePreview3D } from './CandlePreview3D';
+const CandlePreview3D = lazy(() => import('./CandlePreview3D').then((module) => ({ default: module.CandlePreview3D })));
 
 export interface ConstructorOption {
   id: number;
@@ -28,9 +28,9 @@ export interface ConstructorOption {
 export function CandleConstructor() {
   const { t, language } = useLanguage();
   const addItem = useCartStore((state) => state.addItem);
-  const [show3D, setShow3D] = useState(true);
+  const [show3D, setShow3D] = useState(false);
 
-  const { data: optionsData, isLoading } = useQuery<Record<string, ConstructorOption[]>>({
+  const { data: optionsData, isLoading, isError, refetch } = useQuery<Record<string, ConstructorOption[]>>({
     queryKey: ['constructorOptions'],
     queryFn: () => apiClient.get('/constructor-options'),
   });
@@ -41,28 +41,41 @@ export function CandleConstructor() {
   const [aroma, setAroma] = useState<ConstructorOption | null>(null);
   const [customDescription, setCustomDescription] = useState('');
 
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
   useEffect(() => {
-    if (optionsData) {
-      if (optionsData.vessel?.length > 0 && !shape) setShape(optionsData.vessel[0]);
-      if (optionsData.finish?.length > 0 && !finish) setFinish(optionsData.finish[0]);
-      if (optionsData.wax?.length > 0 && !wax) setWax(optionsData.wax[0]);
-      if (optionsData.aroma?.length > 0 && !aroma) setAroma(optionsData.aroma[0]);
-    }
+    if (!optionsData) return;
+    if (!shape || !optionsData.vessel?.some((item) => item.id === shape.id)) setShape(optionsData.vessel?.[0] || null);
+    if (!finish || !optionsData.finish?.some((item) => item.id === finish.id)) setFinish(optionsData.finish?.[0] || null);
+    if (!wax || !optionsData.wax?.some((item) => item.id === wax.id)) setWax(optionsData.wax?.[0] || null);
+    if (!aroma || !optionsData.aroma?.some((item) => item.id === aroma.id)) setAroma(optionsData.aroma?.[0] || null);
   }, [optionsData, shape, finish, wax, aroma]);
 
-  if (!mounted || isLoading || !shape || !finish || !wax || !aroma) {
+  const missingOptions = Boolean(optionsData && ['vessel', 'finish', 'wax', 'aroma'].some(
+    (type) => !optionsData[type]?.length
+  ));
+
+  if (isError || missingOptions) {
     return (
-      <div className="w-full bg-background min-h-[500px] flex flex-col items-center justify-center rounded-3xl border border-border shadow-sm">
-        <Loader2 className="w-12 h-12 animate-spin text-primary opacity-50 mb-4" />
-        <p className="text-muted-foreground font-serif text-lg">{t('constructor.loading')}</p>
+      <div className="flex min-h-80 flex-col items-center justify-center rounded-3xl border border-border bg-card px-6 py-12 text-center" role="alert">
+        <Package className="mb-4 h-10 w-10 text-primary" />
+        <h3 className="font-serif text-2xl font-semibold">{t('constructor.unavailable_title')}</h3>
+        <p className="mt-3 max-w-md text-sm leading-relaxed text-muted-foreground">{t('constructor.unavailable_desc')}</p>
+        <Button onClick={() => void refetch()} className="mt-6 min-h-11">
+          <RefreshCw className="mr-2 h-4 w-4" />{t('shop.retry')}
+        </Button>
       </div>
     );
   }
 
-  const getTranslatedName = (opt: ConstructorOption) => opt.nameTranslations[language] || opt.nameTranslations.en;
+  if (isLoading || !optionsData || !shape || !finish || !wax || !aroma) {
+    return (
+      <div className="flex min-h-80 flex-col items-center justify-center rounded-3xl border border-border bg-card" role="status">
+        <Loader2 className="mb-4 h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground">{t('constructor.loading')}</p>
+      </div>
+    );
+  }
+
+  const getTranslatedName = (opt: ConstructorOption) => opt.nameTranslations?.[language] || opt.nameTranslations?.en || opt.key;
   const getTranslatedDesc = (opt: ConstructorOption) => opt.descTranslations?.[language] || opt.descTranslations?.en || '';
 
   const shapePrice = parseFloat(shape.price || '0');
@@ -72,6 +85,18 @@ export function CandleConstructor() {
   const totalPrice = shapePrice + finishPrice + waxPrice + aromaPrice;
 
   const handleAddToCart = () => {
+    if (!Number.isFinite(totalPrice) || totalPrice <= 0) {
+      toast.error(t('constructor.unavailable_desc'));
+      return;
+    }
+    if (finish.key === 'custom' && !customDescription.trim()) {
+      toast.error(t('constructor.custom_required'));
+      return;
+    }
+    if (customDescription.trim().length > 500) {
+      toast.error(t('constructor.custom_too_long'));
+      return;
+    }
     const customId = `custom-${Date.now()}`;
     const finishName = getTranslatedName(finish);
     const shapeName = getTranslatedName(shape);
@@ -91,19 +116,21 @@ export function CandleConstructor() {
         finishId: finish.id,
         waxId: wax.id,
         aromaId: aroma.id,
-        customDescription: customDescription.trim() || undefined,
+        customDescription: finish.key === 'custom' ? customDescription.trim() : undefined,
       },
     });
     
-    toast.success(t('constructor.step_ready'));
+    toast.success(t('constructor.added'), {
+      action: { label: t('constructor.view_cart'), onClick: () => window.location.assign('/cart') },
+    });
     setCustomDescription('');
   };
 
   return (
-    <div className="w-full bg-background min-h-[720px] relative flex flex-col md:flex-row rounded-3xl overflow-hidden border border-border shadow-sm">
+    <div className="w-full min-h-[720px] relative flex flex-col md:flex-row rounded-3xl overflow-visible md:overflow-hidden border border-border bg-background shadow-sm">
       
       {/* LEFT: Sticky Immersive Visualizer */}
-      <div className="md:w-1/2 md:sticky md:top-0 md:h-[calc(100vh-8rem)] min-h-[450px] relative bg-muted/30 overflow-hidden flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-border/40">
+      <div className="md:w-1/2 md:sticky md:top-0 md:h-[calc(100vh-8rem)] min-h-[460px] relative bg-muted/30 overflow-hidden flex flex-col items-center justify-center px-5 pb-6 pt-16 md:p-8 border-b md:border-b-0 md:border-r border-border/40">
         <div className="absolute inset-0 noise opacity-30 pointer-events-none" />
         
         {/* Soft radial background glow */}
@@ -118,7 +145,7 @@ export function CandleConstructor() {
             className="bg-background/90 backdrop-blur"
             onClick={() => setShow3D(!show3D)}
           >
-            {show3D ? t('constructor.view_2d') : t('constructor.view_3d')}
+            {show3D ? t('constructor.photo') : t('constructor.illustration')}
           </Button>
         </div>
 
@@ -130,7 +157,7 @@ export function CandleConstructor() {
         >
           <AnimatePresence mode="wait">
             <motion.div
-              key={show3D ? '3d' : shape.id}
+              key={show3D ? '3d-' + shape.id : shape.id}
               initial={{ opacity: 0, y: 20, rotate: show3D ? 0 : -5 }}
               animate={{ opacity: 1, y: 0, rotate: 0 }}
               exit={{ opacity: 0, y: -20, rotate: show3D ? 0 : 5 }}
@@ -138,26 +165,34 @@ export function CandleConstructor() {
               className="w-full h-full drop-shadow-2xl transition-transform duration-700"
             >
               {show3D ? (
-                <CandlePreview3D shapeKey={shape.key} colorHex={finish.color || '#e0d8cc'} />
+                <Suspense fallback={<Loader2 className="mx-auto h-8 w-8 animate-spin text-primary" />}>
+                  <CandlePreview3D shapeKey={shape.key} colorHex={finish.color?.startsWith('#') ? finish.color : '#e0d8cc'} />
+                </Suspense>
+              ) : shape.imageUrl ? (
+                <OptimizedImage
+                  src={shape.imageUrl}
+                  alt={getTranslatedName(shape)}
+                  className="w-full h-full object-contain filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)]"
+                />
               ) : (
-                shape.imageUrl && (
-                  <OptimizedImage
-                    src={shape.imageUrl}
-                    alt={getTranslatedName(shape)}
-                    className="w-full h-full object-contain filter drop-shadow-[0_20px_30px_rgba(0,0,0,0.2)]"
-                  />
-                )
+                <div className="flex h-full flex-col items-center justify-center gap-3 text-center">
+                  <Package className="h-12 w-12 text-muted-foreground" />
+                  <p className="font-serif text-xl">{getTranslatedName(shape)}</p>
+                  <span className="text-sm text-muted-foreground">{t('constructor.preview_missing')}</span>
+                </div>
               )}
             </motion.div>
           </AnimatePresence>
         </motion.div>
+
+        {show3D && <p className="relative z-10 mb-3 max-w-sm text-center text-xs leading-relaxed text-muted-foreground">{t('constructor.illustration_note')}</p>}
 
         {/* Live Summary Floating Pill */}
         <motion.div 
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="absolute bottom-6 left-1/2 w-[calc(100%_-_3rem)] max-w-sm -translate-x-1/2 rounded-2xl border border-border bg-background/95 px-5 py-4 shadow-lg backdrop-blur flex flex-col items-center"
+          className="relative z-10 mt-4 w-full max-w-sm rounded-2xl border border-border bg-background/95 px-5 py-4 shadow-lg backdrop-blur flex flex-col items-center md:absolute md:bottom-6 md:left-1/2 md:mt-0 md:w-[calc(100%_-_3rem)] md:-translate-x-1/2"
         >
           <div className="text-xs font-bold tracking-widest uppercase text-muted-foreground mb-2">{t('constructor.review_design')}</div>
           <div className="w-full space-y-1.5 text-sm font-medium">
@@ -174,8 +209,8 @@ export function CandleConstructor() {
       </div>
 
       {/* RIGHT: Scrollable Configurator Options */}
-      <div className="md:w-1/2 relative bg-background/50 md:h-[calc(100vh-8rem)] md:overflow-y-auto custom-scrollbar pb-32">
-        <div className="max-w-2xl mx-auto p-6 md:p-12 space-y-16">
+      <div className="md:w-1/2 relative min-w-0 bg-background/50 md:h-[calc(100vh-8rem)] md:overflow-y-auto custom-scrollbar pb-6 md:pb-32">
+        <div className="max-w-2xl mx-auto p-5 sm:p-7 md:p-10 space-y-12 md:space-y-16">
           
           {/* Section 1: Vessel */}
           <section>
@@ -190,6 +225,8 @@ export function CandleConstructor() {
                 return (
                   <button
                     key={s.id}
+                    type="button"
+                    aria-pressed={shape.id === s.id}
                     onClick={() => setShape(s)}
                     className={cn(
                       "relative group p-4 rounded-2xl border transition-colors duration-200 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
@@ -231,6 +268,8 @@ export function CandleConstructor() {
                 return (
                   <button
                     key={f.id}
+                    type="button"
+                    aria-pressed={finish.id === f.id}
                     onClick={() => setFinish(f)}
                     className={cn(
                       "relative group p-4 rounded-2xl border transition-colors duration-200 flex flex-col items-center text-center outline-none focus-visible:ring-2 focus-visible:ring-primary/50",
@@ -280,6 +319,8 @@ export function CandleConstructor() {
                       placeholder={t('constructor.custom_placeholder')}
                       value={customDescription}
                       onChange={(e) => setCustomDescription(e.target.value)}
+                      maxLength={500}
+                      aria-label={t('constructor.custom_request')}
                       className="resize-none bg-background/80 focus-visible:ring-primary/50 border-border/50 h-24"
                     />
                   </div>
@@ -300,6 +341,8 @@ export function CandleConstructor() {
                 return (
                   <button
                     key={w.id}
+                    type="button"
+                    aria-pressed={wax.id === w.id}
                     onClick={() => setWax(w)}
                     className={cn(
                       "w-full relative group p-5 rounded-2xl border transition-colors duration-200 flex justify-between items-center text-left outline-none",
@@ -341,6 +384,8 @@ export function CandleConstructor() {
                 return (
                   <button
                     key={a.id}
+                    type="button"
+                    aria-pressed={aroma.id === a.id}
                     onClick={() => setAroma(a)}
                     className={cn(
                       "relative group p-4 rounded-2xl border transition-colors duration-200 flex flex-col sm:flex-row justify-between items-center text-left outline-none gap-2",
@@ -370,16 +415,16 @@ export function CandleConstructor() {
       </div>
 
       {/* Floating Checkout Bar (Mobile & Desktop) */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 md:p-6 pointer-events-none z-20 flex justify-end">
+      <div className="sticky bottom-0 left-0 right-0 z-20 flex justify-stretch border-t border-border bg-background/95 p-4 shadow-lg backdrop-blur md:absolute md:justify-end md:border-0 md:bg-transparent md:p-6 md:shadow-none">
         <motion.div 
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, type: 'spring' }}
-          className="pointer-events-auto"
+          className="w-full md:w-auto"
         >
           <Button 
             size="lg" 
-            className="h-14 px-7 shadow-lg group" 
+            className="h-14 w-full px-5 shadow-lg group md:w-auto" 
             onClick={handleAddToCart}
           >
             <span className="flex items-center gap-3 text-lg font-bold">
