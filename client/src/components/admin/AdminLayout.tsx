@@ -22,7 +22,7 @@ import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { adminT as t } from "@/lib/adminI18n";
 import { cn } from "@/lib/utils";
-import { BrandAssets } from "@/lib/imageAssets";
+import { SiteLogo } from "@/components/shared/SiteLogo";
 import { useCurrentUser } from "@/hooks/useApi";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
@@ -133,8 +133,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         )}
       >
         <div className="flex h-20 items-center gap-3 px-5">
-          <img
-            src={BrandAssets.logo}
+          <SiteLogo
+            
             alt="Trosheen Crafts"
             className="h-10 w-10 object-contain"
           />

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useLanguage } from "@/lib/LanguageContext";
 import { ShoppingCartComponent } from "@/components/features/ShoppingCart";
-import { BrandAssets } from "@/lib/imageAssets";
+import { SiteLogo } from "@/components/shared/SiteLogo";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 export function MobileNavigation() {
@@ -34,8 +34,8 @@ export function MobileNavigation() {
     <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl md:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <img
-            src={BrandAssets.logo}
+          <SiteLogo
+            
             alt="Trosheen.Crafts"
             className="h-10 w-10 object-contain"
           />

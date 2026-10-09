@@ -4,6 +4,7 @@
  * This catalog is shared by the server validator and the admin editor.
  */
 export const HOMEPAGE_IMAGE_SLOTS = [
+  { key: "siteLogo", title: "Логотип сайта", description: "Используется в шапке, мобильном меню, подвале и админ-панели. Лучше квадратное фото с прозрачным фоном.", aspect: "square" },
   { key: "hero", title: "Главный экран", description: "Большой фон первого экрана. Главный объект лучше размещать справа, текст — слева.", aspect: "wide" },
   { key: "storyHeritage", title: "История · Наследие", description: "Первая карточка блока истории.", aspect: "landscape" },
   { key: "storyMakers", title: "История · Мастера", description: "Вторая карточка блока истории.", aspect: "landscape" },

@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { BrandAssets } from "@/lib/imageAssets";
+import { SiteLogo } from "@/components/shared/SiteLogo";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
 import { ShoppingCartComponent } from "@/components/features/ShoppingCart";
@@ -25,8 +25,8 @@ export function Navigation() {
     <header className="sticky top-0 z-50 hidden md:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
       <div className="site-container flex h-[72px] items-center justify-between gap-8">
         <Link href="/" className="flex min-w-0 items-center gap-3">
-          <img
-            src={BrandAssets.logo}
+          <SiteLogo
+            
             alt="Trosheen.Crafts"
             className="h-11 w-11 object-contain"
           />

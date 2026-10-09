@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Instagram, Facebook, Youtube, Send, Mail, Phone, MapPin, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
-import { BrandAssets } from "@/lib/imageAssets";
+import { SiteLogo } from "@/components/shared/SiteLogo";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
 
@@ -40,7 +40,7 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.35fr_.75fr_.9fr_1.25fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <img src={BrandAssets.logo} alt="Trosheen.Crafts" className="h-12 w-12 object-contain" />
+              <SiteLogo  alt="Trosheen.Crafts" className="h-12 w-12 object-contain" />
               <span className="font-serif text-xl font-semibold">Trosheen.Crafts</span>
             </Link>
             <p className="mt-5 max-w-sm text-base leading-relaxed text-muted-foreground">{t("footer_desc")}</p>

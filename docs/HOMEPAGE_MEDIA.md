@@ -1,6 +1,6 @@
 # Homepage media on Cloudflare R2
 
-The nine editorial image placements rendered by `client/src/pages/home.tsx` are managed in **Admin → Контент → Фото главной** at `/admin/homepage-media`.
+The ten editable image placements (nine editorial photos and the shared site logo) rendered by `client/src/pages/home.tsx` are managed in **Admin → Контент → Фото главной** at `/admin/homepage-media`.
 
 - `GET /api/site-config/homepage-images` is public and returns a map of Cloudflare image URLs for named slots. Missing entries use the original bundled photos. Broken CDN assets also fall back to the original bundled photos.
 - `PUT /api/site-config/admin/homepage-images` requires admin session + CSRF and accepts `{ "slot": "hero", "url": "https://<R2_PUBLIC_URL>/homepage/....webp" }`. A null URL restores the default image. Valid image URLs must live under the configured R2 public base URL and in the `homepage/`, `images/` or `gallery/` object prefixes.
@@ -14,11 +14,11 @@ The nine editorial image placements rendered by `client/src/pages/home.tsx` are 
 
 In the application runtime environment configure `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` and **`R2_PUBLIC_URL`** to point at the existing publicly served Cloudflare R2 bucket. Do not use the placeholder public URL. Ensure Cloudflare serves public R2 objects (through a custom domain or an appropriate R2 public endpoint).
 
-The code commit by itself **does not transfer files to R2**. After deploying and confirming these environment variables, open `/admin/homepage-media` and choose **Перенести стандартные фото в R2**. Verify that all nine slots show the R2 badge. Then choose **Перенести локальные промо-фото**, if any legacy files are reported.
+The code commit by itself **does not transfer files to R2**. After deploying and confirming these environment variables, open `/admin/homepage-media` and choose **Перенести стандартные фото в R2**. Verify that all ten slots show the R2 badge. Then choose **Перенести локальные промо-фото**, if any legacy files are reported.
 
 ## Smoke-test checklist
 
-1. Open the storefront before any migration; all sections should retain the original photos.
+1. Open the storefront before any migration; all sections and the shared header/footer logo should retain the original imagery.
 2. Replace the hero via drag/drop or file picker, save, and refresh public page in private browsing. Confirm new image loads from R2.
 3. Replace each chapter and lower feature image and check image cropping at mobile and desktop viewport widths.
 4. Reuse a gallery R2 image URL; confirm it saves. Verify random external or `/uploads` URLs are rejected.
