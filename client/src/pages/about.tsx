@@ -41,13 +41,15 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="brand-panel brand-panel-dark">
+      <section className="brand-panel brand-panel-dark brand-panel-about">
         <div className="brand-panel-copy">
           <p className="eyebrow mb-5">{t("nav_story")}</p>
           <h1 className="text-[clamp(2.8rem,5vw,4.8rem)]">{t("brand.story_title")}</h1>
           <p className="mt-6 max-w-prose leading-relaxed">{t("brand.story_desc")}</p>
         </div>
-        <div><img src="/brand/about.webp" alt={t("brand.newsletter_alt")} width="960" height="900" className="brand-panel-image" /></div>
+        <div className="brand-art-crop brand-art-crop--right">
+          <img src="/brand/about.webp" alt={t("brand.story_alt")} width="1920" height="900" fetchPriority="high" className="brand-panel-image" />
+        </div>
       </section>
 
       <section className="section-space">

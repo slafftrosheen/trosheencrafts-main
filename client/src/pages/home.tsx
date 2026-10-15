@@ -13,26 +13,30 @@ export default function HomePage() {
   const { image } = useHomepageImages();
   const hero = image("hero");
   const defaultHero = hero === DEFAULT_HOMEPAGE_IMAGES.hero;
+  const familyPhoto = image("familyFeature");
+  const bundledStoryPhoto = familyPhoto === DEFAULT_HOMEPAGE_IMAGES.familyFeature;
   return (
     <div>
-      <section className="brand-hero brand-hero--immersive">
-        <picture>
-          {defaultHero && <source media="(max-width: 767px)" type="image/webp" srcSet="/brand/hero-mobile.webp 720w, /brand/hero-mobile-1080.webp 1080w" sizes="100vw" />}
-          {defaultHero && <source media="(min-width: 768px)" type="image/webp" srcSet="/brand/hero-desktop-1280.webp 1280w, /brand/hero-desktop.webp 1920w" sizes="100vw" />}
-          <img src={hero} alt={t("brand.hero_alt")} fetchPriority="high" width="2560" height="1000"
-            onError={(event) => {
-              const target = event.currentTarget;
-              if (target.dataset.fallbackApplied) return;
-              target.dataset.fallbackApplied = "true";
-              target.parentElement?.querySelectorAll("source").forEach((source) => source.remove());
-              target.src = DEFAULT_HOMEPAGE_IMAGES.hero;
-            }} />
-        </picture>
+      <section className="brand-hero brand-hero--editorial" aria-labelledby="trosheen-hero-heading">
+        <div className="brand-hero-photo">
+          <picture>
+            {defaultHero && <source media="(max-width: 767px)" type="image/webp" srcSet="/brand/hero-mobile.webp 720w, /brand/hero-mobile-1080.webp 1080w" sizes="100vw" />}
+            {defaultHero && <source media="(min-width: 768px)" type="image/webp" srcSet="/brand/hero-desktop-1280.webp 1280w, /brand/hero-desktop.webp 1920w" sizes="(min-width:768px) 58vw, 100vw" />}
+            <img src={hero} alt={t("brand.hero_alt")} fetchPriority="high" width="2560" height="1000"
+              onError={(event) => {
+                const target = event.currentTarget;
+                if (target.dataset.fallbackApplied) return;
+                target.dataset.fallbackApplied = "true";
+                target.parentElement?.querySelectorAll("source").forEach(source => source.remove());
+                target.src = DEFAULT_HOMEPAGE_IMAGES.hero;
+              }} />
+          </picture>
+        </div>
         <div className="brand-hero-copy">
           <p className="eyebrow mb-5">{t("brand.location")}</p>
-          <h1>{t("brand.tagline")}</h1>
+          <h1 id="trosheen-hero-heading">{t("brand.tagline")}</h1>
           <p className="lead mt-5 max-w-prose">{t("brand.intro")}</p>
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="brand-hero-actions mt-7 flex flex-wrap gap-3">
             <Button asChild size="lg" className="brand-gilt-button"><Link href="/shop">{t("brand.shop")}<ArrowRight className="h-4 w-4" /></Link></Button>
             <Button asChild size="lg" variant="outline" className="brand-story-link"><Link href="/about">{t("nav_story")}</Link></Button>
             <Button asChild size="lg" variant="outline" className="brand-story-link"><Link href="/constructor">{t("shop_custom_builder")}</Link></Button>
@@ -79,7 +83,20 @@ export default function HomePage() {
 
       <section id="story" className="border-y border-border">
         <div className="brand-panel">
-          <div><img src={image("familyFeature")} onError={(event) => { event.currentTarget.src = DEFAULT_HOMEPAGE_IMAGES.familyFeature; }} alt={t("brand.story_alt")} width="960" height="860" loading="lazy" className="brand-panel-image" /></div>
+          <div className={bundledStoryPhoto ? "brand-art-crop brand-art-crop--left" : "brand-editorial-media"}>
+            <img
+              src={familyPhoto}
+              onError={(event) => {
+                const target = event.currentTarget;
+                if (target.dataset.fallbackApplied) return;
+                target.dataset.fallbackApplied = "true";
+                target.closest(".brand-editorial-media")?.classList.add("brand-art-crop", "brand-art-crop--left");
+                target.src = DEFAULT_HOMEPAGE_IMAGES.familyFeature;
+              }}
+              alt={t("brand.story_alt")}
+              width="1920" height="860" loading="lazy" className="brand-panel-image"
+            />
+          </div>
           <div className="brand-panel-copy">
             <p className="eyebrow mb-5">{t("nav_story")}</p>
             <h2>{t("brand.story_title")}</h2>
