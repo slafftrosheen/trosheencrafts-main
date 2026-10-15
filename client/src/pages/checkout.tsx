@@ -13,16 +13,17 @@ import { toast } from "sonner";
 import { useLanguage } from "@/lib/LanguageContext";
 import { LazyImage } from "@/components/shared/LazyImage";
 
-const checkoutSchema = z.object({
-  email: z.string().email("Valid email is required"),
-  name: z.string().min(2, "Full name is required"),
-  street: z.string().min(5, "Street address is required"),
-  city: z.string().min(2, "City is required"),
-  postalCode: z.string().min(3, "Postal code is required"),
-  country: z.string().min(2, "Country is required"),
-});
-
-type CheckoutFormData = z.infer<typeof checkoutSchema>;
+function checkoutSchema(t: (key: string) => string) {
+  return z.object({
+    email: z.string().trim().email(t("forms.invalid_email")),
+    name: z.string().trim().min(2, t("forms.min_2")).max(100, t("forms.too_long")),
+    street: z.string().trim().min(5, t("forms.min_5")).max(200, t("forms.too_long")),
+    city: z.string().trim().min(2, t("forms.min_2")).max(100, t("forms.too_long")),
+    postalCode: z.string().trim().min(3, t("forms.min_3")).max(24, t("forms.too_long")),
+    country: z.string().trim().min(2, t("forms.min_2")).max(100, t("forms.too_long")),
+  });
+}
+type CheckoutFormData = z.infer<ReturnType<typeof checkoutSchema>>;
 
 export default function CheckoutPage() {
   const [, navigate] = useLocation();
@@ -30,6 +31,7 @@ export default function CheckoutPage() {
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
   const totalPrice = getTotalPrice();
+  const hasStockIssue = items.some(item => item.maxStock !== undefined && item.quantity > item.maxStock);
 
   useEffect(() => {
     if (items.length === 0) {
@@ -42,10 +44,11 @@ export default function CheckoutPage() {
     handleSubmit,
     formState: { errors },
   } = useForm<CheckoutFormData>({
-    resolver: zodResolver(checkoutSchema),
+    resolver: zodResolver(checkoutSchema(t)),
   });
 
   const onSubmit = async (data: CheckoutFormData) => {
+    if (hasStockIssue) { toast.error(t("cart.stock_issue")); return; }
     try {
       setLoading(true);
       const response: any = await apiClient.post("/checkout/create-session", {
@@ -66,7 +69,7 @@ export default function CheckoutPage() {
       window.location.assign(response.sessionUrl);
     } catch (error: any) {
       console.error("Checkout error:", error);
-      toast.error(error.message || "Failed to initiate payment");
+      toast.error(t("checkout.payment_error"));
       setLoading(false);
     }
   };
@@ -93,45 +96,46 @@ export default function CheckoutPage() {
             <h2 className="font-serif text-3xl font-semibold">{t("checkout.shipping.title")}</h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("checkout.shipping.desc")}</p>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-6">
+            <form onSubmit={handleSubmit(onSubmit)} noValidate aria-busy={loading} className="mt-8 space-y-6">
               <div className="space-y-2">
-                <Label>{t("checkout.shipping.email")}</Label>
-                <Input {...register("email")} className={fieldClass} disabled={loading} autoComplete="email" />
-                {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
+                <Label htmlFor="checkout-email">{t("checkout.shipping.email")}</Label>
+                <Input id="checkout-email" type="email" aria-invalid={!!errors.email} aria-describedby={errors.email ? "checkout-email-error" : undefined} required {...register("email")} className={fieldClass} disabled={loading} autoComplete="email" />
+                {errors.email && <p id="checkout-email-error" role="alert" className="text-xs text-destructive">{errors.email.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label>{t("checkout.shipping.name")}</Label>
-                <Input {...register("name")} className={fieldClass} disabled={loading} autoComplete="name" />
-                {errors.name && <p className="text-xs text-destructive">{errors.name.message}</p>}
+                <Label htmlFor="checkout-name">{t("checkout.shipping.name")}</Label>
+                <Input id="checkout-name" aria-invalid={!!errors.name} aria-describedby={errors.name ? "checkout-name-error" : undefined} required {...register("name")} className={fieldClass} disabled={loading} autoComplete="name" />
+                {errors.name && <p id="checkout-name-error" role="alert" className="text-xs text-destructive">{errors.name.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label>{t("checkout.shipping.street")}</Label>
-                <Input {...register("street")} className={fieldClass} disabled={loading} autoComplete="street-address" />
-                {errors.street && <p className="text-xs text-destructive">{errors.street.message}</p>}
+                <Label htmlFor="checkout-street">{t("checkout.shipping.street")}</Label>
+                <Input id="checkout-street" aria-invalid={!!errors.street} aria-describedby={errors.street ? "checkout-street-error" : undefined} required {...register("street")} className={fieldClass} disabled={loading} autoComplete="street-address" />
+                {errors.street && <p id="checkout-street-error" role="alert" className="text-xs text-destructive">{errors.street.message}</p>}
               </div>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <Label>{t("checkout.shipping.city")}</Label>
-                  <Input {...register("city")} className={fieldClass} disabled={loading} autoComplete="address-level2" />
-                  {errors.city && <p className="text-xs text-destructive">{errors.city.message}</p>}
+                  <Label htmlFor="checkout-city">{t("checkout.shipping.city")}</Label>
+                  <Input id="checkout-city" aria-invalid={!!errors.city} aria-describedby={errors.city ? "checkout-city-error" : undefined} required {...register("city")} className={fieldClass} disabled={loading} autoComplete="address-level2" />
+                  {errors.city && <p id="checkout-city-error" role="alert" className="text-xs text-destructive">{errors.city.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label>{t("checkout.shipping.postal")}</Label>
-                  <Input {...register("postalCode")} className={fieldClass} disabled={loading} autoComplete="postal-code" />
-                  {errors.postalCode && <p className="text-xs text-destructive">{errors.postalCode.message}</p>}
+                  <Label htmlFor="checkout-postalCode">{t("checkout.shipping.postal")}</Label>
+                  <Input id="checkout-postalCode" aria-invalid={!!errors.postalCode} aria-describedby={errors.postalCode ? "checkout-postalCode-error" : undefined} required {...register("postalCode")} className={fieldClass} disabled={loading} autoComplete="postal-code" />
+                  {errors.postalCode && <p id="checkout-postalCode-error" role="alert" className="text-xs text-destructive">{errors.postalCode.message}</p>}
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label>{t("checkout.shipping.country")}</Label>
-                <Input {...register("country")} className={fieldClass} disabled={loading} autoComplete="country-name" />
-                {errors.country && <p className="text-xs text-destructive">{errors.country.message}</p>}
+                <Label htmlFor="checkout-country">{t("checkout.shipping.country")}</Label>
+                <Input id="checkout-country" aria-invalid={!!errors.country} aria-describedby={errors.country ? "checkout-country-error" : undefined} required {...register("country")} className={fieldClass} disabled={loading} autoComplete="country-name" />
+                {errors.country && <p id="checkout-country-error" role="alert" className="text-xs text-destructive">{errors.country.message}</p>}
               </div>
 
-              <Button type="submit" size="lg" className="w-full" disabled={loading}>
+              {hasStockIssue && <p className="text-sm text-destructive" role="alert">{t("cart.stock_issue")}</p>}
+              <Button type="submit" size="lg" className="w-full" disabled={loading || hasStockIssue}>
                 {loading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
@@ -156,7 +160,7 @@ export default function CheckoutPage() {
                 {items.map((item) => (
                   <div key={String(item.id) + (item.variant || "")} className="flex items-center gap-3">
                     <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-muted">
-                      <LazyImage src={item.image} alt={item.name} className="h-full w-full object-cover" />
+                      {item.image ? <LazyImage src={item.image} alt={item.name} className="h-full w-full object-cover" /> : <img src="/brand/icons/candle.svg" alt="" className="h-full w-full object-contain p-3 opacity-65" />}
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold">{item.name}</p>
