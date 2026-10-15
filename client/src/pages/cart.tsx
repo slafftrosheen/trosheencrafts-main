@@ -1,9 +1,10 @@
 import { Link, useLocation } from "wouter";
-import { Trash2, Plus, Minus, ShoppingBag, ArrowRight } from "lucide-react";
+import { Trash2, Plus, Minus, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { LazyImage } from "@/components/shared/LazyImage";
 import { useLanguage } from "@/lib/LanguageContext";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 export default function CartPage() {
   const [, navigate] = useLocation();
@@ -16,7 +17,7 @@ export default function CartPage() {
     return (
       <div className="site-container page-shell flex min-h-[65vh] items-center justify-center">
         <div className="surface max-w-xl px-8 py-14 text-center sm:px-12">
-          <ShoppingBag className="mx-auto h-9 w-9 text-primary" />
+          <BrandMotion name="empty" mode="loop" className="mx-auto h-36 w-36" poster="/brand/icons/bag.svg" />
           <h1 className="mt-5 font-serif text-4xl font-semibold tracking-tight">{t("cart.empty_title")}</h1>
           <p className="mt-3 text-base leading-relaxed text-muted-foreground">{t("cart.empty_desc")}</p>
           <Button asChild className="mt-7">

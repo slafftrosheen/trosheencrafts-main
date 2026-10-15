@@ -22,8 +22,8 @@ interface SiteConfig {
 
 const DEFAULT_CONFIG: SiteConfig = {
   contact: {
-    email: import.meta.env.VITE_CONTACT_EMAIL || 'hello@trosheen.crafts',
-    phone: import.meta.env.VITE_CONTACT_PHONE || '+371 XXX XXXXX',
+    email: import.meta.env.VITE_CONTACT_EMAIL || 'slaff.trosheen@gmail.com',
+    phone: import.meta.env.VITE_CONTACT_PHONE || '+371 20 678 142',
     address: import.meta.env.VITE_CONTACT_ADDRESS || 'Daugavpils, Latvia',
   },
   social: {
@@ -44,7 +44,24 @@ export function useSiteConfig() {
     queryKey: ['siteConfig'],
     queryFn: async () => {
       try {
-        return await apiClient.get<SiteConfig>('/site-config');
+        const config = await apiClient.get<SiteConfig>('/site-config');
+        const email = config.contact?.email?.trim();
+        const phone = config.contact?.phone?.trim();
+        return {
+          ...DEFAULT_CONFIG,
+          ...config,
+          contact: {
+            ...DEFAULT_CONFIG.contact,
+            ...config.contact,
+            // Do not expose legacy template placeholders to customers.
+            email: email && email.toLowerCase() !== 'hello@trosheen.crafts'
+              ? email : DEFAULT_CONFIG.contact.email,
+            phone: phone && !/[xX]{2,}/.test(phone)
+              ? phone : DEFAULT_CONFIG.contact.phone,
+          },
+          social: { ...DEFAULT_CONFIG.social, ...config.social },
+          businessHours: { ...DEFAULT_CONFIG.businessHours, ...config.businessHours },
+        };
       } catch (error) {
         console.warn('Failed to fetch site config, using defaults:', error);
         return DEFAULT_CONFIG;
