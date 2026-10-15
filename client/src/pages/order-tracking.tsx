@@ -21,10 +21,10 @@ export default function OrderTracking() {
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1fr_.72fr] lg:items-start">
           <div>
-            <p className="eyebrow">Order support</p>
+            <p className="eyebrow">{t("order.support")}</p>
             <h1 className="display-title mt-4">{t("order.track_title")}</h1>
             <p className="lead mt-6 max-w-2xl">
-              For privacy, order details are not exposed through a public numeric URL. We send payment and fulfilment updates to the contact details provided with your order.
+              {t("order.privacy_note")}
             </p>
           </div>
 
@@ -38,19 +38,19 @@ export default function OrderTracking() {
             <div className="mt-6 space-y-4 border-t border-border pt-5 text-sm leading-6 text-muted-foreground">
               <div className="flex gap-3">
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <p>Check the email used at checkout for the latest order communication.</p>
+                <p>{t("order.check_email")}</p>
               </div>
               <div className="flex gap-3">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                <p>Need an update? Send us the order reference and the email used at checkout.</p>
+                <p>{t("order.help_desc")}</p>
               </div>
             </div>
 
             <Button asChild className="mt-6 w-full">
-              <Link href="/contact">Contact the workshop</Link>
+              <Link href="/contact">{t("nav_contact")}</Link>
             </Button>
             <Button asChild variant="outline" className="mt-2 w-full">
-              <Link href="/withdrawal">Withdraw from contract</Link>
+              <Link href="/withdrawal">{t("order.withdrawal")}</Link>
             </Button>
           </aside>
         </div>

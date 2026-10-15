@@ -1,56 +1,51 @@
-import { useState, useEffect } from 'react';
-import { WifiOff, Wifi } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { cn } from '@/lib/utils';
+import { useEffect, useRef, useState } from "react";
+import { WifiOff, Wifi } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useLanguage } from "@/lib/LanguageContext";
 
 export function NetworkStatus() {
-  const [isOnline, setIsOnline] = useState(true);
-  const [showAlert, setShowAlert] = useState(false);
+  const { t } = useLanguage();
+  const [isOnline, setIsOnline] = useState(() => typeof navigator === "undefined" || navigator.onLine);
+  const [showAlert, setShowAlert] = useState(() => typeof navigator !== "undefined" && !navigator.onLine);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    const clear = () => {
+      if (timer.current) clearTimeout(timer.current);
+      timer.current = null;
+    };
     const handleOnline = () => {
+      clear();
       setIsOnline(true);
       setShowAlert(true);
-      setTimeout(() => setShowAlert(false), 3000);
+      timer.current = setTimeout(() => setShowAlert(false), 3000);
     };
-
     const handleOffline = () => {
+      clear();
       setIsOnline(false);
       setShowAlert(true);
     };
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    // Check initial status
-    setIsOnline(navigator.onLine);
-
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
+    handleOfflineIfNeeded();
+    function handleOfflineIfNeeded() {
+      if (!navigator.onLine) handleOffline();
+    }
     return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+      clear();
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
     };
   }, []);
 
   if (!showAlert) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-5">
-      <Alert
-        variant={isOnline ? 'default' : 'destructive'}
-        className={cn(
-          'border-2',
-          isOnline && 'border-green-500 bg-green-50 dark:bg-green-950'
-        )}
-      >
-        {isOnline ? (
-          <Wifi className="h-4 w-4 text-green-600" />
-        ) : (
-          <WifiOff className="h-4 w-4" />
-        )}
+    <div role="status" aria-live="polite" className="fixed bottom-4 left-4 right-4 z-[80] mx-auto max-w-sm sm:left-auto sm:right-6">
+      <Alert variant={isOnline ? "default" : "destructive"} className="border border-border bg-card text-foreground shadow-lg">
+        {isOnline ? <Wifi className="h-4 w-4 text-primary" /> : <WifiOff className="h-4 w-4 text-destructive" />}
         <AlertDescription>
-          {isOnline
-            ? 'Connection restored'
-            : 'No internet connection. Please check your network.'}
+          {isOnline ? t("network.restored") : t("network.offline")}
         </AlertDescription>
       </Alert>
     </div>

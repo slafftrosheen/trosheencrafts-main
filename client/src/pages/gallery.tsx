@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Grid3x3, Images, Heart, Search, X, Plus, Loader2, Play, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -40,6 +40,11 @@ export default function GalleryPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all" | "3d" | "photo" | "video">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedSearch(searchQuery.trim()), 250);
+    return () => window.clearTimeout(timer);
+  }, [searchQuery]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
@@ -50,11 +55,11 @@ export default function GalleryPage() {
   });
 
   const { data: galleryData, isLoading, isFetching, isError, refetch } = useQuery({
-    queryKey: ["galleryItems", activeTab, searchQuery, selectedCategory, page],
+    queryKey: ["galleryItems", activeTab, debouncedSearch, selectedCategory, page],
     queryFn: () => {
       const params: Record<string, string | number> = { limit: page * itemsPerPage };
       if (activeTab !== "all") params.type = activeTab;
-      if (searchQuery.trim()) params.search = searchQuery.trim();
+      if (debouncedSearch) params.search = debouncedSearch;
       if (selectedCategory) params.categoryId = selectedCategory;
       return apiClient.get<any>("/gallery/items", { params });
     },
@@ -126,7 +131,7 @@ export default function GalleryPage() {
                 {searchQuery && (
                   <button
                     type="button"
-                    onClick={() => setSearchQuery("")}
+                    onClick={() => { setSearchQuery(""); setDebouncedSearch(""); setPage(1); }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:text-foreground"
                     aria-label={t("shop.clear_filters")}
                   >

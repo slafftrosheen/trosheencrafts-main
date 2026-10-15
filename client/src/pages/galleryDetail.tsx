@@ -117,6 +117,7 @@ export default function GalleryDetailPage() {
       setHeartAnimation((count) => count + 1);
       toast.success(t("gallery.liked"));
     },
+    onError: () => toast.error(t("gallery.like_error")),
   });
 
   const handleShare = async () => {
