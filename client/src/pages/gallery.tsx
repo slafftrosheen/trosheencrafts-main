@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Grid3x3, Images, Heart, Search, X, Plus, Loader2, Play } from "lucide-react";
+import { Grid3x3, Images, Heart, Search, X, Plus, Loader2, Play, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -49,7 +49,7 @@ export default function GalleryPage() {
     queryFn: () => apiClient.get("/gallery/categories"),
   });
 
-  const { data: galleryData, isLoading, isFetching } = useQuery({
+  const { data: galleryData, isLoading, isFetching, isError, refetch } = useQuery({
     queryKey: ["galleryItems", activeTab, searchQuery, selectedCategory, page],
     queryFn: () => {
       const params: Record<string, string | number> = { limit: page * itemsPerPage };
@@ -177,6 +177,13 @@ export default function GalleryPage() {
               {Array.from({ length: 6 }).map((_, index) => (
                 <div key={index} className="aspect-[4/3] animate-pulse rounded-3xl bg-muted" />
               ))}
+            </div>
+          ) : isError ? (
+            <div className="surface mx-auto my-16 max-w-xl px-7 py-12 text-center" role="alert">
+              <h2 className="font-serif text-3xl">{t("gallery.load_error")}</h2>
+              <button type="button" onClick={() => void refetch()} className="mt-6 inline-flex min-h-11 items-center gap-2 bg-primary px-6 text-sm font-medium text-primary-foreground">
+                <RefreshCw className="h-4 w-4" />{t("shop.retry")}
+              </button>
             </div>
           ) : items.length > 0 ? (
             <>

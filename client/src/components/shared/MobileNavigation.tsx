@@ -30,10 +30,10 @@ export function MobileNavigation() {
   ];
 
   const isActive = (href: string) =>
-    location === href || location.startsWith(href + "/");
+    href === "/constructor" ? location === "/shop" && window.location.search.includes("view=custom") : location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl lg:hidden">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl 2xl:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-36 min-[390px]:w-44 shrink-0 object-contain" />

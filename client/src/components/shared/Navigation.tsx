@@ -20,10 +20,10 @@ export function Navigation() {
   ];
 
   const isActive = (href: string) =>
-    href === "/" ? location === "/" : location === href || location.startsWith(href + "/");
+    href === "/constructor" ? location === "/shop" && window.location.search.includes("view=custom") : href === "/" ? location === "/" : location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 hidden lg:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
+    <header className="sticky top-0 z-50 hidden 2xl:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
       <div className="site-container flex h-24 items-center justify-between gap-4">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-44 shrink-0 object-contain" />

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 function CanvasLoader() {
   const { progress } = useProgress();
@@ -59,6 +60,7 @@ function ThreeViewer({ modelUrl }: { modelUrl: string }) {
 
 function MediaViewer({ item }: { item: any }) {
   const [fullscreen, setFullscreen] = useState(false);
+  const { t } = useLanguage();
 
   if (item.type === "3d") {
     return <ThreeViewer modelUrl={item.mediaUrl} />;
@@ -77,7 +79,7 @@ function MediaViewer({ item }: { item: any }) {
             type="button"
             onClick={() => setFullscreen(true)}
             className="absolute right-4 top-4 rounded-full bg-black/65 p-3 text-white backdrop-blur hover:bg-black/80"
-            aria-label="View fullscreen"
+            aria-label={t("gallery.view_fullscreen")}
           >
             <Maximize2 className="h-4 w-4" />
           </button>
@@ -89,7 +91,7 @@ function MediaViewer({ item }: { item: any }) {
           type="button"
           onClick={() => setFullscreen(false)}
           className="fixed inset-0 z-[100] flex cursor-zoom-out items-center justify-center bg-black/95 p-4"
-          aria-label="Close fullscreen"
+          aria-label={t("gallery.close_fullscreen")}
         >
           <img src={item.mediaUrl} alt={item.title} className="max-h-full max-w-full object-contain" />
         </button>
@@ -103,6 +105,7 @@ export default function GalleryDetailPage() {
   const [, params] = useRoute("/gallery/:slug");
   const slug = params?.slug;
   const queryClient = useQueryClient();
+  const [heartAnimation, setHeartAnimation] = useState(0);
 
   const { data: item, isLoading, isError } = useQuery({
     queryKey: ["galleryItem", slug],
@@ -114,22 +117,27 @@ export default function GalleryDetailPage() {
     mutationFn: (id: number) => apiClient.post("/gallery/items/" + id + "/like"),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["galleryItem", slug] });
+      setHeartAnimation((count) => count + 1);
       toast.success(t("gallery.liked"));
     },
   });
 
   const handleShare = async () => {
     if (navigator.share) {
-      await navigator.share({
-        title: item.title,
-        text: item.description,
-        url: window.location.href,
-      });
+      try {
+        await navigator.share({ title: item.title, text: item.description, url: window.location.href });
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === "AbortError")) toast.error(t("gallery.share_error"));
+      }
       return;
     }
 
-    await navigator.clipboard.writeText(window.location.href);
-    toast.success(t("gallery.link_copied"));
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success(t("gallery.link_copied"));
+    } catch {
+      toast.error(t("gallery.share_error"));
+    }
   };
 
   if (isLoading) {
@@ -175,7 +183,7 @@ export default function GalleryDetailPage() {
           </div>
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
-            <p className="eyebrow">{item.type === "3d" ? "Interactive 3D" : item.type}</p>
+            <p className="eyebrow">{item.type === "3d" ? t("gallery.model_label") : item.type === "photo" ? t("gallery.photos_label") : t("gallery.videos_label")}</p>
             <h1 className="mt-4 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
               {item.title}
             </h1>
@@ -190,7 +198,7 @@ export default function GalleryDetailPage() {
 
             <div className="mt-6 flex gap-3">
               <Button onClick={() => likeMutation.mutate(item.id)} disabled={likeMutation.isPending}>
-                <Heart className="h-4 w-4" />
+                <BrandMotion name="heart" mode="manual" trigger={heartAnimation} className="h-7 w-7" poster="/brand/icons/wishlist.svg" />
                 {t("gallery.like")}
               </Button>
               <Button variant="outline" onClick={handleShare}>
@@ -201,7 +209,7 @@ export default function GalleryDetailPage() {
 
             {item.type === "3d" && (
               <p className="surface-muted mt-7 p-5 text-sm leading-6 text-muted-foreground">
-                Drag to rotate, scroll or pinch to zoom, and inspect the piece from every side.
+                {t("gallery.model_help")}
               </p>
             )}
           </aside>

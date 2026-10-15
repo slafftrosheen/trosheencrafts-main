@@ -61,7 +61,7 @@ export default function ShopPage() {
   const resetFilters = () => {
     setSearch("");
     setCategory("all");
-    setOnlyAvailable(true);
+    setOnlyAvailable(false);
     setSort("featured");
   };
 

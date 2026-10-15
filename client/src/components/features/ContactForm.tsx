@@ -1,13 +1,14 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Loader2, Send, CheckCircle2 } from "lucide-react";
+import { Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useContactForm } from "@/hooks/useApi";
 import { useLanguage } from "@/lib/LanguageContext";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters").max(100),
@@ -38,9 +39,7 @@ export function ContactForm() {
   if (isSuccess) {
     return (
       <div className="py-10 text-center">
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-          <CheckCircle2 className="h-7 w-7" />
-        </div>
+        <BrandMotion name="stamp" mode="view" className="mx-auto h-36 w-36" poster="/brand/seal-spruce.svg" />
         <h3 className="mt-5 font-serif text-3xl font-semibold">{t("contact.form_success_title")}</h3>
         <p className="mx-auto mt-3 max-w-lg leading-7 text-muted-foreground">{t("contact.form_success_desc")}</p>
       </div>

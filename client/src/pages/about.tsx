@@ -169,7 +169,7 @@ export default function AboutPage() {
       <section className="section-space border-b border-border">
         <div className="site-container flex flex-col items-center text-center">
           <img src="/brand/botanical/trosheen-fern.svg" alt="" loading="lazy" className="mb-6 h-24 w-24" />
-          <BrandMotion name="signature" mode="view" className="h-28 w-72 max-w-full" label="Ar siltām rokām, Oļegs" poster="/brand/signature-olegs-animated.svg" />
+          <BrandMotion name="signature" mode="view" className="h-28 w-72 max-w-full" label="Ar siltām rokām, Oļegs" poster="/brand/signature-olegs.svg" />
         </div>
       </section>
 

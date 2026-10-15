@@ -362,3 +362,11 @@
  .brand-motion-poster{opacity:1!important}
  .storefront .brand-panel-image{transition:none!important;transform:none!important}
 }
+
+
+/* Constructor: keep real previews and native focus, remove unnecessary rounded UI. */
+.storefront .constructor-editor { border-radius:2px; box-shadow:none; }
+.storefront .constructor-editor :is(button,[aria-pressed="true"]) { border-radius:2px; }
+.storefront .constructor-editor button[aria-pressed="true"] { outline:2px solid var(--tr-gilt); outline-offset:2px; }
+.storefront .constructor-editor button[aria-pressed="false"]:hover { border-color:var(--tr-spruce); }
+@media(max-width:767px){.storefront .constructor-editor .sticky.bottom-0{padding-bottom:max(1rem,env(safe-area-inset-bottom))}}

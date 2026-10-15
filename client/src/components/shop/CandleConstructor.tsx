@@ -4,12 +4,13 @@ import { useQuery } from '@tanstack/react-query';
 import { useLanguage } from '@/lib/LanguageContext';
 import { useCartStore } from '@/lib/stores/cartStore';
 import { Button } from '@/components/ui/button';
-import { Check, ShoppingBag, Info, Loader2, RefreshCw, Package } from 'lucide-react';
+import { Check, Info, Loader2, RefreshCw, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import { OptimizedImage } from '@/components/shared/OptimizedImage';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { apiClient } from '@/lib/apiClient';
+import { BrandMotion } from '@/components/shared/BrandMotion';
 
 const CandlePreview3D = lazy(() => import('./CandlePreview3D').then((module) => ({ default: module.CandlePreview3D })));
 
@@ -29,6 +30,7 @@ export function CandleConstructor() {
   const { t, language } = useLanguage();
   const addItem = useCartStore((state) => state.addItem);
   const [show3D, setShow3D] = useState(false);
+  const [cartAnimation, setCartAnimation] = useState(0);
 
   const { data: optionsData, isLoading, isError, refetch } = useQuery<Record<string, ConstructorOption[]>>({
     queryKey: ['constructorOptions'],
@@ -120,6 +122,7 @@ export function CandleConstructor() {
       },
     });
     
+    setCartAnimation((count) => count + 1);
     toast.success(t('constructor.added'), {
       action: { label: t('constructor.view_cart'), onClick: () => window.location.assign('/cart') },
     });
@@ -127,7 +130,7 @@ export function CandleConstructor() {
   };
 
   return (
-    <div className="w-full min-h-[720px] relative flex flex-col md:flex-row rounded-3xl overflow-visible md:overflow-hidden border border-border bg-background shadow-sm">
+    <div className="constructor-editor w-full min-h-[720px] relative flex flex-col md:flex-row rounded-3xl overflow-visible md:overflow-hidden border border-border bg-background shadow-sm">
       
       {/* LEFT: Sticky Immersive Visualizer */}
       <div className="md:w-1/2 md:sticky md:top-0 md:h-[calc(100vh-8rem)] min-h-[460px] relative bg-muted/30 overflow-hidden flex flex-col items-center justify-center px-5 pb-6 pt-16 md:p-8 border-b md:border-b-0 md:border-r border-border/40">
@@ -432,9 +435,7 @@ export function CandleConstructor() {
               <span className="w-1 h-1 rounded-full bg-primary-foreground/30" /> 
               €{totalPrice.toFixed(2)}
             </span>
-            <div className="ml-4 bg-primary-foreground/20 p-2 rounded-full group-hover:bg-primary-foreground/30 transition-colors">
-              <ShoppingBag className="w-5 h-5" />
-            </div>
+            <BrandMotion name="cart" mode="manual" trigger={cartAnimation} className="ml-3 h-8 w-8" poster="/brand/icons/bag.svg" />
           </Button>
         </motion.div>
       </div>
