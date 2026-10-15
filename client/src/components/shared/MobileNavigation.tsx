@@ -1,6 +1,7 @@
+import { BrandIcon } from "./BrandIcon";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -31,17 +32,10 @@ export function MobileNavigation() {
     location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl md:hidden">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl lg:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
-          <SiteLogo
-            
-            alt="Trosheen.Crafts"
-            className="h-10 w-10 object-contain"
-          />
-          <span className="hidden font-serif text-base font-semibold tracking-tight min-[390px]:inline">
-            Trosheen.Crafts
-          </span>
+          <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-36 min-[390px]:w-44 shrink-0 object-contain" />
         </Link>
 
         <div className="flex items-center gap-0.5">
@@ -50,8 +44,8 @@ export function MobileNavigation() {
 
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open menu">
-                <Menu className="h-5 w-5" />
+              <Button variant="ghost" size="icon" aria-label={t("brand.menu")}>
+                <BrandIcon name="menu" />
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[88vw] max-w-sm border-l border-border bg-background p-0">
@@ -67,6 +61,7 @@ export function MobileNavigation() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      aria-current={isActive(link.href) ? "page" : undefined}
                       className={cn(
                         "flex items-center justify-between rounded-xl px-4 py-3.5 text-lg font-semibold transition-colors",
                         isActive(link.href)

@@ -1,3 +1,4 @@
+import { useLanguage } from "@/lib/LanguageContext";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
@@ -16,7 +17,8 @@ interface Promotion {
   active: boolean;
 }
 
-export function PromotionalGallery() {
+export function PromotionalGallery({ embedded = false }: { embedded?: boolean }) {
+  const { t } = useLanguage();
   const { data: promotions = [] } = useQuery({
     queryKey: ["promotions"],
     queryFn: () => apiClient.get<Promotion[]>("/promotions"),
@@ -28,19 +30,19 @@ export function PromotionalGallery() {
   });
 
   const activePromotions = promotions.filter((promo) => promo.active !== false);
-  const heading = config?.value?.heading || "Featured Collections";
+  const heading = config?.value?.heading || t("brand.collections");
 
   if (!activePromotions.length) return null;
 
   return (
-    <section className="section-space border-b border-border">
-      <div className="site-container">
-        <div className="mb-8 flex items-end justify-between gap-6">
+    <div className={embedded ? "mb-8" : "section-space border-b border-border"}>
+      <div className={embedded ? "" : "site-container"}>
+        {(!embedded || config?.value?.heading) && <div className="mb-8 flex items-end justify-between gap-6">
           <div>
-            <p className="eyebrow mb-3">Current edit</p>
+            <p className="eyebrow mb-3">{t("brand.season")}</p>
             <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">{heading}</h2>
           </div>
-        </div>
+        </div>}
 
         <div className="grid gap-5 md:grid-cols-2">
           {activePromotions.map((promo) => (
@@ -56,13 +58,13 @@ export function PromotionalGallery() {
                   muted
                   loop
                   playsInline
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
+                  className="h-full w-full object-cover"
                 />
               ) : (
                 <OptimizedImage
                   src={promo.imageUrl}
                   alt={promo.title}
-                  className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
+                  className="h-full w-full object-cover"
                 />
               )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
@@ -91,6 +93,6 @@ export function PromotionalGallery() {
           ))}
         </div>
       </div>
-    </section>
+    </div>
   );
 }

@@ -40,8 +40,7 @@ export function Footer() {
         <div className="grid gap-12 lg:grid-cols-[1.35fr_.75fr_.9fr_1.25fr]">
           <div>
             <Link href="/" className="inline-flex items-center gap-3">
-              <SiteLogo  alt="Trosheen.Crafts" className="h-12 w-12 object-contain" />
-              <span className="font-serif text-xl font-semibold">Trosheen.Crafts</span>
+              <SiteLogo tone="linen" variant="lockup-horizontal" alt="Trosheen" className="h-14 w-56 object-contain" />
             </Link>
             <p className="mt-5 max-w-sm text-base leading-relaxed text-muted-foreground">{t("footer_desc")}</p>
             <div className="mt-6 flex flex-wrap gap-2">
@@ -84,7 +83,7 @@ export function Footer() {
                 <Mail className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <span>{config.contact.email}</span>
               </a>
-              {config.contact.phone && (
+              {config.contact.phone && !/[xX]/.test(config.contact.phone) && (
                 <a
                   href={"tel:" + config.contact.phone.replace(/\s+/g, "")}
                   className="flex items-start gap-3 transition-colors hover:text-foreground"
@@ -110,12 +109,12 @@ export function Footer() {
         </div>
 
         <div className="mt-14 flex flex-col gap-5 border-t border-border pt-6 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-          <p>© {currentYear} Trosheen.Crafts · Daugavpils, Latvia</p>
+          <p>© {currentYear} Trosheen · Daugavpils, Latvia</p>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <Link href="/withdrawal" className="font-semibold text-foreground hover:text-primary">{withdrawalLabel}</Link>
-            <Link href="/privacy" className="hover:text-foreground">Privacy</Link>
-            <Link href="/terms" className="hover:text-foreground">Terms</Link>
-            <Link href="/cookies" className="hover:text-foreground">Cookies</Link>
+            <Link href="/privacy" className="hover:text-foreground">{t("brand.privacy")}</Link>
+            <Link href="/terms" className="hover:text-foreground">{t("brand.terms")}</Link>
+            <Link href="/cookies" className="hover:text-foreground">{t("brand.cookies")}</Link>
           </div>
         </div>
       </div>

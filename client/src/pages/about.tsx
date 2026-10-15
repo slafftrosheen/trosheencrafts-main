@@ -1,8 +1,8 @@
 import { Link } from "wouter";
-import { ArrowRight, Heart, MapPin } from "lucide-react";
+import { ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
-import { HeroPhotos, ScrollStoryPhotos, WorkshopTourPhotos } from "@/lib/imageAssets";
+import { ScrollStoryPhotos, WorkshopTourPhotos } from "@/lib/imageAssets";
 
 export default function AboutPage() {
   const { t } = useLanguage();
@@ -40,30 +40,13 @@ export default function AboutPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <section className="relative min-h-[72svh] overflow-hidden bg-secondary text-white">
-        <img
-          src={HeroPhotos.main}
-          alt={t("about.our_family_story")}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/10" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
-
-        <div className="site-container relative flex min-h-[72svh] items-end pb-14 pt-24 md:items-center md:py-24">
-          <div className="max-w-4xl">
-            <p className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-white/70">
-              <Heart className="h-3.5 w-3.5" />
-              {t("about.our_family_story")}
-            </p>
-            <h1 className="mt-5 font-serif text-[clamp(3.2rem,9vw,8rem)] font-semibold leading-[.86] tracking-[-.055em]">
-              {t("about.three_generations")}
-              <span className="block italic text-[#d9cdbb]">{t("about.one_workshop")}</span>
-            </h1>
-            <p className="mt-7 max-w-2xl text-base leading-8 text-white/75 sm:text-lg">
-              {t("hero_subtitle")}
-            </p>
-          </div>
+      <section className="brand-panel brand-panel-dark">
+        <div className="brand-panel-copy">
+          <p className="eyebrow mb-5">{t("nav_story")}</p>
+          <h1 className="text-[clamp(2.8rem,5vw,4.8rem)]">{t("brand.story_title")}</h1>
+          <p className="mt-6 max-w-prose leading-relaxed">{t("brand.story_desc")}</p>
         </div>
+        <div><img src="/brand/about.webp" alt={t("brand.newsletter_alt")} width="960" height="900" className="brand-panel-image" /></div>
       </section>
 
       <section className="section-space">

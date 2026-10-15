@@ -21,9 +21,9 @@ export function ProductCard({ id, name, price, image, category, isHandmade, inSt
         <div className="relative aspect-[4/5] overflow-hidden rounded-3xl bg-muted">
           {image ? (
             <img src={image} alt={name} loading="lazy" decoding="async"
-              className="h-full w-full object-cover transition-transform duration-500 ease-out motion-safe:group-hover:scale-[1.04]" />
+              className="h-full w-full object-cover" />
           ) : (
-            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Trosheen.Crafts</div>
+            <div className="flex h-full items-center justify-center text-sm text-muted-foreground">Trosheen</div>
           )}
           {isHandmade && (
             <span className="absolute left-4 top-4 rounded-full bg-background/95 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-foreground">

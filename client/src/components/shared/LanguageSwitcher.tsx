@@ -1,11 +1,11 @@
 import { useLanguage } from '@/lib/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { 
-  DropdownMenu, 
-  DropdownMenuContent, 
-  DropdownMenuItem, 
-  DropdownMenuTrigger 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 
 const languages = [
@@ -24,7 +24,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className={cn("rounded-full h-10 px-3 font-bold text-base flex items-center gap-2", className)}>
-          <span className="text-xl hidden sm:inline-block">{currentLang.flag}</span>
+
           <span>{currentLang.code.toUpperCase()}</span>
         </Button>
       </DropdownMenuTrigger>
@@ -38,7 +38,7 @@ export function LanguageSwitcher({ className }: { className?: string }) {
               language === lang.code && "bg-primary/10 text-primary"
             )}
           >
-            <span className="text-xl">{lang.flag}</span>
+
             <span>{lang.label}</span>
           </DropdownMenuItem>
         ))}

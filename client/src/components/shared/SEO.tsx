@@ -9,12 +9,12 @@ interface SEOProps {
 }
 
 export function SEO({ title, description, keywords, image, url }: SEOProps) {
-  const siteUrl = url || typeof window !== 'undefined' ? window.location.href : '';
-  const defaultImage = '/og-image.webp';
+  const siteUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
+  const defaultImage = '/brand/social-share.webp';
 
   return (
     <Helmet>
-      <title>{title} | Trosheen.Crafts</title>
+      <title>{title} | Trosheen</title>
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
       

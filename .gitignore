@@ -58,3 +58,6 @@ server/uploads/
 # Data files (settings, etc.)
 data/
 nul
+
+# Local brand review intermediates
+/tmp/brand-review/

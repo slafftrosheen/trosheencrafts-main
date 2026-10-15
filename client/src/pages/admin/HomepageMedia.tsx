@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/apiClient";
 import { DEFAULT_HOMEPAGE_IMAGES } from "@/lib/homepageImages";
 import { HOMEPAGE_IMAGES_QUERY_KEY } from "@/hooks/useHomepageImages";
-import { HOMEPAGE_IMAGE_SLOTS, type HomepageImageSlot, type HomepageImages } from "../../../../shared/homepageMedia";
+import { ACTIVE_HOMEPAGE_IMAGE_SLOTS as HOMEPAGE_IMAGE_SLOTS, type HomepageImageSlot, type HomepageImages } from "../../../../shared/homepageMedia";
 
 type BusyAction = "upload" | "save" | "reset";
 

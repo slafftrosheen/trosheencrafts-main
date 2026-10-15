@@ -10,8 +10,8 @@ export function Navigation() {
   const { t } = useLanguage();
 
   const links = [
-    { href: "/about", label: t("nav_story") },
     { href: "/shop", label: t("nav_shop") },
+    { href: "/about", label: t("nav_story") },
     { href: "/gallery", label: t("nav_gallery") },
     { href: "/blog", label: t("nav_blog") },
     { href: "/guide", label: t("guide_care_eyebrow") },
@@ -22,17 +22,10 @@ export function Navigation() {
     href === "/" ? location === "/" : location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 hidden md:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
-      <div className="site-container flex h-[72px] items-center justify-between gap-8">
+    <header className="sticky top-0 z-50 hidden lg:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
+      <div className="site-container flex h-24 items-center justify-between gap-4">
         <Link href="/" className="flex min-w-0 items-center gap-3">
-          <SiteLogo
-            
-            alt="Trosheen.Crafts"
-            className="h-11 w-11 object-contain"
-          />
-          <span className="hidden font-serif text-lg font-semibold tracking-tight text-foreground lg:block">
-            Trosheen.Crafts
-          </span>
+          <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-44 shrink-0 object-contain" />
         </Link>
 
         <nav className="flex items-center gap-1" aria-label="Primary navigation">
@@ -40,11 +33,12 @@ export function Navigation() {
             <Link
               key={link.href}
               href={link.href}
+              aria-current={isActive(link.href) ? "page" : undefined}
               className={cn(
-                "rounded-full px-3 py-2 text-[13px] font-semibold transition-colors",
+                "rounded-full px-2 py-3 text-[13px] font-medium transition-colors",
                 isActive(link.href)
-                  ? "bg-muted text-foreground"
-                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  ? "border-b-2 border-[#B89150] text-primary"
+                  : "border-b-2 border-transparent text-primary hover:border-primary/30"
               )}
             >
               {link.label}

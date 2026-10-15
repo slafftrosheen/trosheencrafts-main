@@ -1,6 +1,7 @@
+import { BrandIcon } from "@/components/shared/BrandIcon";
 import { useState } from "react";
 import { Link } from "wouter";
-import { ShoppingCart, X, Plus, Minus, ShoppingBag } from "lucide-react";
+import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -17,7 +18,7 @@ export function ShoppingCartComponent() {
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button variant="ghost" size="icon" className="relative" aria-label={t("cart.basket") || "Basket"}>
-          <ShoppingCart className="h-5 w-5" />
+          <BrandIcon name="bag" />
           {totalItems > 0 && (
             <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
               {totalItems}

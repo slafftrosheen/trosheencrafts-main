@@ -1,3 +1,5 @@
+import { useHomepageImages } from "@/hooks/useHomepageImages";
+import { DEFAULT_HOMEPAGE_IMAGES } from "@/lib/homepageImages";
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Mail, CheckCircle2, AlertCircle, ArrowRight, Loader2 } from "lucide-react";
@@ -20,6 +22,7 @@ export function NewsletterSubscribe({
   source = "website",
 }: NewsletterSubscribeProps) {
   const { t } = useLanguage();
+  const { image } = useHomepageImages();
   const [email, setEmail] = useState("");
   const [preferences] = useState({
     marketing: true,
@@ -34,7 +37,7 @@ export function NewsletterSubscribe({
 
     if (!email || !email.includes("@")) {
       setStatus("error");
-      setMessage("Please enter a valid email address");
+      setMessage(t("newsletter.invalid"));
       haptics.playError();
       return;
     }
@@ -49,7 +52,7 @@ export function NewsletterSubscribe({
       );
 
       setStatus("success");
-      setMessage(data.message);
+      setMessage(t("newsletter.success"));
       setEmail("");
       haptics.playSuccess();
       window.setTimeout(() => {
@@ -58,12 +61,12 @@ export function NewsletterSubscribe({
       }, 5000);
     } catch (error: any) {
       setStatus("error");
-      setMessage(error?.message || "Unable to subscribe. Please try again later.");
+      setMessage(t("newsletter.error"));
       haptics.playError();
     }
   };
 
-  const Form = ({ compact = false }: { compact?: boolean }) => (
+  const renderForm = ({ compact = false }: { compact?: boolean } = {}) => (
     <>
       <form
         onSubmit={handleSubmit}
@@ -73,12 +76,12 @@ export function NewsletterSubscribe({
           <Mail className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="email"
-            aria-label="Email address"
+            aria-label={t("newsletter.email_label")}
             placeholder={t("newsletter.email_placeholder") || "your@email.com"}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={status === "loading" || status === "success"}
-            className="h-12 rounded-full border-border bg-background pl-11"
+            className="h-12 rounded-[2px] border-border bg-background pl-11"
           />
         </div>
         <Button
@@ -105,6 +108,7 @@ export function NewsletterSubscribe({
       <AnimatePresence mode="wait">
         {message && (
           <motion.p
+            role={status === "error" ? "alert" : "status"}
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
@@ -124,7 +128,7 @@ export function NewsletterSubscribe({
   if (variant === "compact") {
     return (
       <div className={cn("w-full", className)}>
-        <Form compact />
+        {renderForm({ compact: true })}
       </div>
     );
   }
@@ -132,24 +136,14 @@ export function NewsletterSubscribe({
   if (variant === "hero") {
     return (
       <div className={cn("surface overflow-hidden", className)}>
-        <div className="grid gap-8 p-7 sm:p-10 md:grid-cols-[1fr_.9fr] md:items-end md:p-12">
-          <div>
-            <p className="eyebrow mb-4">{t("newsletter.exclusive_updates") || "Workshop letters"}</p>
-            <h3 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">
-              {t("newsletter.hero_title") || "Stay close to the workshop"}
-            </h3>
-            <p className="mt-4 max-w-xl text-base leading-relaxed text-muted-foreground">
-              {t("newsletter.hero_subtitle") ||
-                "New collections, workshop stories and occasional notes from Daugavpils."}
-            </p>
-          </div>
-          <div>
-            <Form />
-            {status === "idle" && (
-              <p className="mt-3 text-xs text-muted-foreground">
-                {t("newsletter.privacy_note") || "Unsubscribe anytime."}
-              </p>
-            )}
+        <div className="brand-panel">
+          <div><img src={image("shopFeature")} onError={(event) => { event.currentTarget.src = DEFAULT_HOMEPAGE_IMAGES.shopFeature; }} alt={t("brand.newsletter_alt")} width="600" height="600" loading="lazy" className="brand-panel-image" /></div>
+          <div className="brand-panel-copy">
+            <p className="eyebrow mb-4">{t("newsletter.exclusive_updates")}</p>
+            <h2>{t("newsletter.hero_title")}</h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("newsletter.hero_subtitle")}</p>
+            <div className="mt-7">{renderForm()}</div>
+            {status === "idle" && <p className="mt-3 text-xs text-muted-foreground">{t("newsletter.privacy_note")}</p>}
           </div>
         </div>
       </div>
@@ -158,7 +152,7 @@ export function NewsletterSubscribe({
 
   return (
     <div className={cn("w-full", className)}>
-      <Form />
+      {renderForm()}
     </div>
   );
 }

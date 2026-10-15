@@ -1,0 +1,20 @@
+/* Trosheen — brand tokens for trosheen.shop */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght,SOFT@9..144,300..600,0..100&family=Jost:wght@300..600&display=swap');
+:root{
+  --tr-spruce:#24412F;   /* primary — headings, buttons, footer */
+  --tr-lichen:#8C9A7B;   /* secondary — soft panels (Basalt text only) */
+  --tr-kiln:#8E5636;     /* secondary — warm accents, gift moments */
+  --tr-gilt:#B89150;     /* accent — rules, small details, buttons on Spruce */
+  --tr-linen:#F2EDE3;    /* page background */
+  --tr-basalt:#1F1D1A;   /* body text */
+  --tr-font-heading:'Fraunces', Georgia, serif;
+  --tr-font-body:'Jost', system-ui, sans-serif;
+  --tr-radius:2px;
+  --tr-eyebrow-tracking:.24em;
+}
+body{background:var(--tr-linen);color:var(--tr-basalt);font-family:var(--tr-font-body);font-weight:350;line-height:1.55}
+h1,h2,h3{font-family:var(--tr-font-heading);font-weight:380;font-variation-settings:'opsz' 144,'SOFT' 40;color:var(--tr-spruce);line-height:1.05}
+.tr-eyebrow{font-family:var(--tr-font-body);font-weight:500;font-size:.8rem;letter-spacing:var(--tr-eyebrow-tracking);text-transform:uppercase}
+.tr-btn{background:var(--tr-spruce);color:var(--tr-linen);font-weight:500;letter-spacing:.08em;text-transform:uppercase;padding:1rem 1.8rem;border-radius:var(--tr-radius)}
+.tr-btn--on-dark{background:var(--tr-gilt);color:var(--tr-basalt)}
+.tr-icon{width:24px;height:24px;color:currentColor}
