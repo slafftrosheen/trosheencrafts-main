@@ -14,6 +14,18 @@ export function MobileNavigation() {
   const [location] = useLocation();
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
+  const [isCustom, setIsCustom] = useState(false);
+  useEffect(() => {
+    const sync = () => setIsCustom(window.location.pathname === "/shop" &&
+      new URLSearchParams(window.location.search).get("view") === "custom");
+    sync();
+    window.addEventListener("popstate", sync);
+    window.addEventListener("trosheen:shop-view", sync);
+    return () => {
+      window.removeEventListener("popstate", sync);
+      window.removeEventListener("trosheen:shop-view", sync);
+    };
+  }, [location]);
 
   useEffect(() => {
     setOpen(false);
@@ -30,10 +42,10 @@ export function MobileNavigation() {
   ];
 
   const isActive = (href: string) =>
-    href === "/constructor" ? location === "/shop" && window.location.search.includes("view=custom") : location === href || location.startsWith(href + "/");
+    href === "/constructor" ? isCustom : href === "/shop" ? location === "/shop" && !isCustom : location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl 2xl:hidden">
+    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl xl:hidden">
       <div className="flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-36 min-[390px]:w-44 shrink-0 object-contain" />
@@ -62,6 +74,7 @@ export function MobileNavigation() {
                     <Link
                       key={link.href}
                       href={link.href}
+                      onClick={() => setOpen(false)}
                       aria-current={isActive(link.href) ? "page" : undefined}
                       className={cn(
                         "flex items-center justify-between rounded-xl px-4 py-3.5 text-lg font-semibold transition-colors",

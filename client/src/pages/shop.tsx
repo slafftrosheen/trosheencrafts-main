@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search, Package, Sparkles, X, RefreshCw } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { CandleConstructor } from "@/components/shop/CandleConstructor";
@@ -6,18 +6,31 @@ import { useProducts } from "@/hooks/useApi";
 import { ProductCard } from "@/components/features/product/ProductCard";
 import { cn } from "@/lib/utils";
 import { BrandMotion } from "@/components/shared/BrandMotion";
+import { useLocation } from "wouter";
 
 type ShopTab = "collections" | "custom";
 type SortOrder = "featured" | "newest" | "price-asc" | "price-desc" | "name";
 
 export default function ShopPage() {
   const { t, language } = useLanguage();
+  const [location] = useLocation();
   const { data: products, isLoading, isError, refetch } = useProducts();
   const [activeTab, setActiveTab] = useState<ShopTab>(() =>
     typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "custom"
       ? "custom"
       : "collections"
   );
+  useEffect(() => {
+    const syncTab = () => setActiveTab(new URLSearchParams(window.location.search).get("view") === "custom" ? "custom" : "collections");
+    syncTab();
+    window.addEventListener("popstate", syncTab);
+    window.addEventListener("trosheen:shop-view", syncTab);
+    return () => {
+      window.removeEventListener("popstate", syncTab);
+      window.removeEventListener("trosheen:shop-view", syncTab);
+    };
+  }, [location]);
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState<SortOrder>("featured");
@@ -56,12 +69,13 @@ export default function ShopPage() {
     if (tab === "custom") url.searchParams.set("view", "custom");
     else url.searchParams.delete("view");
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
+    window.dispatchEvent(new Event("trosheen:shop-view"));
   };
 
   const resetFilters = () => {
     setSearch("");
     setCategory("all");
-    setOnlyAvailable(false);
+    setOnlyAvailable(true);
     setSort("featured");
   };
 
@@ -74,13 +88,13 @@ export default function ShopPage() {
             <h1 className="display-title">{t("nav_shop")}</h1>
             <p className="lead lg:pb-2">{t("shop_teaser_desc")}</p>
           </div>
-          <div className="mt-9 inline-flex w-full rounded-full border border-border bg-card p-1 sm:w-auto" role="tablist" aria-label={t("shop.sections")}>
+          <div className="mt-9 inline-flex w-full max-w-full border border-border bg-card p-1 sm:w-auto" role="tablist" aria-label={t("shop.sections")}>
             <button type="button" id="shop-collections-tab" role="tab" aria-controls="shop-collections-panel" aria-selected={activeTab === "collections"} onClick={() => changeTab("collections")}
-              className={cn("flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:flex-none", activeTab === "collections" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}>
+              className={cn("flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 px-3 py-2.5 text-center text-xs font-medium leading-snug transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:flex-none sm:px-5 sm:text-sm", activeTab === "collections" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}>
               <Package className="h-4 w-4" />{t("curated_selection")}
             </button>
             <button type="button" id="shop-custom-tab" role="tab" aria-controls="shop-custom-panel" aria-selected={activeTab === "custom"} onClick={() => changeTab("custom")}
-              className={cn("flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:flex-none", activeTab === "custom" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}>
+              className={cn("flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 px-3 py-2.5 text-center text-xs font-medium leading-snug transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary sm:flex-none sm:px-5 sm:text-sm", activeTab === "custom" ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground")}>
               <Sparkles className="h-4 w-4" />{t("shop_custom_builder")}
             </button>
           </div>
