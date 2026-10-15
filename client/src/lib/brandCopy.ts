@@ -55,5 +55,5 @@ export const brandCopy: Copy = {
   "gallery.model_unavailable": { lv: "Šo 3D modeli pašlaik nevar atvērt. Pārējā galerija ir pieejama.", en: "This 3D model is unavailable. You can still browse the gallery.", ru: "Эту 3D-модель сейчас нельзя открыть. Остальная галерея доступна.", pl: "Ten model 3D jest niedostępny. Możesz nadal przeglądać galerię.", uk: "Цю 3D-модель зараз не можна відкрити. Решта галереї доступна." },
   "gallery.media_filter": { lv: "Mediju veids", en: "Media type", ru: "Тип материалов", pl: "Typ materiału", uk: "Тип матеріалів" },  "brand.explore": { lv: "Apskatīt", en: "Explore", ru: "Подробнее", pl: "Odkryj", uk: "Переглянути" },
   "brand.packed": { lv: "Rūpīgi iepakots", en: "Carefully packed", ru: "Бережно упаковано", pl: "Starannie zapakowane", uk: "Дбайливо упаковано" },
-  "brand.payment": { lv: "Droša apmaksa", en: "Secure payment", ru: "Безопасная оплата", pl: "Bezpieczna płatność", uk: "Безпечна оплата" },
+  "brand.payment": { lv: "Droša apmaksa", en: "Secure payment", ru: "Безопасная оплата", pl: "Bezpieczna płatność", uk: "Безпечна оплата" },  "brand.seo_home": { lv: "Trosheen — roku darbi mājai un dārzam no Daugavpils", en: "Trosheen — handmade pieces from Latvia", ru: "Trosheen — изделия ручной работы из Латвии", pl: "Trosheen — rękodzieło z Łotwy", uk: "Trosheen — вироби ручної роботи з Латвії" },
 };

@@ -26,15 +26,6 @@ function GltfModel({ url }: { url: string }) {
   return <primitive object={scene} />;
 }
 
-function is3dFile(url: string) {
-  try {
-    const pathname = new URL(url, window.location.origin).pathname.toLowerCase();
-    return pathname.endsWith(".glb") || pathname.endsWith(".gltf");
-  } catch {
-    return false;
-  }
-}
-
 class ModelErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
   state = { failed: false };
   static getDerivedStateFromError() { return { failed: true }; }
@@ -66,7 +57,9 @@ function MediaViewer({ item }: { item: any }) {
 
   if (item.type === "3d") {
     const fallback = <div role="status" className="surface-muted flex min-h-[340px] items-center justify-center p-10 text-center text-muted-foreground">{t("gallery.model_unavailable")}</div>;
-    if (!item.mediaUrl || !is3dFile(item.mediaUrl)) return fallback;
+    // R2/CDN model URLs may not carry a .glb extension. Trust the persisted media type;
+    // let GLTFLoader load the bytes and the boundary handle a genuine error.
+    if (!item.mediaUrl) return fallback;
     return <ModelErrorBoundary key={item.mediaUrl} fallback={fallback}><ThreeViewer modelUrl={item.mediaUrl} /></ModelErrorBoundary>;
   }
 

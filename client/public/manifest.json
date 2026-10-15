@@ -6,7 +6,7 @@
   "display": "standalone",
   "background_color": "#F2EDE3",
   "theme_color": "#24412F",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "icons": [
     {
       "src": "/brand/android-chrome-192.png",
@@ -26,20 +26,7 @@
     "lifestyle",
     "art"
   ],
-  "screenshots": [
-    {
-      "src": "/screenshots/home.png",
-      "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide"
-    },
-    {
-      "src": "/screenshots/shop.png",
-      "sizes": "750x1334",
-      "type": "image/png",
-      "form_factor": "narrow"
-    }
-  ],
+  "screenshots": [],
   "shortcuts": [
     {
       "name": "Browse Shop",
@@ -61,18 +48,6 @@
       "icons": [
         {
           "src": "/blog-96.png",
-          "sizes": "96x96"
-        }
-      ]
-    },
-    {
-      "name": "Inspiration Boards",
-      "short_name": "Boards",
-      "description": "View saved favorites",
-      "url": "/inspiration",
-      "icons": [
-        {
-          "src": "/heart-96.png",
           "sizes": "96x96"
         }
       ]

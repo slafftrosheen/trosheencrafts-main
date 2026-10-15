@@ -34,7 +34,7 @@ export function Layout({ children }: LayoutProps) {
         {t("brand.skip")}
       </a>
 
-      <SEO title={location === "/" ? t("brand.tagline") : t(({ "/shop": "nav_shop", "/about": "nav_story", "/gallery": "nav_gallery", "/blog": "nav_blog", "/guide": "guide_care_eyebrow", "/contact": "nav_contact" } as Record<string, string>)[location] || "brand.tagline")} description={t("brand.intro")} />
+      <SEO title={location === "/" ? t("brand.seo_home") : t(({ "/shop": "nav_shop", "/about": "nav_story", "/gallery": "nav_gallery", "/blog": "nav_blog", "/guide": "guide_care_eyebrow", "/contact": "nav_contact", "/cart": "cart.basket", "/checkout": "checkout.title", "/order-confirmation": "confirm.title" } as Record<string, string>)[location] || (location.startsWith("/shop/") ? "nav_shop" : location.startsWith("/gallery/") ? "nav_gallery" : "brand.tagline"))} description={t("brand.intro")} />
       <Navigation />
       <MobileNavigation />
 
