@@ -17,8 +17,15 @@ export function MobileNavigation() {
   const [isCustom, setIsCustom] = useState(false);
   const [compact, setCompact] = useState(false);
   useEffect(() => {
-    const sync = () => setIsCustom(window.location.pathname === "/shop" &&
-      new URLSearchParams(window.location.search).get("view") === "custom");
+    const sync = (event?: Event) => {
+      const view = (event as CustomEvent<"collections" | "custom"> | undefined)?.detail;
+      if (view === "custom" || view === "collections") {
+        setIsCustom(view === "custom");
+      } else {
+        setIsCustom(window.location.pathname === "/shop" &&
+          new URLSearchParams(window.location.search).get("view") === "custom");
+      }
+    };
     sync();
     window.addEventListener("popstate", sync);
     window.addEventListener("trosheen:shop-view", sync);
@@ -82,7 +89,11 @@ export function MobileNavigation() {
                     <Link
                       key={link.href}
                       href={link.href}
-                      onClick={() => setOpen(false)}
+                      onClick={() => {
+                        setOpen(false);
+                        if (link.href === "/shop" || link.href === "/constructor")
+                          window.dispatchEvent(new CustomEvent("trosheen:shop-view", { detail: link.href === "/constructor" ? "custom" : "collections" }));
+                      }}
                       aria-current={isActive(link.href) ? "page" : undefined}
                       className={cn(
                         "flex items-center justify-between rounded-xl px-4 py-3.5 text-lg font-semibold transition-colors",

@@ -21,7 +21,12 @@ export default function ShopPage() {
       : "collections"
   );
   useEffect(() => {
-    const syncTab = () => setActiveTab(new URLSearchParams(window.location.search).get("view") === "custom" ? "custom" : "collections");
+    const syncTab = (event?: Event) => {
+      const requestedView = (event as CustomEvent<ShopTab> | undefined)?.detail;
+      setActiveTab(requestedView === "custom" || requestedView === "collections"
+        ? requestedView
+        : new URLSearchParams(window.location.search).get("view") === "custom" ? "custom" : "collections");
+    };
     syncTab();
     window.addEventListener("popstate", syncTab);
     window.addEventListener("trosheen:shop-view", syncTab);
@@ -69,7 +74,7 @@ export default function ShopPage() {
     if (tab === "custom") url.searchParams.set("view", "custom");
     else url.searchParams.delete("view");
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
-    window.dispatchEvent(new Event("trosheen:shop-view"));
+    window.dispatchEvent(new CustomEvent("trosheen:shop-view", { detail: tab }));
   };
 
   const resetFilters = () => {
