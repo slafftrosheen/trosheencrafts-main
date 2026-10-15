@@ -1,4 +1,4 @@
-import { Suspense, useState } from "react";
+import { Component, Suspense, useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRoute, Link } from "wouter";
 import { Canvas } from "@react-three/fiber";
@@ -14,8 +14,8 @@ function CanvasLoader() {
   const { progress } = useProgress();
   return (
     <Html center>
-      <div className="rounded-full border border-border bg-background/90 px-4 py-2 text-xs font-semibold shadow-sm backdrop-blur">
-        {progress.toFixed(0)}% loading
+      <div role="status" className="border border-border bg-background/90 px-4 py-2 text-xs font-medium backdrop-blur">
+        {progress.toFixed(0)}%
       </div>
     </Html>
   );
@@ -26,17 +26,19 @@ function GltfModel({ url }: { url: string }) {
   return <primitive object={scene} />;
 }
 
-function Model3D({ url }: { url: string }) {
-  if (!url || (!url.endsWith(".glb") && !url.endsWith(".gltf"))) {
-    return (
-      <mesh>
-        <boxGeometry args={[2, 2, 2]} />
-        <meshStandardMaterial color="#746353" metalness={0.1} roughness={0.85} />
-      </mesh>
-    );
+function is3dFile(url: string) {
+  try {
+    const pathname = new URL(url, window.location.origin).pathname.toLowerCase();
+    return pathname.endsWith(".glb") || pathname.endsWith(".gltf");
+  } catch {
+    return false;
   }
+}
 
-  return <GltfModel url={url} />;
+class ModelErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  render() { return this.state.failed ? this.props.fallback : this.props.children; }
 }
 
 function ThreeViewer({ modelUrl }: { modelUrl: string }) {
@@ -49,7 +51,7 @@ function ThreeViewer({ modelUrl }: { modelUrl: string }) {
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <directionalLight position={[-10, -10, -5]} intensity={0.3} />
         <Suspense fallback={<CanvasLoader />}>
-          <Model3D url={modelUrl} />
+          <GltfModel url={modelUrl} />
           <ContactShadows position={[0, -2, 0]} opacity={0.35} scale={10} blur={2} />
           <Environment preset="studio" />
         </Suspense>
@@ -63,7 +65,9 @@ function MediaViewer({ item }: { item: any }) {
   const { t } = useLanguage();
 
   if (item.type === "3d") {
-    return <ThreeViewer modelUrl={item.mediaUrl} />;
+    const fallback = <div role="status" className="surface-muted flex min-h-[340px] items-center justify-center p-10 text-center text-muted-foreground">{t("gallery.model_unavailable")}</div>;
+    if (!item.mediaUrl || !is3dFile(item.mediaUrl)) return fallback;
+    return <ModelErrorBoundary key={item.mediaUrl} fallback={fallback}><ThreeViewer modelUrl={item.mediaUrl} /></ModelErrorBoundary>;
   }
 
   return (
@@ -141,7 +145,7 @@ export default function GalleryDetailPage() {
   };
 
   if (isLoading) {
-    return <div className="site-container page-shell min-h-[60vh] animate-pulse rounded-3xl bg-muted/40" />;
+    return <div className="site-container page-shell min-h-[60vh] animate-pulse bg-muted/40" />;
   }
 
   if (isError || !item) {

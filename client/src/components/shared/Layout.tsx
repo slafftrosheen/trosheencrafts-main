@@ -1,5 +1,6 @@
 import { useLanguage } from "@/lib/LanguageContext";
 import { AnimatePresence } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { SEO } from "./SEO";
 import { Navigation } from "./Navigation";
@@ -15,6 +16,14 @@ interface LayoutProps {
 export function Layout({ children }: LayoutProps) {
   const [location] = useLocation();
   const { t } = useLanguage();
+  const mainRef = useRef<HTMLElement>(null);
+  const previousPath = useRef(location);
+  useEffect(() => {
+    if (previousPath.current === location) return;
+    previousPath.current = location;
+    if (!window.location.hash) window.scrollTo({ top: 0, behavior: "auto" });
+    mainRef.current?.focus({ preventScroll: true });
+  }, [location]);
 
   return (
     <div className="storefront min-h-screen flex flex-col bg-background text-foreground">
@@ -29,7 +38,7 @@ export function Layout({ children }: LayoutProps) {
       <Navigation />
       <MobileNavigation />
 
-      <main id="main-content" className="flex-1 w-full">
+      <main id="main-content" ref={mainRef} tabIndex={-1} className="flex-1 w-full outline-none">
         <AnimatePresence mode="wait" initial={false}>
           <PageTransition key={location}>{children}</PageTransition>
         </AnimatePresence>
