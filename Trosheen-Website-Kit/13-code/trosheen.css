@@ -1,0 +1,187 @@
+/* ==========================================================================
+   TROSHEEN — website styles (brand book v3.1)
+   Tokens · base · components · motion · living details
+   Fonts: load Fraunces + Jost (see head-snippet.html) before this file.
+   ========================================================================== */
+
+/* ---------- 1. Tokens ---------- */
+:root{
+  /* colour — Baltic Heirloom */
+  --tr-spruce:#24412F;   /* primary: header/footer, headlines, primary buttons */
+  --tr-lichen:#8C9A7B;   /* soft panels — Basalt text only                      */
+  --tr-kiln:#8E5636;     /* eyebrows, warm accents, errors                       */
+  --tr-gilt:#B89150;     /* rules, focus, buttons on Spruce — never text on Linen */
+  --tr-linen:#F2EDE3;    /* page background (replaces #F8F6F2 / white)           */
+  --tr-basalt:#1F1D1A;   /* body text (replaces #241E19)                         */
+  --tr-stone:#E4DCCB;    /* quiet fills, tags                                    */
+  --tr-line:rgba(36,65,47,.16);
+
+  /* type */
+  --tr-font-heading:'Fraunces', Georgia, 'Times New Roman', serif;
+  --tr-font-body:'Jost', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --tr-h1:clamp(2.75rem, 1.6rem + 3.6vw, 4.5rem);   /* 44 → 72px */
+  --tr-h2:clamp(2.125rem, 1.6rem + 1.6vw, 3rem);    /* 34 → 48px */
+  --tr-h3:1.625rem;                                  /* 26px      */
+  --tr-body:1.125rem;                                /* 18px      */
+  --tr-small:.9375rem;                               /* 15px      */
+  --tr-eyebrow:.8125rem;                             /* 13px      */
+
+  /* space & layout (8px rhythm: 8 16 24 40 64 96 144) */
+  --tr-s1:8px; --tr-s2:16px; --tr-s3:24px; --tr-s4:40px; --tr-s5:64px; --tr-s6:96px; --tr-s7:144px;
+  --tr-container:1280px;
+  --tr-radius:2px;
+  --tr-radius-card:4px;
+  --tr-shadow:0 18px 50px rgba(31,29,26,.14);
+
+  /* motion */
+  --tr-ease-calm:cubic-bezier(.45,0,.2,1);
+  --tr-ease-enter:cubic-bezier(.2,.7,.2,1);
+  --tr-dur-hover:200ms;
+  --tr-dur-base:400ms;
+  --tr-dur-reveal:600ms;
+  --tr-dur-draw:1600ms;
+}
+
+/* ---------- 2. Base ---------- */
+html{background:var(--tr-linen);-webkit-text-size-adjust:100%}
+body{margin:0;font:350 var(--tr-body)/1.6 var(--tr-font-body);color:var(--tr-basalt);background:var(--tr-linen);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4{font-family:var(--tr-font-heading);color:var(--tr-spruce);font-variation-settings:'opsz' 144,'SOFT' 40;margin:0 0 .4em;letter-spacing:-.01em}
+h1{font-size:var(--tr-h1);font-weight:340;line-height:1.04}
+h2{font-size:var(--tr-h2);font-weight:360;line-height:1.08}
+h3{font-size:var(--tr-h3);font-weight:420;line-height:1.2;font-variation-settings:'opsz' 48}
+p{margin:0 0 1em;max-width:68ch}
+a{color:var(--tr-spruce)}
+img{max-width:100%;height:auto;display:block}
+::selection{background:var(--tr-gilt);color:var(--tr-basalt)}
+:focus-visible{outline:2px solid var(--tr-gilt);outline-offset:3px}
+.tr-container{max-width:var(--tr-container);margin:0 auto;padding:0 var(--tr-s3)}
+.tr-section{padding:var(--tr-s6) 0}
+.tr-eyebrow{font:500 var(--tr-eyebrow)/1.3 var(--tr-font-body);letter-spacing:.24em;text-transform:uppercase;color:var(--tr-kiln);margin:0 0 var(--tr-s2)}
+.tr-rule{width:72px;height:2px;background:var(--tr-gilt);border:0;margin:var(--tr-s4) 0}
+.tr-dark{background:var(--tr-spruce);color:var(--tr-linen)}
+.tr-dark h1,.tr-dark h2,.tr-dark h3,.tr-dark a{color:var(--tr-linen)}
+.tr-dark .tr-eyebrow{color:var(--tr-gilt)}
+.tr-visually-hidden{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- 3. Header & footer ---------- */
+.tr-header{position:sticky;top:0;z-index:50;height:96px;display:flex;align-items:center;gap:var(--tr-s4);padding:0 var(--tr-s4);
+  background:rgba(242,237,227,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--tr-line);
+  transition:height var(--tr-dur-base) var(--tr-ease-calm)}
+.tr-header.is-scrolled{height:72px}
+.tr-header__logo img{height:46px;width:auto;transition:height var(--tr-dur-base) var(--tr-ease-calm)}
+.tr-header.is-scrolled .tr-header__logo img{height:38px}
+.tr-nav{display:flex;gap:30px;flex:1;justify-content:center}
+.tr-nav a{font-size:.9375rem;letter-spacing:.06em;text-decoration:none;color:var(--tr-spruce);padding:6px 0}
+.tr-nav a[aria-current="page"]{box-shadow:inset 0 -2px 0 var(--tr-gilt)}
+.tr-header__tools{display:flex;gap:20px;align-items:center;color:var(--tr-spruce)}
+@media (max-width:960px){.tr-nav{display:none}.tr-header{height:72px;padding:0 var(--tr-s2)}.tr-header__logo img{height:36px}}
+.tr-footer{background:var(--tr-spruce);color:var(--tr-linen);padding:var(--tr-s6) 0 var(--tr-s4)}
+.tr-footer a{color:var(--tr-linen);text-decoration:none;opacity:.88}
+.tr-footer a:hover{opacity:1}
+
+/* ---------- 4. Buttons & links ---------- */
+.tr-btn{display:inline-flex;align-items:center;gap:12px;min-height:56px;padding:0 34px;border:1px solid transparent;border-radius:var(--tr-radius);
+  font:500 .875rem/1 var(--tr-font-body);letter-spacing:.1em;text-transform:uppercase;text-decoration:none;cursor:pointer;
+  transition:background-color var(--tr-dur-hover) var(--tr-ease-calm),color var(--tr-dur-hover) var(--tr-ease-calm),transform var(--tr-dur-hover) var(--tr-ease-calm)}
+.tr-btn:active{transform:scale(.98)}
+.tr-btn--primary{background:var(--tr-spruce);color:var(--tr-linen)}
+.tr-btn--primary:hover{background:var(--tr-basalt)}
+.tr-btn--secondary{background:transparent;color:var(--tr-spruce);border-color:var(--tr-spruce)}
+.tr-btn--secondary:hover{background:var(--tr-spruce);color:var(--tr-linen)}
+.tr-dark .tr-btn--primary,.tr-btn--gilt{background:var(--tr-gilt);color:var(--tr-basalt)}
+.tr-dark .tr-btn--primary:hover,.tr-btn--gilt:hover{background:var(--tr-linen)}
+.tr-link{color:var(--tr-spruce);text-decoration:none;background:linear-gradient(var(--tr-gilt),var(--tr-gilt)) 0 100%/0 1px no-repeat;
+  padding-bottom:3px;transition:background-size 300ms var(--tr-ease-calm)}
+.tr-link:hover,.tr-link:focus-visible{background-size:100% 1px}
+
+/* ---------- 5. Hero (full-width photo, live text, no baked buttons) ---------- */
+.tr-hero{position:relative;min-height:min(92vh,1080px);display:flex;align-items:flex-end;color:var(--tr-linen);overflow:hidden}
+.tr-hero picture,.tr-hero picture img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.tr-hero::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(to top,rgba(31,29,26,.72),rgba(31,29,26,.3) 38%,rgba(31,29,26,0) 62%),
+             linear-gradient(to left,rgba(31,29,26,.45),rgba(31,29,26,0) 55%)}
+.tr-hero__content{position:relative;z-index:2;max-width:780px;margin:0 var(--tr-s6) var(--tr-s6) auto;text-align:right}
+.tr-hero__content h1{color:var(--tr-linen);text-shadow:0 2px 24px rgba(0,0,0,.25)}
+.tr-hero__content .tr-eyebrow{color:var(--tr-linen);opacity:.9}
+.tr-hero__content .tr-rule{margin-left:auto}
+.tr-hero__actions{display:flex;gap:var(--tr-s3);justify-content:flex-end;margin-top:var(--tr-s4)}
+.tr-hero__scroll{position:absolute;left:50%;bottom:var(--tr-s3);width:56px;height:56px;transform:translateX(-50%);z-index:2}
+@media (max-width:760px){
+  .tr-hero{min-height:88vh;align-items:flex-end}
+  .tr-hero::after{background:linear-gradient(to top,rgba(31,29,26,.75),rgba(31,29,26,0) 60%)}
+  .tr-hero__content{margin:0 var(--tr-s3) var(--tr-s5);text-align:left}
+  .tr-hero__content .tr-rule{margin-left:0}
+  .tr-hero__actions{justify-content:flex-start;flex-direction:column;align-items:stretch}
+}
+
+/* ---------- 6. Trust strip ---------- */
+.tr-trust{display:grid;grid-template-columns:repeat(5,1fr);gap:var(--tr-s3);padding:var(--tr-s4) var(--tr-s3);
+  border-block:1px solid var(--tr-line);max-width:var(--tr-container);margin:0 auto}
+.tr-trust__item{display:flex;gap:16px;align-items:center;color:var(--tr-spruce)}
+.tr-trust__item strong{display:block;font:400 1.2rem/1.2 var(--tr-font-heading)}
+.tr-trust__item span{font-size:var(--tr-small);color:var(--tr-basalt);opacity:.72}
+@media (max-width:960px){.tr-trust{grid-template-columns:1fr 1fr}}
+
+/* ---------- 7. Product card ---------- */
+.tr-card{position:relative;background:#fff;border-radius:var(--tr-radius-card);overflow:hidden;
+  transition:transform var(--tr-dur-base) var(--tr-ease-calm),box-shadow var(--tr-dur-base) var(--tr-ease-calm)}
+.tr-card:hover{transform:translateY(-4px);box-shadow:var(--tr-shadow)}
+.tr-card__media{aspect-ratio:4/5;overflow:hidden}
+.tr-card__media img{width:100%;height:100%;object-fit:cover;transition:transform 800ms var(--tr-ease-calm)}
+.tr-card:hover .tr-card__media img{transform:scale(1.04)}
+.tr-card__body{padding:var(--tr-s3)}
+.tr-card__material{font:500 .6875rem/1.3 var(--tr-font-body);letter-spacing:.16em;text-transform:uppercase;color:var(--tr-kiln)}
+.tr-card__name{font:400 1.5rem/1.2 var(--tr-font-heading);color:var(--tr-spruce);margin:6px 0}
+.tr-card__price{font-weight:500}
+.tr-card__wish{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;background:none;cursor:pointer}
+.tr-badge{display:inline-block;padding:6px 10px;border-radius:var(--tr-radius);background:var(--tr-linen);color:var(--tr-spruce);
+  font:600 .6875rem/1 var(--tr-font-body);letter-spacing:.16em;text-transform:uppercase}
+.tr-card .tr-badge{position:absolute;top:16px;left:16px}
+
+/* ---------- 8. Forms ---------- */
+.tr-field{display:flex;flex-direction:column;gap:8px;margin-bottom:var(--tr-s3)}
+.tr-field label{font:500 .6875rem/1 var(--tr-font-body);letter-spacing:.16em;text-transform:uppercase}
+.tr-field input,.tr-field textarea,.tr-field select{font:inherit;min-height:56px;padding:0 18px;border:1px solid rgba(36,65,47,.4);
+  border-radius:var(--tr-radius);background:#fff;color:var(--tr-basalt)}
+.tr-field textarea{padding:16px 18px;min-height:140px}
+.tr-field input:focus,.tr-field textarea:focus{outline:2px solid var(--tr-gilt);outline-offset:1px;border-color:var(--tr-spruce)}
+.tr-field--error input{border-color:var(--tr-kiln)}
+.tr-field__error{color:var(--tr-kiln);font-size:var(--tr-small)}
+
+/* ---------- 9. Empty / error / 404 states ---------- */
+.tr-state{max-width:560px;margin:var(--tr-s6) auto;text-align:center}
+.tr-state__anim{width:160px;height:160px;margin:0 auto var(--tr-s3)}
+
+/* ---------- 10. Icons ---------- */
+.tr-icon{width:24px;height:24px;color:currentColor;flex:none}
+.tr-icon--lg{width:44px;height:44px}
+
+/* ---------- 11. Motion: scroll reveal ---------- */
+[data-reveal]{opacity:0;transform:translateY(16px);transition:opacity var(--tr-dur-reveal) var(--tr-ease-enter),transform var(--tr-dur-reveal) var(--tr-ease-enter)}
+[data-reveal].is-visible{opacity:1;transform:none}
+
+/* ---------- 12. Living details: botanicals, seasons, signature ---------- */
+.tr-botanical{color:var(--tr-spruce);opacity:.7;width:100%;height:auto}
+.tr-botanical path{stroke-dasharray:1 1;stroke-dashoffset:1;transition:stroke-dashoffset var(--tr-dur-draw) var(--tr-ease-calm)}
+.tr-botanical.is-drawn path{stroke-dashoffset:0}
+.tr-divider{display:block;max-width:1200px;margin:var(--tr-s6) auto}
+html[data-season="spring"]{--tr-season-accent:var(--tr-lichen)}
+html[data-season="summer"]{--tr-season-accent:var(--tr-gilt)}
+html[data-season="autumn"]{--tr-season-accent:var(--tr-kiln)}
+html[data-season="winter"]{--tr-season-accent:var(--tr-spruce)}
+.tr-season-rule{height:3px;background:var(--tr-season-accent)}
+.tr-season-ambient{position:absolute;inset:0;pointer-events:none;opacity:.55;z-index:1}
+[data-season-only]{display:none}
+html[data-season="spring"] [data-season-only="spring"],html[data-season="summer"] [data-season-only="summer"],
+html[data-season="autumn"] [data-season-only="autumn"],html[data-season="winter"] [data-season-only="winter"]{display:block}
+.tr-signature{width:min(360px,80%);color:var(--tr-spruce)}
+
+/* ---------- 13. Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:1ms!important;animation-duration:1ms!important;animation-iteration-count:1!important}
+  [data-reveal]{opacity:1;transform:none}
+  .tr-botanical path{stroke-dashoffset:0}
+  .tr-season-ambient{display:none}
+  .tr-card:hover,.tr-card:hover .tr-card__media img{transform:none}
+}
