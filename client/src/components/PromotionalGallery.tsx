@@ -18,6 +18,15 @@ interface Promotion {
   active: boolean;
 }
 
+/** The marketing-kit banners contain their own fixed English typesetting.
+ * Crop to the photographic half. Headlines and CTAs always remain live HTML.
+ * Unknown admin/R2 photos are shown without forced cropping. */
+export function kitBannerPhotoSide(src: string): "left" | "right" | null {
+  const match = /trosheen-collection-banner-0([1-5])(?:-|\.)/i.exec(src);
+  if (!match) return null;
+  return Number(match[1]) % 2 === 0 ? "left" : "right";
+}
+
 export function PromotionalGallery({ embedded = false }: { embedded?: boolean }) {
   const { t } = useLanguage();
   const reduceMotion = useReducedMotion();
@@ -25,83 +34,63 @@ export function PromotionalGallery({ embedded = false }: { embedded?: boolean })
     queryKey: ["promotions"],
     queryFn: () => apiClient.get<Promotion[]>("/promotions"),
   });
-
   const { data: config } = useQuery({
     queryKey: ["site-config-gallery"],
     queryFn: () => apiClient.get<{ value: { heading: string } }>("/site-config/promotionalGallery"),
   });
-
-  const activePromotions = promotions.filter((promo) => promo.active !== false);
+  const activePromotions = promotions.filter(promo => promo.active !== false);
   const heading = config?.value?.heading || t("brand.collections");
 
   if (!activePromotions.length) return null;
-
   return (
-    <div className={embedded ? "mb-8" : "section-space border-b border-border"}>
+    <section className={embedded ? "mb-10" : "section-space border-b border-border"} aria-label={heading}>
       <div className={embedded ? "" : "site-container"}>
-        {!embedded && <div className="mb-8 flex items-end justify-between gap-6">
-          <div>
+        {!embedded && (
+          <div className="mb-9">
             <p className="eyebrow mb-3">{t("brand.season")}</p>
-            <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">{heading}</h2>
+            <h2 className="section-title">{heading}</h2>
           </div>
-        </div>}
-
-        <div className="grid gap-5 md:grid-cols-2">
-          {activePromotions.map((promo) => (
-            <article
-              key={promo.id}
-              className="group relative aspect-[5/4] overflow-hidden rounded-3xl bg-secondary"
-            >
-              {promo.videoUrl ? (
-                <video
-                  src={promo.videoUrl}
-                  poster={promo.imageUrl}
-                  autoPlay={!reduceMotion}
-                  muted
-                  loop
-                  preload="metadata"
-                  aria-label={promo.title}
-                  playsInline
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <OptimizedImage
-                  src={promo.imageUrl}
-                  alt={promo.title}
-                  className="h-full w-full object-cover"
-                />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-8">
-                <h3 className="font-serif text-3xl font-semibold leading-none tracking-tight">{promo.title}</h3>
-                {promo.description && (
-                  <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/75 sm:text-base">
-                    {promo.description}
-                  </p>
-                )}
-                {promo.linkUrl && (/^(https?:\/\/|\/|#)/i.test(promo.linkUrl)) && (
-                  <Button
-                    asChild
-                    variant="secondary"
-                    size="sm"
-                    className="mt-5 bg-white text-black border-white hover:bg-white/90"
-                  >
-                    {/^https?:\/\//i.test(promo.linkUrl) ? (
-                      <a href={promo.linkUrl} target="_blank" rel="noopener noreferrer">
-                        {promo.linkText || t("brand.explore")}<ArrowRight className="h-4 w-4" />
-                      </a>
-                    ) : (
-                      <Link href={promo.linkUrl}>
-                        {promo.linkText || t("brand.explore")}<ArrowRight className="h-4 w-4" />
-                      </Link>
-                    )}
-                  </Button>
-                )}
-              </div>
-            </article>
-          ))}
+        )}
+        <div className="grid gap-6 md:grid-cols-2">
+          {activePromotions.map(promo => {
+            const side = !promo.videoUrl ? kitBannerPhotoSide(promo.imageUrl) : null;
+            const href = promo.linkUrl?.trim() || "";
+            const safeLink = /^(https?:\/\/|\/(?!\/)|#)/i.test(href);
+            return (
+              <article key={promo.id} className="brand-promo-card group flex min-w-0 flex-col overflow-hidden border border-border bg-card">
+                <div className={"brand-promo-media" + (side ? " brand-promo-media--" + side : "")}>
+                  {promo.videoUrl ? (
+                    <video src={promo.videoUrl} poster={promo.imageUrl}
+                      autoPlay={!reduceMotion} muted loop playsInline preload="metadata"
+                      aria-label={promo.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <OptimizedImage src={promo.imageUrl} alt={promo.title} className="h-full w-full" />
+                  )}
+                </div>
+                <div className="flex flex-1 flex-col gap-3 px-6 py-7 sm:px-8 sm:py-8">
+                  <h3 className="font-serif text-[clamp(1.7rem,2.5vw,2.5rem)] leading-tight text-foreground">{promo.title}</h3>
+                  {promo.description && <p className="max-w-prose text-sm leading-7 text-muted-foreground sm:text-base">{promo.description}</p>}
+                  {safeLink && (
+                    <div className="mt-auto pt-4">
+                      <Button asChild variant="outline" className="max-w-full">
+                        {/^https?:\/\//i.test(href) ? (
+                          <a href={href} target="_blank" rel="noopener noreferrer">
+                            {promo.linkText || t("brand.explore")}<ArrowRight className="h-4 w-4" />
+                          </a>
+                        ) : (
+                          <Link href={href}>
+                            {promo.linkText || t("brand.explore")}<ArrowRight className="h-4 w-4" />
+                          </Link>
+                        )}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
         </div>
       </div>
-    </div>
+    </section>
   );
 }

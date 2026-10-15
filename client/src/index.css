@@ -536,3 +536,41 @@
 /* Product photography, never the ready-made branded artwork panel, may zoom subtly. */
 .storefront .brand-art-crop:hover .brand-panel-image,
 .storefront .brand-editorial-media:hover .brand-panel-image { transform: none !important; }
+
+/* Promotional imagery is never a canvas for duplicate baked English typography. */
+.storefront .brand-promo-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--tr-linen);
+}
+.storefront .brand-promo-media > div,
+.storefront .brand-promo-media video {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+.storefront .brand-promo-media img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+.storefront .brand-promo-media--right img {
+  object-position: 100% center;
+  transform: scale(1.12);
+  transform-origin: right center;
+}
+.storefront .brand-promo-media--left img {
+  object-position: 0 center;
+  transform: scale(1.12);
+  transform-origin: left center;
+}
+.storefront .brand-promo-card h3 { text-wrap: balance; }
+@media (max-width: 640px) {
+  .storefront .brand-promo-media { aspect-ratio: 5 / 4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .storefront .brand-promo-media img { transition: none !important; }
+}
