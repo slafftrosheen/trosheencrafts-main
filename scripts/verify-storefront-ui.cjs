@@ -74,6 +74,42 @@ expect(confirmation.includes('"/checkout/status/"') && confirmation.includes("if
 const seo = text("client/src/components/shared/SEO.tsx");
 expect(!seo.includes("window.location.href"), "Never publish checkout token in canonical or OG URL");
 
+// Prevent silent UI regressions where t("missing.key") prints the key verbatim.
+const translationText = text("client/src/lib/LanguageContext.tsx") + "\n" +
+  text("client/src/lib/brandCopy.ts");
+const translationKeys = new Set();
+for (const match of translationText.matchAll(/(?:^|[,\n])\s*(?:"([^"]+)"|'([^']+)'|([a-zA-Z_][\w.]*))\s*:\s*\{\s*["']?(?:en|lv|ru|pl|uk)["']?\s*:/g)) {
+  translationKeys.add(match[1] || match[2] || match[3]);
+}
+const localizedPages = [
+  "client/src/pages/home.tsx", "client/src/pages/shop.tsx",
+  "client/src/pages/gallery.tsx", "client/src/pages/galleryDetail.tsx",
+  "client/src/pages/product-detail.tsx", "client/src/pages/cart.tsx",
+  "client/src/pages/checkout.tsx", "client/src/pages/contact.tsx",
+  "client/src/pages/order-confirmation.tsx", "client/src/pages/order-tracking.tsx",
+  "client/src/pages/about.tsx", "client/src/pages/guide.tsx",
+  "client/src/pages/blog.tsx", "client/src/pages/blog-post.tsx",
+  "client/src/pages/not-found.tsx", "client/src/pages/privacy.tsx",
+  "client/src/pages/terms.tsx", "client/src/pages/cookies.tsx",
+  "client/src/pages/withdrawal.tsx",
+  "client/src/components/shared/Footer.tsx",
+  "client/src/components/shared/Navigation.tsx",
+  "client/src/components/shared/MobileNavigation.tsx",
+  "client/src/components/shared/Layout.tsx",
+  "client/src/components/shared/LanguageSwitcher.tsx",
+  "client/src/components/shared/LoadingStates.tsx",
+  "client/src/components/features/ShoppingCart.tsx",
+  "client/src/components/features/ContactForm.tsx",
+  "client/src/components/shop/CandleConstructor.tsx",
+  "client/src/components/NewsletterSubscribe.tsx",
+  "client/src/components/PromotionalGallery.tsx",
+];
+for (const page of localizedPages) {
+  for (const match of text(page).matchAll(/\bt\s*\(\s*["']([^"']+)["']/g)) {
+    expect(translationKeys.has(match[1]), "Missing translation: " + match[1] + " in " + page);
+  }
+}
+
 const manifest = JSON.parse(text("client/public/manifest.json") || "{}");
 for (const shortcut of manifest.shortcuts || []) {
   expect(shortcut.url !== "/inspiration", "Manifest links to a non-existent route");

@@ -197,7 +197,7 @@ export default function GalleryDetailPage() {
             <div className="mt-6 flex gap-3">
               <Button onClick={() => likeMutation.mutate(item.id)} disabled={likeMutation.isPending}>
                 <BrandMotion name="heart" mode="manual" trigger={heartAnimation} className="h-7 w-7" poster="/brand/icons/wishlist.svg" />
-                {t("gallery.like")}
+                {t("gallery.like_this")}
               </Button>
               <Button variant="outline" onClick={handleShare}>
                 <Share2 className="h-4 w-4" />
