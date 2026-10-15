@@ -17,10 +17,16 @@ export default function HomePage() {
     <div>
       <section className="brand-hero brand-hero--immersive">
         <picture>
-          {defaultHero && <source media="(max-width: 767px)" srcSet="/brand/hero-mobile.webp" />}
-          {defaultHero && <source media="(min-width: 768px)" srcSet="/brand/hero-desktop.webp" />}
+          {defaultHero && <source media="(max-width: 767px)" type="image/webp" srcSet="/brand/hero-mobile.webp 720w, /brand/hero-mobile-1080.webp 1080w" sizes="100vw" />}
+          {defaultHero && <source media="(min-width: 768px)" type="image/webp" srcSet="/brand/hero-desktop-1280.webp 1280w, /brand/hero-desktop.webp 1920w" sizes="100vw" />}
           <img src={hero} alt={t("brand.hero_alt")} fetchPriority="high" width="2560" height="1000"
-            onError={(event) => { event.currentTarget.src = DEFAULT_HOMEPAGE_IMAGES.hero; }} />
+            onError={(event) => {
+              const target = event.currentTarget;
+              if (target.dataset.fallbackApplied) return;
+              target.dataset.fallbackApplied = "true";
+              target.parentElement?.querySelectorAll("source").forEach((source) => source.remove());
+              target.src = DEFAULT_HOMEPAGE_IMAGES.hero;
+            }} />
         </picture>
         <div className="brand-hero-copy">
           <p className="eyebrow mb-5">{t("brand.location")}</p>
@@ -41,8 +47,8 @@ export default function HomePage() {
             ["handmade", "brand.handmade", "/about"],
             ["one-of-a-kind", "brand.unique", "/shop"],
             ["natural-materials", "brand.materials", "/guide"],
-            ["parcel", "brand.care", "/guide"],
-            ["secure-payment", "brand.help", "/contact"],
+            ["parcel", "brand.packed", "/shop"],
+            ["secure-payment", "brand.payment", "/shop"],
           ].map(([icon, key, href]) => <li key={key}><img src={`/brand/icons/${icon}.svg`} alt="" width="24" height="24" /><Link href={href} className="hover:underline underline-offset-4">{t(key)}</Link></li>)}
         </ul>
       </section>
@@ -50,7 +56,7 @@ export default function HomePage() {
       <section className="section-space" aria-labelledby="collection-title">
         <div className="site-container">
           <p className="eyebrow">{t("brand.season")}</p>
-          <h2 id="collection-title" className="section-title mt-4 mb-10">{t("brand.collections")}</h2>
+          <div className="mb-10 flex items-end justify-between gap-5"><h2 id="collection-title" className="section-title mt-4">{t("brand.collections")}</h2><img src="/brand/botanical/trosheen-lilac.svg" alt="" className="hidden h-16 w-16 opacity-60 sm:block" loading="lazy" /></div>
           <PromotionalGallery embedded />
           <div className="space-y-8">
             {[

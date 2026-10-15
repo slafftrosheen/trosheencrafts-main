@@ -10,6 +10,7 @@ export function Navigation() {
   const [location] = useLocation();
   const { t } = useLanguage();
   const [isCustom, setIsCustom] = useState(false);
+  const [compact, setCompact] = useState(false);
   useEffect(() => {
     const sync = () => setIsCustom(window.location.pathname === "/shop" &&
       new URLSearchParams(window.location.search).get("view") === "custom");
@@ -21,6 +22,13 @@ export function Navigation() {
       window.removeEventListener("trosheen:shop-view", sync);
     };
   }, [location]);
+
+  useEffect(() => {
+    const update = () => setCompact(window.scrollY > 40);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
 
   const links = [
     { href: "/shop", label: t("nav_shop") },
@@ -36,7 +44,7 @@ export function Navigation() {
     href === "/constructor" ? isCustom : href === "/shop" ? location === "/shop" && !isCustom : href === "/" ? location === "/" : location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 hidden xl:block border-b border-border/80 bg-background/92 backdrop-blur-xl">
+    <header data-compact={compact} className="brand-desktop-header sticky top-0 z-50 hidden xl:block border-b border-border/80 bg-background/95 backdrop-blur-xl">
       <div className="site-container flex h-24 items-center justify-between gap-3 transition-[height] duration-300">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-11 w-40 shrink-0 object-contain" />

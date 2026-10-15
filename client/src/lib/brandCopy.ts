@@ -53,5 +53,7 @@ export const brandCopy: Copy = {
   "gallery.share_error": { lv: "Saiti neizdevās kopīgot. Mēģiniet vēlreiz.", en: "Could not share the link. Try again.", ru: "Не удалось поделиться ссылкой. Попробуйте ещё раз.", pl: "Nie udało się udostępnić linku. Spróbuj ponownie.", uk: "Не вдалося поділитися посиланням. Спробуйте ще раз." },
   "gallery.load_error": { lv: "Galeriju neizdevās ielādēt.", en: "Could not load the gallery.", ru: "Не удалось загрузить галерею.", pl: "Nie udało się wczytać galerii.", uk: "Не вдалося завантажити галерею." },  "cart.continue_shopping": { lv: "Turpināt iepirkties", en: "Continue shopping", ru: "Продолжить покупки", pl: "Kontynuuj zakupy", uk: "Продовжити покупки" },
   "gallery.model_unavailable": { lv: "Šo 3D modeli pašlaik nevar atvērt. Pārējā galerija ir pieejama.", en: "This 3D model is unavailable. You can still browse the gallery.", ru: "Эту 3D-модель сейчас нельзя открыть. Остальная галерея доступна.", pl: "Ten model 3D jest niedostępny. Możesz nadal przeglądać galerię.", uk: "Цю 3D-модель зараз не можна відкрити. Решта галереї доступна." },
-  "gallery.media_filter": { lv: "Mediju veids", en: "Media type", ru: "Тип материалов", pl: "Typ materiału", uk: "Тип матеріалів" },
+  "gallery.media_filter": { lv: "Mediju veids", en: "Media type", ru: "Тип материалов", pl: "Typ materiału", uk: "Тип матеріалів" },  "brand.explore": { lv: "Apskatīt", en: "Explore", ru: "Подробнее", pl: "Odkryj", uk: "Переглянути" },
+  "brand.packed": { lv: "Rūpīgi iepakots", en: "Carefully packed", ru: "Бережно упаковано", pl: "Starannie zapakowane", uk: "Дбайливо упаковано" },
+  "brand.payment": { lv: "Droša apmaksa", en: "Secure payment", ru: "Безопасная оплата", pl: "Bezpieczna płatność", uk: "Безпечна оплата" },
 };

@@ -15,6 +15,7 @@ export function MobileNavigation() {
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const [isCustom, setIsCustom] = useState(false);
+  const [compact, setCompact] = useState(false);
   useEffect(() => {
     const sync = () => setIsCustom(window.location.pathname === "/shop" &&
       new URLSearchParams(window.location.search).get("view") === "custom");
@@ -31,6 +32,13 @@ export function MobileNavigation() {
     setOpen(false);
   }, [location]);
 
+  useEffect(() => {
+    const update = () => setCompact(window.scrollY > 40);
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
+  }, []);
+
   const links = [
     { href: "/about", label: t("nav_story") },
     { href: "/shop", label: t("nav_shop") },
@@ -45,8 +53,8 @@ export function MobileNavigation() {
     href === "/constructor" ? isCustom : href === "/shop" ? location === "/shop" && !isCustom : location === href || location.startsWith(href + "/");
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border/80 bg-background/94 backdrop-blur-xl xl:hidden">
-      <div className="flex h-16 items-center justify-between px-4">
+    <header data-compact={compact} className="brand-mobile-header sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur-xl xl:hidden">
+      <div className="flex h-16 items-center justify-between px-4 transition-[height] duration-300">
         <Link href="/" className="flex items-center gap-2">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-36 min-[390px]:w-44 shrink-0 object-contain" />
         </Link>

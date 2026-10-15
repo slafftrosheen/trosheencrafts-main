@@ -204,6 +204,11 @@ export default function GalleryPage() {
                             preload="metadata"
                             className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
                           />
+                        ) : item.type === "3d" && !item.thumbnailUrl ? (
+                          <div className="flex h-full flex-col items-center justify-center gap-3 bg-muted text-primary">
+                            <BrandMotion name="imprint" className="h-20 w-20" mode="view" poster="/brand/icons/botanical.svg" />
+                            <span className="text-xs font-medium uppercase tracking-widest">{t("gallery.model_label")}</span>
+                          </div>
                         ) : (
                           <img
                             src={item.thumbnailUrl || item.mediaUrl}

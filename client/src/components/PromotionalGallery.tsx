@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/apiClient";
 import { OptimizedImage } from "@/components/shared/OptimizedImage";
+import { useReducedMotion } from "framer-motion";
 
 interface Promotion {
   id: number;
@@ -19,6 +20,7 @@ interface Promotion {
 
 export function PromotionalGallery({ embedded = false }: { embedded?: boolean }) {
   const { t } = useLanguage();
+  const reduceMotion = useReducedMotion();
   const { data: promotions = [] } = useQuery({
     queryKey: ["promotions"],
     queryFn: () => apiClient.get<Promotion[]>("/promotions"),
@@ -37,7 +39,7 @@ export function PromotionalGallery({ embedded = false }: { embedded?: boolean })
   return (
     <div className={embedded ? "mb-8" : "section-space border-b border-border"}>
       <div className={embedded ? "" : "site-container"}>
-        {(!embedded || config?.value?.heading) && <div className="mb-8 flex items-end justify-between gap-6">
+        {!embedded && <div className="mb-8 flex items-end justify-between gap-6">
           <div>
             <p className="eyebrow mb-3">{t("brand.season")}</p>
             <h2 className="font-serif text-3xl font-semibold tracking-tight sm:text-4xl">{heading}</h2>
@@ -54,9 +56,11 @@ export function PromotionalGallery({ embedded = false }: { embedded?: boolean })
                 <video
                   src={promo.videoUrl}
                   poster={promo.imageUrl}
-                  autoPlay
+                  autoPlay={!reduceMotion}
                   muted
                   loop
+                  preload="metadata"
+                  aria-label={promo.title}
                   playsInline
                   className="h-full w-full object-cover"
                 />
@@ -75,17 +79,22 @@ export function PromotionalGallery({ embedded = false }: { embedded?: boolean })
                     {promo.description}
                   </p>
                 )}
-                {promo.linkUrl && (
+                {promo.linkUrl && (/^(https?:\/\/|\/|#)/i.test(promo.linkUrl)) && (
                   <Button
                     asChild
                     variant="secondary"
                     size="sm"
                     className="mt-5 bg-white text-black border-white hover:bg-white/90"
                   >
-                    <Link href={promo.linkUrl}>
-                      {promo.linkText || "Explore"}
-                      <ArrowRight className="h-4 w-4" />
-                    </Link>
+                    {/^https?:\/\//i.test(promo.linkUrl) ? (
+                      <a href={promo.linkUrl} target="_blank" rel="noopener noreferrer">
+                        {promo.linkText || t("brand.explore")}<ArrowRight className="h-4 w-4" />
+                      </a>
+                    ) : (
+                      <Link href={promo.linkUrl}>
+                        {promo.linkText || t("brand.explore")}<ArrowRight className="h-4 w-4" />
+                      </Link>
+                    )}
                   </Button>
                 )}
               </div>
