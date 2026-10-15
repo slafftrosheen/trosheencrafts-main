@@ -51,7 +51,7 @@ export function Navigation() {
     href === "/constructor" ? isCustom : href === "/shop" ? location === "/shop" && !isCustom : href === "/" ? location === "/" : location === href || location.startsWith(href + "/");
 
   return (
-    <header data-compact={compact} className="brand-desktop-header sticky top-0 z-50 hidden xl:block border-b border-border/80 bg-background/95 backdrop-blur-xl">
+    <header data-compact={compact} className="brand-desktop-header sticky top-0 z-50 hidden 2xl:block border-b border-border/80 bg-background/95 backdrop-blur-xl">
       <div className="site-container flex h-24 items-center justify-between gap-3 transition-[height] duration-300">
         <Link href="/" className="flex min-w-0 items-center gap-3">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-11 w-40 shrink-0 object-contain" />

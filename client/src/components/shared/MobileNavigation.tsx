@@ -60,7 +60,7 @@ export function MobileNavigation() {
     href === "/constructor" ? isCustom : href === "/shop" ? location === "/shop" && !isCustom : location === href || location.startsWith(href + "/");
 
   return (
-    <header data-compact={compact} className="brand-mobile-header sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur-xl xl:hidden">
+    <header data-compact={compact} className="brand-mobile-header sticky top-0 z-50 border-b border-border/80 bg-background/95 backdrop-blur-xl 2xl:hidden">
       <div className="flex h-16 items-center justify-between px-4 transition-[height] duration-300">
         <Link href="/" className="flex items-center gap-2">
           <SiteLogo variant="lockup-horizontal" alt="Trosheen" className="h-12 w-36 min-[390px]:w-44 shrink-0 object-contain" />

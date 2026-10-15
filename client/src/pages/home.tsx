@@ -90,7 +90,9 @@ export default function HomePage() {
                 const target = event.currentTarget;
                 if (target.dataset.fallbackApplied) return;
                 target.dataset.fallbackApplied = "true";
-                target.closest(".brand-editorial-media")?.classList.add("brand-art-crop", "brand-art-crop--left");
+                const wrapper = target.closest(".brand-editorial-media");
+                wrapper?.classList.remove("brand-editorial-media");
+                wrapper?.classList.add("brand-art-crop", "brand-art-crop--left");
                 target.src = DEFAULT_HOMEPAGE_IMAGES.familyFeature;
               }}
               alt={t("brand.story_alt")}

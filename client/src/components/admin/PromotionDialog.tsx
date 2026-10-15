@@ -102,6 +102,10 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="imageUrl">Изображение-превью</Label>
+              <p className="text-xs leading-5 text-muted-foreground">
+                Используйте фото без готовых надписей и цветных рекламных полей:
+                заголовок, описание и кнопка отображаются отдельно на сайте.
+              </p>
               <ImageUpload 
                 value={watch('imageUrl')} 
                 onChange={url => setValue('imageUrl', url)} 

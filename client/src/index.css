@@ -370,8 +370,6 @@
 .storefront .brand-trust li img { width:26px; height:26px; }
 @media(max-width:480px){
   .storefront .brand-trust { grid-template-columns:1fr; row-gap:1.25rem; }
-  .storefront .brand-hero--immersive .brand-hero-copy > .mt-7 { gap:.5rem; }
-  .storefront .brand-hero--immersive .brand-hero-copy > .mt-7 > a { flex:1 1 auto; font-size:.84rem; min-width:0; }
 }
 @media(prefers-reduced-motion:reduce){
   .storefront .brand-desktop-header .site-container,
@@ -573,4 +571,11 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .storefront .brand-promo-media img { transition: none !important; }
+}
+
+/* Contrast corrections for every editorial dark panel, including the About hero. */
+.storefront .brand-panel-dark .eyebrow { color:var(--tr-linen); }
+.storefront .brand-panel-dark :is(h1,h2,h3) { color:var(--tr-linen); }
+@media (min-width:1280px) and (max-width:1535px) {
+  .storefront .brand-mobile-header > div:first-child { padding-inline:clamp(20px,4vw,56px); }
 }
