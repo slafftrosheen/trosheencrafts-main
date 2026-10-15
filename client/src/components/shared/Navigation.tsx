@@ -11,6 +11,7 @@ export function Navigation() {
 
   const links = [
     { href: "/shop", label: t("nav_shop") },
+    { href: "/constructor", label: t("shop_custom_builder") },
     { href: "/about", label: t("nav_story") },
     { href: "/gallery", label: t("nav_gallery") },
     { href: "/blog", label: t("nav_blog") },

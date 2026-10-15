@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { apiClient } from "@/lib/apiClient";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 interface OrderStatusResponse {
   status: string;
@@ -49,12 +50,14 @@ export default function OrderConfirmation() {
   return (
     <div className="site-container page-shell flex min-h-[70vh] items-center justify-center">
       <div className="max-w-2xl text-center" aria-live="polite">
+        {paid && <BrandMotion name="parcel" mode="view" className="mx-auto mb-4 h-40 w-40" poster="/brand/icons/gift-wrap.svg" />}
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted text-primary">
           {paid ? <CheckCircle2 className="h-8 w-8" /> : pending ? <Clock3 className="h-8 w-8" /> : <AlertTriangle className="h-8 w-8 text-destructive" />}
         </div>
         <h1 className="mt-7 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
         <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">{description}</p>
         {validRequest && !isError && <p className="mt-3 text-sm text-muted-foreground">{t("confirm.order_number")} #{orderId}</p>}
+        {paid && <BrandMotion name="familySignature" mode="view" className="mx-auto mt-5 h-24 w-64" label="Ar siltām rokām, Trosheen ģimene" poster="/brand/signature-family-animated.svg" />}
         {paid && (
           <div className="surface-muted mx-auto mt-8 max-w-xl p-6">
             <p className="text-sm leading-7 text-muted-foreground">{t("confirm.desc")}</p>

@@ -22,6 +22,7 @@ export function MobileNavigation() {
   const links = [
     { href: "/about", label: t("nav_story") },
     { href: "/shop", label: t("nav_shop") },
+    { href: "/constructor", label: t("shop_custom_builder") },
     { href: "/gallery", label: t("nav_gallery") },
     { href: "/blog", label: t("nav_blog") },
     { href: "/guide", label: t("guide_care_eyebrow") },

@@ -6,6 +6,7 @@ import { useHomepageImages } from "@/hooks/useHomepageImages";
 import { DEFAULT_HOMEPAGE_IMAGES } from "@/lib/homepageImages";
 import { PromotionalGallery } from "@/components/PromotionalGallery";
 import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 export default function HomePage() {
   const { t } = useLanguage();
@@ -14,7 +15,7 @@ export default function HomePage() {
   const defaultHero = hero === DEFAULT_HOMEPAGE_IMAGES.hero;
   return (
     <div>
-      <section className="brand-hero">
+      <section className="brand-hero brand-hero--immersive">
         <picture>
           {defaultHero && <source media="(max-width: 767px)" srcSet="/brand/hero-mobile.webp" />}
           {defaultHero && <source media="(min-width: 768px)" srcSet="/brand/hero-desktop.webp" />}
@@ -28,7 +29,9 @@ export default function HomePage() {
           <div className="mt-7 flex flex-wrap gap-3">
             <Button asChild size="lg" className="brand-gilt-button"><Link href="/shop">{t("brand.shop")}<ArrowRight className="h-4 w-4" /></Link></Button>
             <Button asChild size="lg" variant="outline" className="brand-story-link"><Link href="/about">{t("nav_story")}</Link></Button>
+            <Button asChild size="lg" variant="outline" className="brand-story-link"><Link href="/constructor">{t("shop_custom_builder")}</Link></Button>
           </div>
+          <a className="brand-scroll-cue" href="#collection-title" aria-label={t("brand.collections")}><BrandMotion name="ripple" mode="loop" className="h-12 w-12" poster="/brand/icons/fountain.svg" /></a>
         </div>
       </section>
 
@@ -38,8 +41,8 @@ export default function HomePage() {
             ["handmade", "brand.handmade", "/about"],
             ["one-of-a-kind", "brand.unique", "/shop"],
             ["natural-materials", "brand.materials", "/guide"],
-            ["care", "brand.care", "/guide"],
-            ["chat", "brand.help", "/contact"],
+            ["parcel", "brand.care", "/guide"],
+            ["secure-payment", "brand.help", "/contact"],
           ].map(([icon, key, href]) => <li key={key}><img src={`/brand/icons/${icon}.svg`} alt="" width="24" height="24" /><Link href={href} className="hover:underline underline-offset-4">{t(key)}</Link></li>)}
         </ul>
       </section>
@@ -75,6 +78,7 @@ export default function HomePage() {
             <p className="eyebrow mb-5">{t("nav_story")}</p>
             <h2>{t("brand.story_title")}</h2>
             <p className="mt-5 leading-relaxed">{t("brand.story_desc")}</p>
+            <img src="/brand/botanical/trosheen-divider-vine.svg" alt="" loading="lazy" className="mt-7 h-10 w-auto max-w-[220px]" />
             <Button asChild variant="outline" className="mt-7"><Link href="/about">{t("nav_story")}<ArrowRight className="h-4 w-4" /></Link></Button>
           </div>
         </div>

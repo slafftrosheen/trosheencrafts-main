@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingCart, ArrowLeft, Check, Package, Minus, Plus } from "lucide-react";
+import { ArrowLeft, Check, Package, Minus, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { PageLoader } from "@/components/shared/LoadingStates";
@@ -10,6 +10,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { apiClient } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/shop/:id");
@@ -18,6 +19,7 @@ export default function ProductDetail() {
   const addItem = useCartStore((state) => state.addItem);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [cartAnimation, setCartAnimation] = useState(0);
 
   const { data: product, isLoading, error } = useQuery({
     queryKey: ["/api/products/" + id],
@@ -73,6 +75,7 @@ export default function ProductDetail() {
         maxStock: availableStock,
       });
     }
+    setCartAnimation((count) => count + 1);
     toast.success(t("product.added_to_cart"), {
       action: { label: t("constructor.view_cart"), onClick: () => window.location.assign("/cart") },
     });
@@ -102,7 +105,7 @@ export default function ProductDetail() {
                 />
               ) : (
                 <div className="flex h-full items-center justify-center text-muted-foreground">
-                  Trosheen.Crafts
+                  Trosheen
                 </div>
               )}
             </div>
@@ -189,7 +192,7 @@ export default function ProductDetail() {
                 disabled={availableStock === 0}
                 className="flex-1"
               >
-                <ShoppingCart className="h-4 w-4" />
+                <BrandMotion name="cart" mode="manual" trigger={cartAnimation} className="h-7 w-7" poster="/brand/icons/bag.svg" />
                 {t("product.add_to_cart")}
               </Button>
             </div>

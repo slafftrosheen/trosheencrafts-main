@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useLanguage } from "@/lib/LanguageContext";
 import { haptics } from "@/lib/haptics";
 import { apiClient } from "@/lib/apiClient";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 interface NewsletterSubscribeProps {
   variant?: "default" | "compact" | "hero" | "footer";
@@ -139,7 +140,7 @@ export function NewsletterSubscribe({
         <div className="brand-panel">
           <div><img src={image("shopFeature")} onError={(event) => { event.currentTarget.src = DEFAULT_HOMEPAGE_IMAGES.shopFeature; }} alt={t("brand.newsletter_alt")} width="600" height="600" loading="lazy" className="brand-panel-image" /></div>
           <div className="brand-panel-copy">
-            <p className="eyebrow mb-4">{t("newsletter.exclusive_updates")}</p>
+            <div className="mb-4 flex items-center gap-3"><BrandMotion name="candle" mode="loop" className="h-16 w-16 shrink-0" poster="/brand/icons/candle.svg" /><p className="eyebrow">{t("newsletter.exclusive_updates")}</p></div>
             <h2>{t("newsletter.hero_title")}</h2>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">{t("newsletter.hero_subtitle")}</p>
             <div className="mt-7">{renderForm()}</div>

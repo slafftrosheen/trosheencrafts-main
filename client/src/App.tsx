@@ -87,7 +87,7 @@ function Router() {
         <Route path="/terms"><Layout><Terms /></Layout></Route>
         <Route path="/cookies"><Layout><Cookies /></Layout></Route>
         <Route path="/withdrawal"><Layout><Withdrawal /></Layout></Route>
-        <Route component={NotFound} />
+        <Route><Layout><NotFound /></Layout></Route>
       </Switch>
     </Suspense>
   );

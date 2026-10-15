@@ -1,11 +1,11 @@
 import { useMemo, useState } from "react";
-import { Search, SlidersHorizontal, Package, Sparkles, X, RefreshCw } from "lucide-react";
+import { Search, Package, Sparkles, X, RefreshCw } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { CandleConstructor } from "@/components/shop/CandleConstructor";
 import { useProducts } from "@/hooks/useApi";
 import { ProductCard } from "@/components/features/product/ProductCard";
-import { Spinner } from "@/components/shared/LoadingStates";
 import { cn } from "@/lib/utils";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 type ShopTab = "collections" | "custom";
 type SortOrder = "featured" | "newest" | "price-asc" | "price-desc" | "name";
@@ -21,7 +21,7 @@ export default function ShopPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
   const [sort, setSort] = useState<SortOrder>("featured");
-  const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [onlyAvailable, setOnlyAvailable] = useState(true);
 
   const publishedProducts = useMemo(() => (products || []).filter((product) => product.published), [products]);
   const categories = useMemo(() =>
@@ -61,7 +61,7 @@ export default function ShopPage() {
   const resetFilters = () => {
     setSearch("");
     setCategory("all");
-    setOnlyAvailable(false);
+    setOnlyAvailable(true);
     setSort("featured");
   };
 
@@ -144,8 +144,8 @@ export default function ShopPage() {
               </div>
 
               {isLoading ? (
-                <div className="flex min-h-72 items-center justify-center" role="status">
-                  <Spinner size="lg" className="text-primary" />
+                <div className="flex min-h-72 flex-col items-center justify-center gap-3" role="status">
+                  <BrandMotion name="seal" mode="loop" className="h-28 w-28" poster="/brand/seal-spruce.svg" />
                   <span className="sr-only">{t("shop.loading")}</span>
                 </div>
               ) : isError ? (
@@ -168,7 +168,7 @@ export default function ShopPage() {
                 </div>
               ) : (
                 <div className="surface mx-auto max-w-2xl px-7 py-14 text-center sm:px-12">
-                  <SlidersHorizontal className="mx-auto h-9 w-9 text-primary" />
+                  <BrandMotion name={publishedProducts.length ? "imprint" : "empty"} mode="loop" className="mx-auto h-40 w-40" poster="/brand/icons/planter.svg" />
                   <h2 className="mt-5 font-serif text-3xl font-semibold tracking-tight">
                     {publishedProducts.length ? t("shop.no_results") : t("shop_empty_title")}
                   </h2>

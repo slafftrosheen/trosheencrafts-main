@@ -3,6 +3,7 @@ import { ArrowRight, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
 import { ScrollStoryPhotos, WorkshopTourPhotos } from "@/lib/imageAssets";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 export default function AboutPage() {
   const { t } = useLanguage();
@@ -162,6 +163,13 @@ export default function AboutPage() {
               className="h-full w-full object-cover"
             />
           </div>
+        </div>
+      </section>
+
+      <section className="section-space border-b border-border">
+        <div className="site-container flex flex-col items-center text-center">
+          <img src="/brand/botanical/trosheen-fern.svg" alt="" loading="lazy" className="mb-6 h-24 w-24" />
+          <BrandMotion name="signature" mode="view" className="h-28 w-72 max-w-full" label="Ar siltām rokām, Oļegs" poster="/brand/signature-olegs-animated.svg" />
         </div>
       </section>
 

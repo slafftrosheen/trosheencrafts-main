@@ -1,6 +1,7 @@
 import { Droplets, Heart, ShieldCheck, Sun, Recycle, Beaker } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { ScrollStoryPhotos } from "@/lib/imageAssets";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 export default function GuidePage() {
   const { t } = useLanguage();
@@ -72,7 +73,7 @@ export default function GuidePage() {
 
       <section className="border-y border-border bg-card">
         <div className="site-container section-space">
-          <p className="eyebrow text-center">Material qualities</p>
+          <p className="eyebrow text-center">{t("guide.material_qualities")}</p>
           <h2 className="section-title mx-auto mt-4 max-w-3xl text-center">{t("guide_material_adv_title")}</h2>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {advantages.map((item) => {
@@ -91,7 +92,7 @@ export default function GuidePage() {
       <section className="bg-secondary text-secondary-foreground">
         <div className="site-container section-space max-w-5xl">
           <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-secondary-foreground/50">
-            Trosheen material philosophy
+            {t("guide.material_philosophy")}
           </p>
           <h2 className="mt-4 font-serif text-4xl font-semibold tracking-tight sm:text-6xl">{t("guide_art_title")}</h2>
           <p className="mt-6 max-w-3xl text-base leading-8 text-secondary-foreground/70 sm:text-lg">{t("guide_art_intro")}</p>
@@ -125,6 +126,7 @@ export default function GuidePage() {
             <p className="lead mt-5">{t("guide_care_intro")}</p>
           </div>
 
+          <div className="mt-8 flex items-center gap-5 border-y border-border py-5"><BrandMotion name="frost" mode="view" className="h-16 w-16 shrink-0" poster="/brand/icons/frost-care.svg" /><p className="text-sm leading-6 text-muted-foreground">{t("guide.seasonal_care")}</p></div>
           <div className="mt-10 grid gap-5 md:grid-cols-2">
             {careGroups.map((group) => {
               const Icon = group.icon;

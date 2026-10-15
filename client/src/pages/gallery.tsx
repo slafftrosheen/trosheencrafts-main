@@ -7,6 +7,7 @@ import { useLanguage } from "@/lib/LanguageContext";
 import { Link } from "wouter";
 import { apiClient } from "@/lib/apiClient";
 import { cn } from "@/lib/utils";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 interface GalleryItem {
   id: number;
@@ -85,8 +86,8 @@ export default function GalleryPage() {
                 {[
                   { id: "all", label: t("gallery.all") },
                   { id: "3d", label: "3D" },
-                  { id: "photo", label: "Photos" },
-                  { id: "video", label: "Videos" },
+                  { id: "photo", label: t("gallery.photos_label") },
+                  { id: "video", label: t("gallery.videos_label") },
                 ].map((tab) => (
                   <button
                     key={tab.id}
@@ -124,7 +125,7 @@ export default function GalleryPage() {
                     type="button"
                     onClick={() => setSearchQuery("")}
                     className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:text-foreground"
-                    aria-label="Clear search"
+                    aria-label={t("shop.clear_filters")}
                   >
                     <X className="h-4 w-4" />
                   </button>
@@ -203,7 +204,7 @@ export default function GalleryPage() {
                         )}
                         <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.1em] backdrop-blur">
                           <TypeIcon type={item.type} />
-                          {item.type === "3d" ? "Interactive 3D" : item.type}
+                          {item.type === "3d" ? t("gallery.model_label") : item.type === "photo" ? t("gallery.photos_label") : t("gallery.videos_label")}
                         </span>
                       </div>
 
@@ -246,7 +247,7 @@ export default function GalleryPage() {
             </>
           ) : (
             <div className="py-20 text-center">
-              <Images className="mx-auto h-9 w-9 text-primary" />
+              <BrandMotion name="imprint" mode="view" className="mx-auto h-36 w-36" poster="/brand/icons/botanical.svg" />
               <h2 className="mt-5 font-serif text-3xl font-semibold">{t("gallery.no_items")}</h2>
               <p className="mt-2 text-muted-foreground">{t("gallery.try_different_filter")}</p>
             </div>

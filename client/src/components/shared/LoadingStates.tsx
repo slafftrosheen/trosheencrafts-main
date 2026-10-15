@@ -1,6 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/lib/LanguageContext';
+import { BrandMotion } from './BrandMotion';
 
 interface PageLoaderProps {
   className?: string;
@@ -18,7 +19,7 @@ export function PageLoader({ className, text }: PageLoaderProps) {
         className
       )}
     >
-      <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+      <BrandMotion name="seal" mode="loop" className="mb-4 h-24 w-24" poster="/brand/seal-spruce.svg" />
       <p className="text-muted-foreground animate-pulse font-serif italic">{loadingText}</p>
     </div>
   );

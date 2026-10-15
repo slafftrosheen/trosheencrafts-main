@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useBlogPosts } from "@/hooks/useApi";
 import { Spinner } from "@/components/shared/LoadingStates";
 import { useLanguage } from "@/lib/LanguageContext";
+import { BrandMotion } from "@/components/shared/BrandMotion";
 
 export default function BlogPage() {
   const { data: posts = [], isLoading } = useBlogPosts();
@@ -83,7 +84,7 @@ export default function BlogPage() {
             </div>
           ) : (
             <div className="surface mx-auto max-w-xl p-10 text-center">
-              <BookOpen className="mx-auto h-8 w-8 text-primary" />
+              <BrandMotion name="imprint" mode="view" className="mx-auto h-32 w-32" poster="/brand/icons/botanical.svg" />
               <h2 className="mt-5 font-serif text-3xl font-semibold">{t("blog.journal_title")}</h2>
               <p className="mt-3 text-muted-foreground">{t("blog.intro_text")}</p>
               <Button asChild variant="outline" className="mt-6">
