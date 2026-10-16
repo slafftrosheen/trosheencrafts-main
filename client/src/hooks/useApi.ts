@@ -20,6 +20,7 @@ export interface Product {
   updatedAt: string;
   published: boolean;
   nameTranslations?: Record<string, string>;
+  descriptionTranslations?: Record<string, string>;
   metadata?: Record<string, any>;
   compareAtPrice?: number;
 }

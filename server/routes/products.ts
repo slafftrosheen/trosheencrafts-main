@@ -149,7 +149,9 @@ const createProductSchema = z.object({
     price: z.coerce.number().positive(),
     category: z.string().min(1),
     image: z.string().optional(),
-    images: z.array(z.string()).optional(),
+    images: z.array(z.string().url()).max(30).optional(),
+    nameTranslations: z.record(z.string().max(500)).optional(),
+    descriptionTranslations: z.record(z.string().max(20000)).optional(),
     stock: z.coerce.number().min(0).default(0),
     featured: z.boolean().default(false),
     published: z.boolean().default(true),
@@ -176,7 +178,8 @@ productsRouter.post(
       const data = req.body;
       
       // Generate slug from name if not provided
-      const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      const slug = data.slug || data.name.normalize('NFKC').toLowerCase().trim()
+        .replace(/[^\p{L}\p{N}]+/gu, '-').replace(/^-+|-+$/g, '');
       
       const [product] = await db.insert(products).values({
         name: data.name,
@@ -185,7 +188,9 @@ productsRouter.post(
         price: String(data.price),
         category: data.category,
         images: data.images || (data.image ? [data.image] : []),
-        stock: data.inStock ? (data.stock || 10) : 0,
+        stock: data.inStock ? data.stock : 0,
+        nameTranslations: data.nameTranslations || {},
+        descriptionTranslations: data.descriptionTranslations || {},
         featured: data.featured,
         published: data.published,
       }).returning();
@@ -212,7 +217,10 @@ productsRouter.post(
 productsRouter.put(
   '/:id',
   adminAuthMiddleware,
-  validateRequest(getProductSchema),
+  validateRequest(z.object({
+    params: getProductSchema.shape.params,
+    body: createProductSchema.shape.body.partial(),
+  })),
   async (req, res, next) => {
     try {
       const { id } = req.params as any;
@@ -236,18 +244,17 @@ productsRouter.put(
       if (data.description !== undefined) updateData.description = data.description;
       if (data.price !== undefined) updateData.price = String(data.price);
       if (data.category !== undefined) updateData.category = data.category;
+      if (data.nameTranslations !== undefined) updateData.nameTranslations = data.nameTranslations;
+      if (data.descriptionTranslations !== undefined) updateData.descriptionTranslations = data.descriptionTranslations;
       if (data.images !== undefined) updateData.images = data.images;
-      if (data.image !== undefined && !data.images) updateData.images = [data.image];
+      if (data.image !== undefined && data.images === undefined)
+        updateData.images = data.image ? [data.image, ...(existingProduct.images || []).filter((url: string) => url !== data.image)] : [];
       if (data.featured !== undefined) updateData.featured = data.featured;
       if (data.published !== undefined) updateData.published = data.published;
       
-      // Handle stock: prefer explicit stock value, otherwise derive from inStock
-      if (data.stock !== undefined) {
-        updateData.stock = data.stock;
-      } else if (data.inStock !== undefined) {
-        // Only use inStock logic if stock wasn't explicitly provided
-        updateData.stock = data.inStock ? 10 : 0;
-      }
+      // A disabled inventory toggle always means unavailable; never restore an invented 10 units.
+      if (data.inStock === false) updateData.stock = 0;
+      else if (data.stock !== undefined) updateData.stock = data.stock;
 
       const [product] = await db
         .update(products)

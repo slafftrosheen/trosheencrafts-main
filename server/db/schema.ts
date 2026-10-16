@@ -19,6 +19,8 @@ export const products = pgTable('products', {
   name: text('name').notNull(),
   slug: text('slug').notNull().unique(),
   description: text('description'),
+  nameTranslations: jsonb('name_translations').$type<Record<string, string>>().default({}),
+  descriptionTranslations: jsonb('description_translations').$type<Record<string, string>>().default({}),
   price: decimal('price', { precision: 10, scale: 2 }).notNull(),
   category: text('category'),
   images: jsonb('images').$type<string[]>().default([]),
