@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useWishlist } from "@/lib/wishlist";
+import { localizedText } from "@/lib/localizedContent";
 import { Lottie } from "./Lottie";
 import type { Product } from "@/hooks/useApi";
 
@@ -13,7 +14,7 @@ interface ProductCardV4Props {
 }
 
 export function productTitle(product: Product, language: string): string {
-  return product.nameTranslations?.[language] || product.name;
+  return localizedText(product.name, product.nameTranslations, language);
 }
 
 export function productImage(product: Product): string {

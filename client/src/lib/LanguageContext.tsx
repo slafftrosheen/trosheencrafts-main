@@ -3,6 +3,7 @@ import { v4Copy } from "./v4Copy";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClient } from "./apiClient";
+import { useLocation } from "wouter";
 
 type Language = "en" | "lv" | "ru" | "pl" | "uk";
 
@@ -773,7 +774,9 @@ export type SiteCopyOverrides = Record<string, Partial<Record<Language, string>>
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const { data: siteCopy = {} } = useQuery<SiteCopyOverrides>({
+  const [pathname] = useLocation();
+  const adminMode = pathname.startsWith("/admin");
+  const { data: siteCopy = {}} = useQuery<SiteCopyOverrides>({
     queryKey: ["siteCopy"],
     queryFn: () => apiClient.get<SiteCopyOverrides>("/site-config/content"),
     staleTime: 60_000,
@@ -793,8 +796,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    document.documentElement.lang = window.location.pathname.startsWith("/admin") ? "ru" : language;
-  }, [language]);
+    document.documentElement.lang = adminMode ? "ru" : language;
+  }, [adminMode, language]);
 
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
@@ -806,10 +809,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   const t = (key: string) => {
-    const activeLanguage: Language =
-      typeof window !== "undefined" && window.location.pathname.startsWith("/admin")
-        ? "ru"
-        : language;
+    const activeLanguage: Language = adminMode ? "ru" : language;
     return siteCopy[key]?.[activeLanguage]?.trim()
       || translations[key]?.[activeLanguage]
       || translations[key]?.lv
@@ -818,7 +818,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language: adminMode ? "ru" : language, setLanguage, t }}>
       {children}
     </LanguageContext.Provider>
   );

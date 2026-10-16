@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
+import { localizedText } from "@/lib/localizedContent";
 import { useWishlist } from "@/lib/wishlist";
 import { useProducts, useContactForm, type Product } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
@@ -136,10 +137,12 @@ export default function ShopPage() {
       .filter((product) => matcher(product))
       .filter((product) => {
         if (!term) return true;
-        const description =
-          typeof product.description === "string"
-            ? product.description
-            : product.description?.[language] || product.description?.en || "";
+        const description = localizedText(
+          typeof product.description === "string" ? product.description : "",
+          product.descriptionTranslations ||
+            (typeof product.description === "object" ? product.description : undefined),
+          language,
+        );
         return (productTitle(product, language) + " " + description + " " + (product.category || ""))
           .toLocaleLowerCase()
           .includes(term);

@@ -3,6 +3,7 @@ import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/LanguageContext";
+import { localizedText } from "@/lib/localizedContent";
 import { apiClient } from "@/lib/apiClient";
 import { useCartStore } from "@/lib/stores/cartStore";
 import { useProducts, type Product } from "@/hooks/useApi";
@@ -67,10 +68,11 @@ export default function ProductDetail() {
       : [];
   const [heroImage, ...rest] = images;
   const availableStock = Math.max(0, Number(product.stock ?? 0));
-  const description =
-    typeof product.description === "string"
-      ? product.description
-      : product.description?.[language] || product.description?.en || "";
+  const description = localizedText(
+    typeof product.description === "string" ? product.description : "",
+    product.descriptionTranslations || (typeof product.description === "object" ? product.description : undefined),
+    language,
+  );
   const metadata = Object.entries(product.metadata || {});
 
   const handleAddToCart = () => {

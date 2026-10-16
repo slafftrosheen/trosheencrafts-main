@@ -96,13 +96,14 @@ export default function AdminProducts() {
                 <TableHead>{t("admin.category")}</TableHead>
                 <TableHead>{t("admin.price")}</TableHead>
                 <TableHead>{t("admin.stock")}</TableHead>
+                <TableHead>Публикация</TableHead>
                 <TableHead className="px-6 text-right">{t("admin.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {products.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
                     {t("shop.no_items")}
                   </TableCell>
                 </TableRow>
@@ -136,6 +137,14 @@ export default function AdminProducts() {
                       >
                         {product.inStock ? t("admin.in_stock") : t("admin.out_of_stock")}
                       </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col gap-1 text-xs">
+                        <span className={product.published ? "text-primary" : "text-muted-foreground"}>
+                          {product.published ? "Опубликован" : "Черновик"}
+                        </span>
+                        {product.featured && <span className="text-amber-700">Избранный</span>}
+                      </div>
                     </TableCell>
                     <TableCell className="px-6 text-right">
                       <div className="flex justify-end gap-1">
