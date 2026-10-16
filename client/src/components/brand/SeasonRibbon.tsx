@@ -13,7 +13,7 @@ export function SeasonRibbon() {
   }, [season]);
 
   const info = SEASONS[season];
-  const line = language === "lv" ? info.line.lv : info.line.en;
+  const line = info.line[language];
 
   return (
     <div className="season-ribbon">

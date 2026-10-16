@@ -2,6 +2,7 @@ import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ArrowRight, BookOpen } from "lucide-react";
 import React from "react";
+import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/shared/LoadingStates";
 import { useLanguage } from "@/lib/LanguageContext";
@@ -19,6 +20,12 @@ function parseInline(text: string): React.ReactNode {
 }
 
 function ArticleBody({ content }: { content: string }) {
+  // Existing admin entries may contain HTML; sanitize before injecting it.
+  if (/<[a-z][\s\S]*?>/i.test(content)) {
+    return <div className="prose prose-stone max-w-none text-muted-foreground" dangerouslySetInnerHTML={{
+      __html: DOMPurify.sanitize(content, { USE_PROFILES: { html: true } }),
+    }} />;
+  }
   const blocks = content.split(/\n\n+/).map((block) => block.trim()).filter(Boolean);
 
   return (

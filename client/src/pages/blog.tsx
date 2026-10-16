@@ -64,7 +64,7 @@ export default function BlogPage() {
                   {feature.image ? (
                     <img src={feature.image} alt={localized(feature).title} />
                   ) : (
-                    <img src="/photos/piece-16.webp" alt="" />
+                    <Lottie file="trosheen-29-gallery-frame.json" mode="view" className="empty__art" />
                   )}
                 </div>
                 <div>
@@ -94,7 +94,7 @@ export default function BlogPage() {
                       {post.image ? (
                         <img src={post.image} alt={localized(post).title} loading="lazy" />
                       ) : (
-                        <img src="/photos/piece-02.webp" alt="" loading="lazy" />
+                        <Lottie file="trosheen-29-gallery-frame.json" mode="view" className="empty__art" />
                       )}
                     </div>
                     <span className="post__meta">

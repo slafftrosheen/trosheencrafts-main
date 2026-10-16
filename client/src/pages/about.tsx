@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useHomepageImages } from "@/hooks/useHomepageImages";
 import { Lottie } from "@/components/brand/Lottie";
 import { Ornament } from "@/components/brand/Ornament";
 import { SplitWords } from "@/components/brand/SplitWords";
@@ -50,6 +51,7 @@ const TIMELINE: { year?: number; label?: string; title: string; desc: string }[]
 
 export default function AboutPage() {
   const { t } = useLanguage();
+  const { image } = useHomepageImages();
 
   return (
     <div>
@@ -65,7 +67,7 @@ export default function AboutPage() {
             srcSet="/heroes/trosheen-hero-desktop-04-1280.webp 1280w, /heroes/trosheen-hero-desktop-04-1920.webp 1920w, /heroes/trosheen-hero-desktop-04-2560.webp 2560w"
             type="image/webp"
           />
-          <img src="/heroes/trosheen-hero-desktop-04-1920.jpg" alt="" fetchPriority="high" />
+          <img src={image("familyFeature")} alt={t("v4.story.hero.title")} fetchPriority="high" />
         </picture>
         <div className="wrap hero__content">
           <p className="eyebrow">{t("v4.story.hero.eyebrow")}</p>

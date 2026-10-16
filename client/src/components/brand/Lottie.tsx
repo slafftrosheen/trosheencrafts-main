@@ -85,6 +85,12 @@ export function Lottie({
           { rootMargin: "0px 0px -12% 0px", threshold: 0.12 },
         );
         observer.observe(host);
+      } else if (mode === "view" && !reduced) {
+        animation.play();
+      }
+
+      if (mode === "manual" && trigger !== undefined && trigger > 0 && !reduced) {
+        animation.play();
       }
 
       if (mode === "hover") {
@@ -104,6 +110,8 @@ export function Lottie({
       observer?.disconnect();
       if (hoverListener) hoverListener[0].removeEventListener("mouseenter", hoverListener[1]);
       animation?.destroy();
+      delete (host as unknown as { _lottie?: LottieAnimation })._lottie;
+      host.replaceChildren();
     };
   }, [file, mode, cover]);
 

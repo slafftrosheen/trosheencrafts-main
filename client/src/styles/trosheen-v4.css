@@ -471,3 +471,17 @@ mark[data-mark].is-in{background-size:100% 100%}
   mark[data-mark]{background-size:100% 100%}
   .page-veil{display:none}
 }
+
+/* Preserve the complete artwork of kit-supplied typeset heroes at every viewport. */
+.hero__media--uncropped { background: var(--spruce, #24412f); }
+.hero__media--uncropped img,
+.hero.is-in .hero__media--uncropped img {
+  object-fit: contain;
+  object-position: center;
+  transform: none;
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .marquee__track { animation: none; }
+  .marquee { overflow-x: auto; }
+}

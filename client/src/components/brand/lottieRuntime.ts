@@ -50,7 +50,7 @@ export function loadLottieRuntime(): Promise<LottieRuntime | null> {
     const existing = document.querySelector<HTMLScriptElement>("script[data-trosheen-lottie]");
     if (existing) {
       existing.addEventListener("load", () => resolve(window.lottie ?? null));
-      existing.addEventListener("error", () => resolve(null));
+      existing.addEventListener("error", () => { runtimePromise = null; resolve(null); });
       return;
     }
     const script = document.createElement("script");
@@ -58,7 +58,7 @@ export function loadLottieRuntime(): Promise<LottieRuntime | null> {
     script.async = true;
     script.dataset.trosheenLottie = "true";
     script.addEventListener("load", () => resolve(window.lottie ?? null));
-    script.addEventListener("error", () => resolve(null));
+    script.addEventListener("error", () => { runtimePromise = null; script.remove(); resolve(null); });
     document.head.appendChild(script);
   });
 

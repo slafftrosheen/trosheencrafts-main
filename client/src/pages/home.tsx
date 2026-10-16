@@ -12,26 +12,6 @@ import { NewsletterForm } from "@/components/brand/NewsletterForm";
 import { ProductCardV4, productImage } from "@/components/brand/ProductCardV4";
 import { PromotionalGallery } from "@/components/PromotionalGallery";
 
-/** Real piece photography used until products with images exist in the API. */
-const FALLBACK_STRIP = [
-  "/photos/piece-01.webp",
-  "/photos/piece-02.webp",
-  "/photos/piece-03.webp",
-  "/photos/piece-04.webp",
-  "/photos/piece-05.webp",
-  "/photos/piece-06.webp",
-  "/photos/piece-07.webp",
-  "/photos/piece-08.webp",
-  "/photos/piece-09.webp",
-  "/photos/piece-10.webp",
-  "/photos/piece-11.webp",
-  "/photos/piece-12.webp",
-  "/photos/piece-13.webp",
-  "/photos/piece-14.webp",
-  "/photos/piece-15.webp",
-  "/photos/piece-16.webp",
-];
-
 const Arrow = () => (
   <svg
     className="tr-arrow"
@@ -54,6 +34,8 @@ export default function HomePage() {
 
   const hero = image("hero");
   const bundledHero = hero === DEFAULT_HOMEPAGE_IMAGES.hero;
+  const galleryFeature = image("galleryFeature");
+  const journalFeature = image("journalFeature");
 
   const published = useMemo(
     () => (products || []).filter((product) => product.published),
@@ -73,7 +55,6 @@ export default function HomePage() {
 
   const stripImages = useMemo(() => {
     const withImages = published.filter((product) => productImage(product));
-    if (!withImages.length) return FALLBACK_STRIP;
     return withImages.slice(0, 12).map((product) => productImage(product));
   }, [published]);
 
@@ -81,7 +62,7 @@ export default function HomePage() {
     <div>
       {/* ---------- hero ---------- */}
       <section className="hero" style={{ "--focus": "50% 60%" } as React.CSSProperties}>
-        <picture className="hero__media">
+        <picture className={bundledHero ? "hero__media hero__media--uncropped" : "hero__media"}>
           {bundledHero && (
             <source
               media="(max-width:700px)"
@@ -134,11 +115,11 @@ export default function HomePage() {
         <div className="wrap split">
           <div className="photo-pair" data-reveal>
             <figure className="polaroid" style={{ "--tilt": "-2.5deg", margin: 0, width: "78%" } as React.CSSProperties}>
-              <img src="/photos/photo-g05.webp" alt={t("v4.letter.caption1")} loading="lazy" />
+              <img src={image("storyHeritage")} alt={t("v4.letter.caption1")} loading="lazy" />
               <figcaption>{t("v4.letter.caption1")}</figcaption>
             </figure>
             <figure className="polaroid" style={{ margin: 0 }}>
-              <img src="/photos/photo-i03.webp" alt={t("v4.letter.caption2")} loading="lazy" />
+              <img src={image("storyMakers")} alt={t("v4.letter.caption2")} loading="lazy" />
               <figcaption>{t("v4.letter.caption2")}</figcaption>
             </figure>
           </div>
@@ -234,15 +215,17 @@ export default function HomePage() {
           <p className="eyebrow">{t("v4.works.eyebrow")}</p>
           <h2>{t("v4.works.title")}</h2>
         </div>
-        <div className="marquee">
-          <div className="marquee__track">
-            {[...stripImages, ...stripImages].map((src, index) => (
-              <figure className="marquee__item" key={`${src}-${index}`}>
-                <img src={src} alt="" loading="lazy" />
-              </figure>
-            ))}
+        {stripImages.length > 0 && (
+          <div className="marquee" aria-label={t("v4.works.title")}>
+            <div className="marquee__track">
+              {[...stripImages, ...stripImages].map((src, index) => (
+                <figure className="marquee__item" key={`${src}-${index}`}>
+                  <img src={src} alt="" loading="lazy" />
+                </figure>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Admin-managed promotions stay on the homepage; hidden until one exists. */}
         <div className="wrap" style={{ marginTop: "var(--s6)" }}>
@@ -365,7 +348,7 @@ export default function HomePage() {
       <section className="section">
         <div className="wrap split split--flip">
           <figure className="drawing" data-ink style={{ margin: 0, "--ar": "4/3" } as React.CSSProperties}>
-            <img src="/photos/piece-04.webp" alt="" loading="lazy" />
+            <img src={image("shopFeature")} alt={t("v4.custom.title")} loading="lazy" />
           </figure>
           <div data-reveal>
             <p className="eyebrow">{t("v4.custom.eyebrow")}</p>
@@ -393,7 +376,11 @@ export default function HomePage() {
           <div className="grid grid-2" style={{ marginTop: "2.5rem" }}>
             <Link className="post card" href="/gallery" data-reveal>
               <div className="frame">
-                <img src="/photos/photo-g06.webp" alt="" loading="lazy" />
+                {galleryFeature ? (
+                  <img src={galleryFeature} alt={t("v4.duo.gallery.title")} loading="lazy" />
+                ) : (
+                  <span className="empty__art" aria-hidden="true"><Lottie file="trosheen-29-gallery-frame.json" mode="view" /></span>
+                )}
               </div>
               <span className="post__meta">{t("v4.duo.gallery.meta")}</span>
               <h3>{t("v4.duo.gallery.title")}</h3>
@@ -406,7 +393,11 @@ export default function HomePage() {
               style={{ "--delay": "120ms" } as React.CSSProperties}
             >
               <div className="frame">
-                <img src="/photos/piece-02.webp" alt="" loading="lazy" />
+                {journalFeature ? (
+                  <img src={journalFeature} alt={t("v4.duo.journal.title")} loading="lazy" />
+                ) : (
+                  <span className="empty__art" aria-hidden="true"><Lottie file="trosheen-04-sprouting-planter.json" mode="view" /></span>
+                )}
               </div>
               <span className="post__meta">{t("v4.duo.journal.meta")}</span>
               <h3>{t("v4.duo.journal.title")}</h3>

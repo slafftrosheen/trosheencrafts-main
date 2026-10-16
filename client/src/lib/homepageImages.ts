@@ -11,6 +11,8 @@ export const DEFAULT_HOMEPAGE_IMAGES: Record<HomepageImageSlot, string> = {
   storyPhilosophy: ScrollStoryPhotos.chapter5_mastery,
   materials: WorkshopTourPhotos.materialsArea,
   craftsmanship: WorkshopTourPhotos.castingStation,
-  shopFeature: "/photos/photo-g06.webp",
-  familyFeature: "/heroes/trosheen-hero-mobile-04-750.webp",
+  shopFeature: "/photos/piece-04.webp",
+  galleryFeature: "",
+  journalFeature: "",
+  familyFeature: "/heroes/trosheen-hero-desktop-04-1920.jpg",
 };

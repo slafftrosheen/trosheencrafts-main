@@ -12,7 +12,9 @@ export const HOMEPAGE_IMAGE_SLOTS = [
   { key: "storyPhilosophy", title: "История · Философия", description: "Четвёртая карточка блока истории.", aspect: "landscape" },
   { key: "materials", title: "Материалы", description: "Горизонтальное фото процесса и материалов.", aspect: "landscape" },
   { key: "craftsmanship", title: "Мастерство", description: "Квадратное фото в тёмном разделе.", aspect: "square" },
-  { key: "shopFeature", title: "Весточки из мастерской", description: "Фото рядом с формой подписки на главной.", aspect: "landscape" },
+  { key: "shopFeature", title: "Индивидуальный заказ", description: "Фото в блоке с переходом в конструктор на главной.", aspect: "landscape" },
+  { key: "galleryFeature", title: "Галерея · анонс", description: "Фото ссылки на галерею на главной. Пока фото не загружено, выводится фирменная анимация.", aspect: "landscape" },
+  { key: "journalFeature", title: "Журнал · анонс", description: "Фото ссылки на журнал на главной. Пока фото не загружено, выводится фирменная анимация.", aspect: "landscape" },
   { key: "familyFeature", title: "Семейная история", description: "Фото рядом с краткой историей семьи на главной.", aspect: "landscape" },
 ] as const;
 
