@@ -40,6 +40,10 @@ export function Lottie({
   ariaHidden = true,
 }: LottieProps) {
   const hostRef = useRef<HTMLSpanElement>(null);
+  // A manual animation must not play on initial mount, and an early trigger
+  // must survive the asynchronous vendor-script and JSON loading.
+  const seenTrigger = useRef(trigger);
+  const pendingManual = useRef(false);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -66,7 +70,12 @@ export function Lottie({
       });
 
       animation.addEventListener("DOMLoaded", () => {
-        if (reduced) animation?.goToAndStop(animation.totalFrames - 1, true);
+        if (reduced) {
+          animation?.goToAndStop(animation.totalFrames - 1, true);
+        } else if (mode === "manual" && pendingManual.current) {
+          pendingManual.current = false;
+          animation?.goToAndPlay(0, true);
+        }
       });
 
       // Exposed on the DOM node so a `manual` sibling can replay it (kit parity).
@@ -77,8 +86,7 @@ export function Lottie({
           (entries) => {
             entries.forEach((entry) => {
               if (!entry.isIntersecting || reduced) return;
-              animation?.stop();
-              animation?.play();
+              animation?.goToAndPlay(0, true);
               observer?.unobserve(entry.target);
             });
           },
@@ -89,16 +97,11 @@ export function Lottie({
         animation.play();
       }
 
-      if (mode === "manual" && trigger !== undefined && trigger > 0 && !reduced) {
-        animation.play();
-      }
-
       if (mode === "hover") {
         hoverTarget = host.closest<HTMLElement>("[data-lottie-host]") ?? host;
         const onEnter = () => {
           if (reduced) return;
-          animation?.stop();
-          animation?.play();
+          animation?.goToAndPlay(0, true);
         };
         hoverTarget.addEventListener("mouseenter", onEnter);
         hoverListener = [hoverTarget, onEnter];
@@ -111,17 +114,22 @@ export function Lottie({
       if (hoverListener) hoverListener[0].removeEventListener("mouseenter", hoverListener[1]);
       animation?.destroy();
       delete (host as unknown as { _lottie?: LottieAnimation })._lottie;
+      pendingManual.current = false;
       host.replaceChildren();
     };
   }, [file, mode, cover]);
 
   useEffect(() => {
     if (mode !== "manual" || trigger === undefined) return;
+    if (trigger === seenTrigger.current) return;
+    seenTrigger.current = trigger;
+    if (trigger <= 0 || prefersReducedMotion()) return;
     const host = hostRef.current;
     const animation = (host as unknown as { _lottie?: LottieAnimation })?._lottie;
-    if (animation && !prefersReducedMotion()) {
-      animation.stop();
-      animation.play();
+    if (animation?.isLoaded) {
+      animation.goToAndPlay(0, true);
+    } else {
+      pendingManual.current = true;
     }
   }, [mode, trigger]);
 

@@ -49,6 +49,7 @@ export function loadLottieRuntime(): Promise<LottieRuntime | null> {
   runtimePromise = new Promise<LottieRuntime | null>((resolve) => {
     const existing = document.querySelector<HTMLScriptElement>("script[data-trosheen-lottie]");
     if (existing) {
+      if (window.lottie) { resolve(window.lottie); return; }
       existing.addEventListener("load", () => resolve(window.lottie ?? null));
       existing.addEventListener("error", () => { runtimePromise = null; resolve(null); });
       return;
