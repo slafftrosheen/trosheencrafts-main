@@ -18,6 +18,7 @@ export default function ProductDetail() {
   const { language, t } = useLanguage();
   const addItem = useCartStore((state) => state.addItem);
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
   const [added, setAdded] = useState(0);
   const [labelOverride, setLabelOverride] = useState(false);
 
@@ -30,6 +31,7 @@ export default function ProductDetail() {
 
   useEffect(() => {
     setQuantity(1);
+    setSelectedImage(0);
     setAdded(0);
     setLabelOverride(false);
   }, [id]);
@@ -66,7 +68,8 @@ export default function ProductDetail() {
     : product.image
       ? [product.image]
       : [];
-  const [heroImage, ...rest] = images;
+  const heroImage = images[0];
+  const currentImage = images[Math.min(selectedImage, Math.max(0, images.length - 1))] || heroImage;
   const availableStock = Math.max(0, Number(product.stock ?? 0));
   const description = localizedText(
     typeof product.description === "string" ? product.description : "",
@@ -90,7 +93,7 @@ export default function ProductDetail() {
         id: product.id,
         name,
         price,
-        image: heroImage || rest[0],
+        image: heroImage || "",
         maxStock: availableStock,
       });
     }
@@ -114,21 +117,21 @@ export default function ProductDetail() {
           <div className="pdp" style={{ marginTop: "1.5rem" }}>
             <div className="pdp__gallery">
               <div className="frame">
-                {heroImage ? (
-                  <img src={heroImage} alt={name} />
+                {currentImage ? (
+                  <img src={currentImage} alt={name} />
                 ) : (
                   <img src="/brand/icons/candle.svg" alt="" style={{ opacity: 0.3, padding: "30%" }} />
                 )}
               </div>
-              {(rest.length ? rest : [heroImage, heroImage]).slice(0, 2).map((image, index) =>
-                image ? (
-                  <div className="frame" key={`${image}-${index}`}>
-                    <img src={image} alt="" loading="lazy" />
-                  </div>
-                ) : (
-                  <div className="frame" key={`empty-${index}`} aria-hidden="true" />
-                ),
-              )}
+              {images.length > 1 && images.map((image, index) => (
+                <button key={image} type="button"
+                  className={"frame pdp__thumbnail " + (index === selectedImage ? "is-selected" : "")}
+                  onClick={() => setSelectedImage(index)}
+                  aria-label={t("v4.pdp.image") + " " + (index + 1)}
+                  aria-pressed={index === selectedImage}>
+                  <img src={image} alt="" loading="lazy" />
+                </button>
+              ))}
             </div>
 
             <div className="pdp__info">

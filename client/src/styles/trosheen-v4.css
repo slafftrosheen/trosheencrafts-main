@@ -488,3 +488,14 @@ mark[data-mark].is-in{background-size:100% 100%}
   .marquee__track { animation: none; }
   .marquee { overflow-x: auto; }
 }
+
+/* Public R2 galleries: all admin-uploaded photographs remain accessible. */
+.pdp__gallery .pdp__thumbnail{
+  cursor:pointer;border:2px solid transparent;padding:0;background:transparent;
+  transition:border-color .2s var(--ease);
+}
+.pdp__gallery .pdp__thumbnail.is-selected,
+.pdp__gallery .pdp__thumbnail:focus-visible{
+  border-color:var(--spruce);
+}
+.pdp__gallery .pdp__thumbnail img{width:100%;height:100%;object-fit:cover}

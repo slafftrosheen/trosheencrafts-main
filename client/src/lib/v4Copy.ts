@@ -206,6 +206,7 @@ const raw: Record<string, Entry> = {
 
   /* ---------- product ---------- */
   "v4.pdp.crumb": { lv: "Veikals", en: "Shop", ru: "Магазин", pl: "Sklep", uk: "Магазин" },
+  "v4.pdp.image": { lv: "Foto", en: "Photo", ru: "Фото", pl: "Zdjęcie", uk: "Фото" },
   "v4.pdp.fact1": { lv: "Lieta un krāsota ar rokām Daugavpilī", en: "Cast and painted by hand in Daugavpils", ru: "Отлито и окрашено вручную в Даугавпилсе", pl: "Odlewane i malowane ręcznie w Dyneburgu", uk: "Відлито й розписано вручну в Даугавпілсі" },
   "v4.pdp.fact2": { lv: "Otra tieši tāda nav — un nebūs", en: "There is no second one exactly like it, and never will be", ru: "Второй в точности такой вещи нет и не будет", pl: "Nie ma i nigdy nie będzie drugiego identycznego egzemplarza", uk: "Другої цілком такої самої речі немає і не буде" },
   "v4.pdp.fact3": { lv: "Rūpīgi iesaiņota, ar kopšanas kartīti", en: "Carefully wrapped, with a care card", ru: "Бережная упаковка и памятка по уходу", pl: "Starannie zapakowane, z instrukcją pielęgnacji", uk: "Дбайливе пакування та пам'ятка з догляду" },

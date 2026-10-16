@@ -1,4 +1,6 @@
 import { Link } from "wouter";
+import { Heart } from "lucide-react";
+import { useState } from "react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useWishlist } from "@/lib/wishlist";
 import { localizedText } from "@/lib/localizedContent";
@@ -31,6 +33,7 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
   const { t, language } = useLanguage();
   const wished = useWishlist(state => state.ids.includes(product.id));
   const toggleWishlist = useWishlist(state => state.toggle);
+  const [wishPulse, setWishPulse] = useState(0);
   const image = productImage(product);
 
   return (
@@ -53,13 +56,15 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
           className="icon-btn product__wish"
           aria-pressed={wished}
           aria-label={t("v4.nav.wishlist")}
-          onClick={() => toggleWishlist(product.id)}
+          onClick={() => { toggleWishlist(product.id); setWishPulse(count => count + 1); }}
         >
+          <Heart className="h-5 w-5" aria-hidden="true" fill={wished ? "currentColor" : "none"} />
           <Lottie
             file="trosheen-03-wishlist-heart.json"
             mode="manual"
-            trigger={wished ? 1 : 0}
-            style={{ width: 30, height: 30 }}
+            trigger={wishPulse}
+            className="absolute inset-0 pointer-events-none"
+            style={{ width: "100%", height: "100%", opacity: wishPulse > 0 ? 0.85 : 0 }}
           />
         </button>
       </div>
