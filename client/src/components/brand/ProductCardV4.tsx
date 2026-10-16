@@ -34,29 +34,26 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
   const image = productImage(product);
 
   return (
-    <Link
+    <article
       className="product"
-      href={`/shop/${product.id}`}
       data-reveal
       style={{ "--delay": `${delay}ms` } as React.CSSProperties}
     >
       <div className="product__media">
+        <Link href={`/shop/${product.id}`} aria-label={productTitle(product, language)}>
         {image ? (
           <img src={image} alt={productTitle(product, language)} loading="lazy" />
         ) : (
           <img src="/brand/icons/candle.svg" alt="" style={{ opacity: 0.35, padding: "30%" }} />
         )}
         <span className="product__tag">{t("v4.tag.oneOfAKind")}</span>
+        </Link>
         <button
           type="button"
           className="icon-btn product__wish"
           aria-pressed={wished}
           aria-label={t("v4.nav.wishlist")}
-          onClick={(event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            toggleWishlist(product.id);
-          }}
+          onClick={() => toggleWishlist(product.id)}
         >
           <Lottie
             file="trosheen-03-wishlist-heart.json"
@@ -66,11 +63,13 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
           />
         </button>
       </div>
-      <h3 className="product__title">{productTitle(product, language)}</h3>
+      <h3 className="product__title">
+        <Link href={`/shop/${product.id}`}>{productTitle(product, language)}</Link>
+      </h3>
       <div className="product__meta">
         <span>{kind || product.category || t("v4.tag.oneOfAKind")}</span>
         <span className="product__price">{formatPrice(product)}</span>
       </div>
-    </Link>
+    </article>
   );
 }

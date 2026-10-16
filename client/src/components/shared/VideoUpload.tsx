@@ -40,6 +40,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
       toast.error(error.message || 'Не удалось загрузить видео');
     } finally {
       setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -76,6 +77,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
             <Button
               variant="secondary"
               size="sm"
+              type="button"
               onClick={handleClick}
               disabled={uploading}
               className="rounded-xl"
@@ -87,6 +89,7 @@ export function VideoUpload({ value, onChange, onRemove, className, maxSizeMB = 
               <Button
                 variant="destructive"
                 size="sm"
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemove();

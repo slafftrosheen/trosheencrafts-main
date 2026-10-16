@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/apiClient";
+import { R2MediaPicker } from "@/components/admin/R2MediaPicker";
 import { DEFAULT_HOMEPAGE_IMAGES } from "@/lib/homepageImages";
 import { HOMEPAGE_IMAGES_QUERY_KEY } from "@/hooks/useHomepageImages";
 import { ACTIVE_HOMEPAGE_IMAGE_SLOTS as HOMEPAGE_IMAGE_SLOTS, type HomepageImageSlot, type HomepageImages } from "../../../../shared/homepageMedia";
@@ -38,6 +39,7 @@ interface SlotCardProps {
 function SlotCard({ slot, assigned, busy, disabled, onSave, onUpload }: SlotCardProps) {
   const [draft, setDraft] = useState(assigned || "");
   const [dragging, setDragging] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => setDraft(assigned || ""), [assigned]);
@@ -59,6 +61,8 @@ function SlotCard({ slot, assigned, busy, disabled, onSave, onUpload }: SlotCard
 
   return (
     <article className="overflow-hidden rounded-3xl border border-border bg-card shadow-sm">
+      <R2MediaPicker open={pickerOpen} onOpenChange={setPickerOpen} kind="image"
+        onSelect={setDraft} />
       <div className="p-5 sm:p-6">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-serif text-xl font-semibold">{slot.title}</h2>
@@ -120,6 +124,10 @@ function SlotCard({ slot, assigned, busy, disabled, onSave, onUpload }: SlotCard
           <Button type="button" variant="outline" className="min-h-11" disabled={isBusy}
             onClick={() => inputRef.current?.click()}>
             <UploadCloud className="mr-2 h-4 w-4" /> Загрузить / заменить
+          </Button>
+          <Button type="button" variant="outline" className="min-h-11" disabled={isBusy}
+            onClick={() => setPickerOpen(true)}>
+            <ImageIcon className="mr-2 h-4 w-4" /> Выбрать из R2
           </Button>
           <Button type="button" className="min-h-11" disabled={isBusy || !dirty}
             onClick={() => void onSave(slot.key, draft.trim() || null)}>
