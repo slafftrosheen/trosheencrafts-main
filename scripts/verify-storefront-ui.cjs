@@ -61,7 +61,15 @@ expect(home.includes('image("storyHeritage")') && home.includes('image("storyMak
 expect(!home.includes("FALLBACK_STRIP"), "Home must not fabricate portfolio imagery");
 expect(routes.includes('path="/admin/content"'), "The public-site copy editor must remain accessible from admin");
 const editor = text("client/src/pages/admin/WebsiteContent.tsx");
-expect(editor.includes('key.startsWith("brand.")'), "Brand copy must also be editable from admin");
+expect(editor.includes('Object.keys(translations)') && editor.includes('admin[._-]'),
+  "Admin copy editor must expose public strings without changing Russian admin chrome");
+expect(routes.includes('path="/admin/media"'), "R2 media library must be available to administrators");
+const r2Routes = text("server/routes/r2Media.ts");
+expect(r2Routes.includes("referenceLocations") && r2Routes.includes("download"),
+  "R2 media library must support reference-guarded deletion and downloads");
+const r2Picker = text("client/src/components/admin/R2MediaPicker.tsx");
+expect(r2Picker.includes("onSelect") && r2Picker.includes("/media-library/files"),
+  "Admin editors must be able to reuse existing R2 media");
 const copyApi = text("server/routes/siteConfig.ts");
 expect(copyApi.includes("get('/content'") && copyApi.includes("'/admin/content'"), "Copy overrides must be wired to persistent site-config APIs");
 const v4Copy = text("client/src/lib/v4Copy.ts");
