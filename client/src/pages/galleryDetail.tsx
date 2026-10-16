@@ -6,6 +6,7 @@ import { OrbitControls, PerspectiveCamera, Environment, ContactShadows, useGLTF,
 import { ArrowLeft, Heart, Share2, Maximize2, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
+import { localizedText } from "@/lib/localizedContent";
 import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
 import { BrandMotion } from "@/components/shared/BrandMotion";
@@ -98,7 +99,7 @@ function MediaViewer({ item }: { item: any }) {
 }
 
 export default function GalleryDetailPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [, params] = useRoute("/gallery/:slug");
   const slug = params?.slug;
   const queryClient = useQueryClient();
@@ -120,10 +121,13 @@ export default function GalleryDetailPage() {
     onError: () => toast.error(t("gallery.like_error")),
   });
 
+  const heading = localizedText(item?.title, item?.titleTranslations, language);
+  const details = localizedText(item?.description, item?.descriptionTranslations, language);
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: item.title, text: item.description, url: window.location.href });
+        await navigator.share({ title: heading, text: details, url: window.location.href });
       } catch (error) {
         if (!(error instanceof DOMException && error.name === "AbortError")) toast.error(t("gallery.share_error"));
       }
@@ -183,10 +187,10 @@ export default function GalleryDetailPage() {
           <aside className="lg:sticky lg:top-28 lg:self-start">
             <p className="eyebrow">{item.type === "3d" ? t("gallery.model_label") : item.type === "photo" ? t("gallery.photos_label") : t("gallery.videos_label")}</p>
             <h1 className="mt-4 font-serif text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-              {item.title}
+              {heading}
             </h1>
-            {item.description && (
-              <p className="mt-5 text-base leading-8 text-muted-foreground">{item.description}</p>
+            {details && (
+              <p className="mt-5 text-base leading-8 text-muted-foreground">{details}</p>
             )}
 
             <div className="mt-7 flex items-center gap-5 border-y border-border py-4 text-xs font-semibold text-muted-foreground">

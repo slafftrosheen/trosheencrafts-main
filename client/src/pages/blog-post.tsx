@@ -6,6 +6,7 @@ import DOMPurify from "dompurify";
 import { Button } from "@/components/ui/button";
 import { PageLoader } from "@/components/shared/LoadingStates";
 import { useLanguage } from "@/lib/LanguageContext";
+import { localizedText } from "@/lib/localizedContent";
 
 function parseInline(text: string): React.ReactNode {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -125,11 +126,12 @@ export default function BlogPostPage() {
     );
   }
 
-  const title = post.titleTranslations?.[language] || post.title;
-  const content =
-    typeof post.content === "object"
-      ? post.content?.[language] || post.content?.en || ""
-      : post.content || "";
+  const title = localizedText(post.title, post.titleTranslations, language);
+  const content = localizedText(
+    typeof post.content === "string" ? post.content : "",
+    post.contentTranslations || (typeof post.content === "object" ? post.content : undefined),
+    language,
+  );
   const date = post.publishedAt
     ? new Date(post.publishedAt).toLocaleDateString(language, {
         year: "numeric",

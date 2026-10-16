@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Loader2, RefreshCw, X } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
+import { localizedText } from "@/lib/localizedContent";
 import { apiClient } from "@/lib/apiClient";
 import { Lottie } from "@/components/brand/Lottie";
 import { Ornament } from "@/components/brand/Ornament";
@@ -12,6 +13,8 @@ interface GalleryItem {
   title: string;
   slug: string;
   description?: string;
+  titleTranslations?: Record<string, string>;
+  descriptionTranslations?: Record<string, string>;
   type: "3d" | "photo" | "video";
   mediaUrl: string;
   thumbnailUrl?: string;
@@ -25,11 +28,12 @@ interface GalleryCategory {
   id: number;
   name: string;
   slug: string;
-  type: "3d" | "photo";
+  nameTranslations?: Record<string, string>;
+  type: "3d" | "photo" | "video";
 }
 
 export default function GalleryPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all" | "3d" | "photo" | "video">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
@@ -127,7 +131,7 @@ export default function GalleryPage() {
                   setPage(1);
                 }}
               >
-                {category.name}
+                {localizedText(category.name, category.nameTranslations, language)}
               </button>
             ))}
           </div>
@@ -187,7 +191,7 @@ export default function GalleryPage() {
             <div className="masonry">
               {items.map((item, index) => (
                 <figure key={item.id} data-reveal style={{ "--delay": `${(index % 3) * 80}ms` } as React.CSSProperties}>
-                  <Link href={"/gallery/" + item.slug} aria-label={item.title}>
+                  <Link href={"/gallery/" + item.slug} aria-label={localizedText(item.title, item.titleTranslations, language)}>
                     {item.type === "video" ? (
                       <video
                         src={item.mediaUrl}
@@ -218,7 +222,7 @@ export default function GalleryPage() {
                     ) : (
                       <img
                         src={item.thumbnailUrl || item.mediaUrl}
-                        alt={item.title}
+                        alt={localizedText(item.title, item.titleTranslations, language)}
                         loading="lazy"
                       />
                     )}
@@ -227,7 +231,7 @@ export default function GalleryPage() {
                     </span>
                   </Link>
                   <figcaption className="note" style={{ padding: ".7rem .2rem 0" }}>
-                    {item.title}
+                    {localizedText(item.title, item.titleTranslations, language)}
                   </figcaption>
                 </figure>
               ))}

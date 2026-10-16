@@ -1,5 +1,6 @@
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
+import { localizedText } from "@/lib/localizedContent";
 import { useBlogPosts } from "@/hooks/useApi";
 import { Lottie } from "@/components/brand/Lottie";
 import { Ornament } from "@/components/brand/Ornament";
@@ -24,8 +25,8 @@ export default function BlogPage() {
   const { t, language } = useLanguage();
 
   const localized = (post: any) => ({
-    title: post.titleTranslations?.[language] || post.title,
-    excerpt: post.excerptTranslations?.[language] || post.excerpt,
+    title: localizedText(post.title, post.titleTranslations, language),
+    excerpt: localizedText(post.excerpt, post.excerptTranslations, language),
     date: new Date(post.publishedAt || post.createdAt).toLocaleDateString(language, {
       year: "numeric",
       month: "long",
