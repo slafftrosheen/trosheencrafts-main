@@ -1,27 +1,10 @@
-import { useState, useRef, useCallback } from 'react';
-import { Upload, X, Image as ImageIcon, Film, Box, File, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useToast } from '@/hooks/use-toast';
-
-interface MediaUploaderProps {
-  /** Callback when file is successfully uploaded */
-  onUploadComplete: (url: string, file: UploadedFile) => void;
-  /** Accepted file types (mime types or extensions) */
-  accept?: string;
-  /** Maximum file size in MB */
-  maxSizeMB?: number;
-  /** Show preview of uploaded image */
-  showPreview?: boolean;
-  /** Current value (URL) if editing */
-  value?: string;
-  /** Label for the upload button */
-  label?: string;
-  /** Allow multiple file selection */
-  multiple?: boolean;
-  /** Class name for container */
-  className?: string;
-}
+import { useEffect, useRef, useState } from "react";
+import { FolderOpen, Upload, Image as ImageIcon, Loader2, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { apiClient } from "@/lib/apiClient";
+import { toast } from "sonner";
+import { R2MediaPicker } from "@/components/admin/R2MediaPicker";
+import { cn } from "@/lib/utils";
 
 interface UploadedFile {
   filename: string;
@@ -30,274 +13,113 @@ interface UploadedFile {
   size: number;
   url: string;
 }
+interface MediaUploaderProps {
+  onUploadComplete: (url: string, file: UploadedFile) => void;
+  accept?: string;
+  maxSizeMB?: number;
+  showPreview?: boolean;
+  value?: string;
+  label?: string;
+  multiple?: boolean;
+  className?: string;
+}
 
+/** Legacy media editor; now uses the same authenticated R2 pipeline as all admin screens. */
 export function MediaUploader({
-  onUploadComplete,
-  accept = 'image/*,video/*,.glb,.gltf',
-  maxSizeMB = 50,
-  showPreview = true,
-  value,
-  label = 'Загрузить файл',
-  multiple = false,
-  className,
+  onUploadComplete, accept = ".jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.glb,.gltf",
+  maxSizeMB = 100, showPreview = true, value, label = "Загрузить файл",
+  multiple = false, className,
 }: MediaUploaderProps) {
-  const [uploading, setUploading] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const [preview, setPreview] = useState<string | null>(value || null);
-  const [uploadedFile, setUploadedFile] = useState<UploadedFile | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
+  const [uploading, setUploading] = useState(false);
+  const [dragging, setDragging] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [preview, setPreview] = useState(value || "");
+  const [progress, setProgress] = useState(0);
 
-  const validateFile = useCallback(
-    (file: File): boolean => {
-      // Check file size
-      const maxSize = maxSizeMB * 1024 * 1024;
-      if (file.size > maxSize) {
-        toast({
-          title: 'Файл слишком большой',
-          description: `Максимальный размер файла — ${maxSizeMB} МБ`,
-          variant: 'destructive',
-        });
-        return false;
-      }
-      return true;
-    },
-    [maxSizeMB, toast]
-  );
+  useEffect(() => setPreview(value || ""), [value]);
 
-  const uploadFile = useCallback(
-    async (file: File) => {
-      if (!validateFile(file)) return;
-
-      setUploading(true);
-      try {
-        const formData = new FormData();
-        formData.append('file', file);
-
-        const response = await fetch('/api/media/upload', {
-          method: 'POST',
-          credentials: 'include',
-          body: formData,
-        });
-
-        if (!response.ok) {
-          throw new Error('Не удалось загрузить файл');
+  const uploadFiles = async (files: File[]) => {
+    if (uploading || !files.length) return;
+    setUploading(true);
+    try {
+      for (const file of (multiple ? files : files.slice(0, 1))) {
+        if (file.size > maxSizeMB * 1024 * 1024) {
+          toast.error(`Превышен максимальный размер файла: ${maxSizeMB} МБ`);
+          continue;
         }
-
-        const data = await response.json();
-        const uploadedFile = data.file as UploadedFile;
-
-        setUploadedFile(uploadedFile);
-
-        // Generate preview for images
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            setPreview(reader.result as string);
-          };
-          reader.readAsDataURL(file);
-        } else {
-          setPreview(uploadedFile.url);
-        }
-
-        onUploadComplete(uploadedFile.url, uploadedFile);
-
-        toast({
-          title: 'Файл загружен',
-          description: `${file.name} загружен`,
+        const photo = /\.(jpe?g|png|webp)$/i.test(file.name);
+        const result = await apiClient.uploadFile(
+          photo ? "/upload/image" : "/upload/gallery", file,
+          percent => setProgress(Math.round(percent)),
+        );
+        setPreview(result.url);
+        onUploadComplete(result.url, {
+          filename: result.filename,
+          originalName: file.name,
+          mimetype: result.contentType,
+          size: result.size,
+          url: result.url,
         });
-      } catch (error) {
-        console.error('Ошибка загрузки:', error);
-        toast({
-          title: 'Ошибка загрузки',
-          description: error instanceof Error ? error.message : 'Не удалось загрузить файл',
-          variant: 'destructive',
-        });
-      } finally {
-        setUploading(false);
       }
-    },
-    [validateFile, onUploadComplete, toast]
-  );
-
-  const handleFileSelect = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (!files || files.length === 0) return;
-
-      if (multiple) {
-        // Handle multiple files
-        Array.from(files).forEach((file) => uploadFile(file));
-      } else {
-        uploadFile(files[0]);
-      }
-
-      // Reset input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-    },
-    [multiple, uploadFile]
-  );
-
-  const handleDrag = useCallback((e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
+      toast.success("Файлы загружены в R2.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Ошибка загрузки в R2.");
+    } finally {
+      setUploading(false);
+      setProgress(0);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
-  }, []);
-
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setDragActive(false);
-
-      const files = e.dataTransfer.files;
-      if (!files || files.length === 0) return;
-
-      if (multiple) {
-        Array.from(files).forEach((file) => uploadFile(file));
-      } else {
-        uploadFile(files[0]);
-      }
-    },
-    [multiple, uploadFile]
-  );
-
-  const handleClick = useCallback(() => {
-    fileInputRef.current?.click();
-  }, []);
-
-  const handleClear = useCallback(() => {
-    setPreview(null);
-    setUploadedFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  }, []);
-
-  const getFileIcon = (mimetype?: string) => {
-    if (!mimetype) return <File className="w-8 h-8" />;
-    if (mimetype.startsWith('image/')) return <ImageIcon className="w-8 h-8" />;
-    if (mimetype.startsWith('video/')) return <Film className="w-8 h-8" />;
-    if (mimetype.includes('gltf') || mimetype.includes('glb')) return <Box className="w-8 h-8" />;
-    return <File className="w-8 h-8" />;
   };
 
   return (
-    <div className={cn('space-y-4', className)}>
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept={accept}
-        onChange={handleFileSelect}
-        className="hidden"
-        multiple={multiple}
-      />
-
-      {/* Upload Area */}
-      <div
-        onDragEnter={handleDrag}
-        onDragLeave={handleDrag}
-        onDragOver={handleDrag}
-        onDrop={handleDrop}
-        onClick={handleClick}
-        className={cn(
-          'relative border-2 border-dashed rounded-2xl p-8 transition-all cursor-pointer',
-          'hover:border-primary hover:bg-primary/5',
-          dragActive ? 'border-primary bg-primary/10' : 'border-border/40',
-          uploading && 'pointer-events-none opacity-50',
-          preview && showPreview && 'hidden'
-        )}
-      >
-        <div className="flex flex-col items-center justify-center text-center space-y-4">
-          <div className="p-4 rounded-full bg-primary/10 text-primary">
-            <Upload className="w-8 h-8" />
-          </div>
-          <div>
-            <p className="text-sm font-medium mb-1">
-              {dragActive ? 'Перетащите файл сюда' : `Нажмите, чтобы выбрать файл, или перетащите его сюда`}
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Макс. размер: {maxSizeMB} МБ
-            </p>
-          </div>
-        </div>
-
-        {uploading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-2xl">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-sm font-medium">Загрузка...</p>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Preview Area */}
-      {preview && showPreview && (
-        <div className="relative rounded-2xl border-2 border-border/40 overflow-hidden bg-muted/30">
-          <Button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleClear();
-            }}
-            variant="destructive"
-            size="icon"
-            className="absolute top-3 right-3 z-10 rounded-full w-8 h-8"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-
-          {uploadedFile?.mimetype?.startsWith('image/') || value?.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-            <div className="aspect-video w-full">
-              <img
-                src={preview}
-                alt="Предпросмотр"
-                className="w-full h-full object-contain"
-              />
-            </div>
-          ) : (
-            <div className="aspect-video w-full flex flex-col items-center justify-center p-8">
-              <div className="p-6 rounded-full bg-primary/10 text-primary mb-4">
-                {getFileIcon(uploadedFile?.mimetype)}
-              </div>
-              <p className="text-sm font-medium mb-1">
-                {uploadedFile?.originalName || 'Файл загружен'}
-              </p>
-              {uploadedFile && (
-                <p className="text-xs text-muted-foreground">
-                  {(uploadedFile.size / 1024 / 1024).toFixed(2)} МБ
-                </p>
-              )}
-              <div className="mt-4 flex items-center gap-2 text-xs text-green-600">
-                <Check className="w-4 h-4" />
-                Загрузка завершена
-              </div>
-            </div>
-          )}
-
-          <div className="p-4 bg-background/80 backdrop-blur-sm border-t border-border/40">
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-muted-foreground truncate flex-1 mr-4">
-                {uploadedFile?.url || preview}
-              </div>
-              <Button
-                onClick={handleClick}
-                variant="outline"
-                size="sm"
-                className="rounded-full flex-shrink-0"
-              >
-                Заменить
-              </Button>
-            </div>
-          </div>
-        </div>
+    <div className={cn("space-y-3", className)}>
+      <R2MediaPicker open={pickerOpen} onOpenChange={setPickerOpen} kind="all"
+        onSelect={url => {
+          setPreview(url);
+          onUploadComplete(url, {
+            url, filename: url.split("/").pop() || "file",
+            originalName: url.split("/").pop() || "file",
+            mimetype: "application/octet-stream", size: 0,
+          });
+        }} />
+      <input ref={fileInputRef} type="file" accept={accept} multiple={multiple}
+        className="sr-only" disabled={uploading}
+        onChange={event => void uploadFiles(Array.from(event.target.files || []))} />
+      <div className={cn(
+        "flex min-h-40 flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-border/60 p-4 text-center",
+        dragging && "border-primary bg-primary/10",
       )}
+        onDragEnter={event => { event.preventDefault(); setDragging(true); }}
+        onDragOver={event => { event.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={event => {
+          event.preventDefault();
+          setDragging(false);
+          void uploadFiles(Array.from(event.dataTransfer.files || []));
+        }}>
+        {showPreview && preview && /\.(jpe?g|png|webp|gif)$/i.test(new URL(preview, window.location.origin).pathname)
+          ? <img src={preview} alt="Предпросмотр" className="max-h-44 max-w-full rounded-xl object-contain" />
+          : <ImageIcon className="h-10 w-10 text-muted-foreground" />}
+        {uploading && <span role="status" className="text-xs text-muted-foreground">Загрузка: {progress}%</span>}
+        {preview && <a href={preview} target="_blank" rel="noopener noreferrer"
+          className="max-w-full break-all text-xs text-primary underline">Открыть текущий файл</a>}
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button type="button" size="sm" variant="outline" disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}>
+            {uploading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Upload className="mr-2 h-4 w-4" />}
+            {label}
+          </Button>
+          <Button type="button" size="sm" variant="outline" disabled={uploading}
+            onClick={() => setPickerOpen(true)}>
+            <FolderOpen className="mr-2 h-4 w-4" /> Выбрать из R2
+          </Button>
+          {preview && <Button type="button" size="sm" variant="ghost" disabled={uploading}
+            onClick={() => setPreview("")} title="Убрать только предпросмотр, не удаляя объект R2">
+            <X className="h-4 w-4" /> Закрыть
+          </Button>}
+        </div>
+      </div>
     </div>
   );
 }
