@@ -11,6 +11,8 @@ type Lang = "en" | "lv" | "ru" | "pl" | "uk";
 type Entry = { lv: string; en: string; ru?: string; pl?: string; uk?: string };
 
 const raw: Record<string, Entry> = {
+  "v4.media.unavailable": { lv: "Attēls nav pieejams", en: "Image unavailable", ru: "Изображение недоступно", pl: "Obraz niedostępny", uk: "Зображення недоступне" },
+
   /* ---------- navigation, shell ---------- */
   "v4.nav.home": { lv: "Sākums", en: "Home", ru: "Главная", pl: "Strona główna", uk: "Головна" },
   "v4.nav.shop": { lv: "Veikals", en: "Shop", ru: "Магазин", pl: "Sklep", uk: "Магазин" },

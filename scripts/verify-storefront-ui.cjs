@@ -60,6 +60,8 @@ expect(home.includes("useHomepageImages") && home.includes("image(\"hero\")"), "
 expect(home.includes('image("storyHeritage")') && home.includes('image("storyMakers")') && home.includes('image("shopFeature")'), "Home photography must be connected to editor slots");
 expect(!home.includes("FALLBACK_STRIP"), "Home must not fabricate portfolio imagery");
 expect(routes.includes('path="/admin/content"'), "The public-site copy editor must remain accessible from admin");
+const editor = text("client/src/pages/admin/WebsiteContent.tsx");
+expect(editor.includes('key.startsWith("brand.")'), "Brand copy must also be editable from admin");
 const copyApi = text("server/routes/siteConfig.ts");
 expect(copyApi.includes("get('/content'") && copyApi.includes("'/admin/content'"), "Copy overrides must be wired to persistent site-config APIs");
 const v4Copy = text("client/src/lib/v4Copy.ts");

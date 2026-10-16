@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { blogPosts } from '../db/schema';
-import { eq, desc, ilike, sql, and, isNotNull } from 'drizzle-orm';
+import { eq, desc, ilike, and, isNotNull } from 'drizzle-orm';
 import { validateRequest } from '../middleware/validation';
 import { adminAuthMiddleware } from '../middleware/auth';
 import { spawn } from 'child_process';

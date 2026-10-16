@@ -15,7 +15,9 @@ const LANGUAGES = [
 ] as const;
 type Language = (typeof LANGUAGES)[number]["code"];
 
-const copyKeys = Object.keys(translations).filter((key) => key.startsWith("v4.")).sort();
+const copyKeys = Object.keys(translations)
+  .filter((key) => key.startsWith("v4.") || key.startsWith("brand."))
+  .sort();
 const sections: Record<string, string> = {
   "nav": "Навигация", "hero": "Главный экран", "letter": "Приветствие",
   "pillars": "Принципы", "cats": "Категории", "works": "Работы",
@@ -24,6 +26,7 @@ const sections: Record<string, string> = {
   "footer": "Подвал", "shop": "Магазин", "wiz": "Конструктор",
   "pdp": "Карточка товара", "story": "Наша история", "care": "Уход",
   "contact": "Контакты", "gallery": "Галерея", "journal": "Журнал",
+  "tagline": "Фирменный слоган", "intro": "Вступление", "location": "Локация",
 };
 
 export default function WebsiteContent() {
@@ -68,7 +71,7 @@ export default function WebsiteContent() {
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">Контент · Trosheen v4.3</p>
         <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Тексты сайта</h1>
         <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-          Редактируйте заголовки, подписи и описания публичных страниц на пяти языках.
+          Редактируйте заголовки, подписи, описания и фирменные тексты публичных страниц на пяти языках.
           Изменения сохраняются в базе данных и сразу доступны на сайте. Исходные тексты
           брендбука остаются резервными и могут быть восстановлены одной кнопкой.
         </p>
@@ -77,7 +80,10 @@ export default function WebsiteContent() {
         <Languages className="h-5 w-5 text-primary" />
         <label className="text-sm font-semibold" htmlFor="content-language">Язык версии сайта</label>
         <select id="content-language" className="h-11 rounded-xl border border-border bg-card px-4 text-sm"
-          value={language} onChange={(event) => setLanguage(event.target.value as Language)}>
+          value={language} onChange={(event) => {
+            if (dirty && !window.confirm("Есть несохранённые изменения. Сменить язык без сохранения?")) return;
+            setLanguage(event.target.value as Language);
+          }}>
           {LANGUAGES.map(({ code, label }) => <option value={code} key={code}>{label}</option>)}
         </select>
         <span className="text-xs text-muted-foreground">{copyKeys.length} редактируемых строк</span>
