@@ -164,8 +164,8 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
               <Label htmlFor="videoUrl">Фоновое видео (необязательно)</Label>
               <VideoUpload 
                 value={watch('videoUrl')} 
-                onChange={url => setValue('videoUrl', url)} 
-                onRemove={() => setValue('videoUrl', '')} 
+                onChange={url => setValue('videoUrl', url, { shouldDirty: true })} 
+                onRemove={() => setValue('videoUrl', '', { shouldDirty: true })} 
               />
             </div>
           </div>
@@ -185,7 +185,7 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
             <Switch 
               id="active" 
               checked={watch('active')} 
-              onCheckedChange={(c) => setValue('active', c)} 
+              onCheckedChange={(c) => setValue('active', c, { shouldDirty: true })} 
             />
             <Label htmlFor="active">Активен</Label>
           </div>

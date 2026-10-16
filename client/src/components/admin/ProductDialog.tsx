@@ -177,8 +177,8 @@ export function ProductDialog({
           </div>
 
           <LocalizedFields names={watch("nameTranslations") || {}} descriptions={watch("descriptionTranslations") || {}}
-            onNameChange={value => setValue("nameTranslations", value, { shouldDirty: true })}
-            onDescriptionChange={value => setValue("descriptionTranslations", value, { shouldDirty: true })} />
+            onNameChange={value => setValue("nameTranslations", value as Record<string, string>, { shouldDirty: true })}
+            onDescriptionChange={value => setValue("descriptionTranslations", value as Record<string, string>, { shouldDirty: true })} />
 
           <div className="grid gap-4 rounded-2xl border border-border p-4 sm:grid-cols-2">
             <div>

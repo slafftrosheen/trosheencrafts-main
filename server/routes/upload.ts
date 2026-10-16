@@ -44,11 +44,17 @@ async function validatedMedia(file: Express.Multer.File): Promise<{
     const metadata = await decoded.metadata();
     if (!metadata.format || !['jpeg', 'png', 'webp', 'gif'].includes(metadata.format))
       throw new Error('Файл не является поддерживаемым изображением.');
-    data = await decoded.rotate().resize({
-      width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true,
-    }).webp({ quality: 86 }).toBuffer();
-    contentType = 'image/webp';
-    filename = generateFilename('picture.webp');
+    if (metadata.format === 'gif' && (metadata.pages || 1) > 1) {
+      // Keep animated campaign media moving; regular Sharp processing takes the first frame.
+      contentType = 'image/gif';
+      filename = generateFilename('animation.gif');
+    } else {
+      data = await decoded.rotate().resize({
+        width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true,
+      }).webp({ quality: 86 }).toBuffer();
+      contentType = 'image/webp';
+      filename = generateFilename('picture.webp');
+    }
   } else if (ext === 'glb') {
     if (data.subarray(0, 4).toString('ascii') !== 'glTF') throw new Error('Некорректный файл GLB.');
     contentType = 'model/gltf-binary'; filename = generateFilename(file.originalname);
