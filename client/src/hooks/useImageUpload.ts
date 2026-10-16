@@ -14,11 +14,11 @@ export function useImageUpload() {
     try {
       setUploading(true);
       const result = await apiClient.uploadFile('/upload/image', file);
-      toast.success('Image uploaded successfully');
+      toast.success('Изображение загружено в R2');
       return result as any;
     } catch (error) {
       console.error('Upload failed:', error);
-      toast.error('Failed to upload image');
+      toast.error(error instanceof Error ? error.message : 'Не удалось загрузить изображение');
       return null;
     } finally {
       setUploading(false);

@@ -66,9 +66,6 @@ const csrfProtection = csurf({
 
 app.use((req, res, next) => {
   const csrfExempt =
-    req.path.startsWith("/api/upload") ||
-    req.path.startsWith("/api/uploads") ||
-    req.path.startsWith("/api/gallery/admin") ||
     req.path === "/api/checkout/webhook";
 
   if (csrfExempt) {

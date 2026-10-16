@@ -3,7 +3,7 @@ import { productsRouter } from './products';
 import { ordersRouter } from './orders';
 import { authRouter } from './auth';
 import { contactRouter } from './contact';
-import { uploadsRouter } from './uploads';
+import uploadRouter from './upload';
 import { blogRouter } from './blog';
 import { galleryRouter } from './gallery';
 import { adminRouter } from './admin';
@@ -39,7 +39,8 @@ export const createApiRouter = (): Router => {
   router.use('/analytics', analyticsRouter);
   router.use('/settings', settingsRouter);
   router.use('/inventory', inventoryRouter);
-  router.use('/uploads', uploadsRouter);
+  // Deprecated plural image endpoint now uses the same R2-backed handler.
+  router.use('/uploads', uploadRouter);
 
   // Health check
   router.get('/health', (req, res) => {

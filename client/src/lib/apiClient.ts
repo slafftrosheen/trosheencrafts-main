@@ -208,7 +208,7 @@ class ApiClient {
     file: File,
     onProgress?: (progress: number) => void,
     _retry: boolean = false
-  ): Promise<{ url: string; key: string }> {
+  ): Promise<{ success: boolean; url: string; filename: string; key?: string; size: number; contentType: string }> {
     const token = await this.getCsrfToken();
 
     return new Promise((resolve, reject) => {
@@ -231,21 +231,25 @@ class ApiClient {
         if (xhr.status >= 200 && xhr.status < 300) {
           try {
             const response = JSON.parse(xhr.responseText);
+            if (typeof response?.url !== 'string' || !response.url) {
+              throw new Error('Сервер не вернул адрес загруженного файла');
+            }
             resolve(response);
           } catch {
             reject(new ApiClientError('Invalid response format', xhr.status));
           }
-        } else if (xhr.status === 403 && !_retry) {
-          // CSRF failure? Clear token and retry once
-          this.csrfToken = null;
-          try {
-            const retryResult = await this.uploadFile(endpoint, file, onProgress, true);
-            resolve(retryResult);
-          } catch (e) {
-            reject(e);
-          }
         } else {
-          reject(new ApiClientError(`Upload failed: ${xhr.statusText}`, xhr.status));
+          let detail: { message?: string; code?: string } = {};
+          try { detail = JSON.parse(xhr.responseText); } catch { /* fallback to HTTP status */ }
+          const csrfFailure = xhr.status === 403 &&
+            (detail.code === 'EBADCSRFTOKEN' || /csrf/i.test(detail.message || ''));
+          if (csrfFailure && !_retry) {
+            this.csrfToken = null;
+            try { resolve(await this.uploadFile(endpoint, file, onProgress, true)); }
+            catch (error) { reject(error); }
+          } else {
+            reject(new ApiClientError(detail.message || `Загрузка не удалась (HTTP ${xhr.status})`, xhr.status));
+          }
         }
       });
 
@@ -255,8 +259,12 @@ class ApiClient {
       });
 
       xhr.addEventListener('abort', () => {
-        reject(new ApiClientError('Upload cancelled', 0));
+        reject(new ApiClientError('Загрузка прервана', 0));
       });
+      xhr.addEventListener('timeout', () => {
+        reject(new ApiClientError('Превышено время загрузки', 408));
+      });
+      xhr.timeout = 180000;
 
       // Send request
       xhr.open('POST', `${this.baseURL}${endpoint}`);
