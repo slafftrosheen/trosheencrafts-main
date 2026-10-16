@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
 import { cn } from "@/lib/utils";
 import { ShoppingCartComponent } from "@/components/features/ShoppingCart";
+import { SiteLogo } from "@/components/shared/SiteLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -68,13 +69,9 @@ export function Navigation() {
     <>
       <header className={cn("site-header", compact && "is-compact")}>
         <div className="wrap">
-          <Link className="brand" href="/" aria-label="Trosheen — sākums">
-            <img
-              src="/brand/trosheen-lockup-horizontal-spruce.svg"
-              alt="Trosheen"
-              width={190}
-              height={42}
-            />
+          <Link className="brand" href="/" aria-label={t("v4.nav.home")}>
+            <SiteLogo variant="lockup-horizontal" tone="spruce"
+              alt="Trosheen" width={190} height={42} />
           </Link>
 
           <nav className="nav" aria-label={t("v4.nav.aria")}>

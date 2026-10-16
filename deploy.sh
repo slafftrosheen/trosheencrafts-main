@@ -1,26 +1,21 @@
 #!/bin/bash
-# Trosheen Crafts deploy: pull, rebuild, migrate, verify.
-set -e
-
+# Manual production deployment. Do not invoke during source-only coding.
+# Additive migrations are applied BEFORE the updated application is served.
+set -euo pipefail
 cd "$(dirname "$0")"
 
-echo "🚀 Deploying Trosheen Crafts..."
+echo "Deploying Trosheen..."
+git pull --ff-only origin main
 
-# Pull latest changes
-git pull origin main
+# Build does not alter live containers. Postgres must be available to the migrator.
+docker compose build app
+docker compose up -d postgres
 
-# Build and restart containers
-docker compose down
-docker compose build
-docker compose up -d
+# Abort deployment if a SQL migration fails. Real customer/R2 data is preserved.
+docker compose run --rm --no-deps -T app node scripts/migrate.cjs
 
-# Wait for containers to start
-sleep 10
+# Restart only after successful database migration.
+docker compose up -d --remove-orphans
+curl --fail --silent --show-error http://localhost:5000/api/health
 
-# Apply pending database migrations (tracked in _migrations table)
-docker compose exec -T app node scripts/migrate.cjs
-
-# Check health
-curl -f http://localhost:5000/api/health
-
-echo "✅ Deployment successful!"
+echo "Trosheen deployment complete."

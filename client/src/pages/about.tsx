@@ -111,7 +111,7 @@ export default function AboutPage() {
             data-reveal
             style={{ margin: 0, maxWidth: 480, justifySelf: "center" }}
           >
-            <img src="/photos/photo-g06.webp" alt={t("v4.story.c1.title")} loading="lazy" />
+            <img src={image("storyLegacy")} alt={t("v4.story.c1.title")} loading="lazy" />
           </figure>
         </div>
       </section>
@@ -138,7 +138,7 @@ export default function AboutPage() {
             data-ink
             style={{ margin: 0, "--ar": "3/4", maxWidth: 480, justifySelf: "center" } as React.CSSProperties}
           >
-            <img src="/photos/piece-02.webp" alt="" loading="lazy" />
+            <img src={image("storyPhilosophy")} alt="" loading="lazy" />
           </figure>
         </div>
       </section>
@@ -207,11 +207,11 @@ export default function AboutPage() {
               className="polaroid"
               style={{ "--tilt": "2deg", margin: 0, width: "78%" } as React.CSSProperties}
             >
-              <img src="/photos/photo-g05.webp" alt={t("v4.story.c4.cap1")} loading="lazy" />
+              <img src={image("materials")} alt={t("v4.story.c4.cap1")} loading="lazy" />
               <figcaption>{t("v4.story.c4.cap1")}</figcaption>
             </figure>
             <figure className="polaroid" style={{ margin: 0 }}>
-              <img src="/photos/photo-i03.webp" alt={t("v4.story.c4.cap2")} loading="lazy" />
+              <img src={image("craftsmanship")} alt={t("v4.story.c4.cap2")} loading="lazy" />
               <figcaption>{t("v4.story.c4.cap2")}</figcaption>
             </figure>
           </div>
