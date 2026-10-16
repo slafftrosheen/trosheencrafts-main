@@ -45,6 +45,7 @@ const AdminNewsletterSubscribers = lazy(() => import("@/pages/admin/NewsletterSu
 const AdminConstructor = lazy(() => import("@/pages/admin/ConstructorConfig"));
 const AdminHomepageMedia = lazy(() => import("@/pages/admin/HomepageMedia"));
 const AdminWebsiteContent = lazy(() => import("@/pages/admin/WebsiteContent"));
+const AdminMediaLibrary = lazy(() => import("@/pages/admin/MediaLibrary"));
 
 function Router() {
   const [location] = useLocation();
@@ -58,6 +59,7 @@ function Router() {
         <Route path="/admin/promotions"><AdminLayout><AdminPromotions /></AdminLayout></Route>
         <Route path="/admin/homepage-media"><AdminLayout><AdminHomepageMedia /></AdminLayout></Route>
         <Route path="/admin/content"><AdminLayout><AdminWebsiteContent /></AdminLayout></Route>
+        <Route path="/admin/media"><AdminLayout><AdminMediaLibrary /></AdminLayout></Route>
         <Route path="/admin/subscribers"><AdminLayout><AdminNewsletterSubscribers /></AdminLayout></Route>
         <Route path="/admin/products"><AdminLayout><AdminProducts /></AdminLayout></Route>
         <Route path="/admin/constructor"><AdminLayout><AdminConstructor /></AdminLayout></Route>
