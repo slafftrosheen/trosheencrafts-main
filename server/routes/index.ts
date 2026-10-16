@@ -4,6 +4,7 @@ import { ordersRouter } from './orders';
 import { authRouter } from './auth';
 import { contactRouter } from './contact';
 import uploadRouter from './upload';
+import { r2MediaRouter } from './r2Media';
 import { blogRouter } from './blog';
 import { galleryRouter } from './gallery';
 import { adminRouter } from './admin';
@@ -41,6 +42,7 @@ export const createApiRouter = (): Router => {
   router.use('/inventory', inventoryRouter);
   // Deprecated plural image endpoint now uses the same R2-backed handler.
   router.use('/uploads', uploadRouter);
+  router.use('/media-library', r2MediaRouter);
 
   // Health check
   router.get('/health', (req, res) => {
