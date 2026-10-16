@@ -102,7 +102,7 @@ siteConfigRouter.get('/homepage-images', async (_req, res, next) => {
 const siteCopyLanguages = ['lv', 'en', 'ru', 'pl', 'uk'] as const;
 const siteCopyEntrySchema = z.object({
   body: z.object({
-    key: z.string().regex(/^(?:v4|brand)\.[A-Za-z0-9_.-]{1,100}$/),
+    key: z.string().regex(/^(?!admin[._-])[A-Za-z][A-Za-z0-9_.-]{1,100}$/),
     language: z.enum(siteCopyLanguages),
     value: z.string().max(4000).nullable(),
   }).strict(),
@@ -115,7 +115,7 @@ siteConfigRouter.get('/content', async (_req, res, next) => {
     const copy: Record<string, Record<string, string>> = {};
     if (source && typeof source === 'object' && !Array.isArray(source)) {
       for (const [key, entry] of Object.entries(source)) {
-        if (!/^(?:v4|brand)\.[A-Za-z0-9_.-]{1,100}$/.test(key) ||
+        if (!/^(?!admin[._-])[A-Za-z][A-Za-z0-9_.-]{1,100}$/.test(key) ||
             !entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
         const localized: Record<string, string> = {};
         for (const language of siteCopyLanguages) {

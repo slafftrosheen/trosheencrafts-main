@@ -16,7 +16,7 @@ const LANGUAGES = [
 type Language = (typeof LANGUAGES)[number]["code"];
 
 const copyKeys = Object.keys(translations)
-  .filter((key) => key.startsWith("v4.") || key.startsWith("brand."))
+  .filter(key => !/^(admin[._-]|settings[._-])/.test(key))
   .sort();
 const sections: Record<string, string> = {
   "nav": "Навигация", "hero": "Главный экран", "letter": "Приветствие",
@@ -71,7 +71,7 @@ export default function WebsiteContent() {
         <p className="text-xs font-semibold uppercase tracking-[.18em] text-primary">Контент · Trosheen v4.3</p>
         <h1 className="font-serif text-3xl font-semibold sm:text-4xl">Тексты сайта</h1>
         <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
-          Редактируйте заголовки, подписи, описания и фирменные тексты публичных страниц на пяти языках.
+          Редактируйте тексты публичных страниц, магазина, конструктора и форм на пяти языках.
           Изменения сохраняются в базе данных и сразу доступны на сайте. Исходные тексты
           брендбука остаются резервными и могут быть восстановлены одной кнопкой.
         </p>

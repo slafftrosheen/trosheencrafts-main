@@ -239,7 +239,7 @@ function CategoryManager() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteMutation.mutate(cat.id)}
+                      onClick={() => { if (window.confirm("Удалить категорию? Элементы останутся без категории.")) deleteMutation.mutate(cat.id); }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

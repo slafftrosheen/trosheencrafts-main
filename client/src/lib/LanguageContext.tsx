@@ -810,7 +810,8 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
 
   const t = (key: string) => {
     const activeLanguage: Language = adminMode ? "ru" : language;
-    return siteCopy[key]?.[activeLanguage]?.trim()
+    // Admin chrome never inherits public CMS overrides; it always stays Russian.
+    return (adminMode ? undefined : siteCopy[key]?.[activeLanguage]?.trim())
       || translations[key]?.[activeLanguage]
       || translations[key]?.lv
       || translations[key]?.en
