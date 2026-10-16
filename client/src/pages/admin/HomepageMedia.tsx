@@ -76,8 +76,18 @@ function SlotCard({ slot, assigned, busy, disabled, onSave, onUpload }: SlotCard
             setDragging(false);
             void handleFile(event.dataTransfer.files?.[0]);
           }}>
-          <img src={preview} alt={"Предпросмотр: " + slot.title}
-            className={"w-full object-cover " + shape} loading="lazy" />
+          {preview ? (
+            <img src={preview} alt={"Предпросмотр: " + slot.title}
+              className={"w-full " + (slot.key === "hero" || slot.key === "familyFeature" ? "object-contain" : "object-cover") + " " + shape}
+              loading="lazy" />
+          ) : (
+            <div className={"flex flex-col items-center justify-center gap-3 text-center p-8 " + shape}>
+              <ImageIcon className="h-9 w-9 text-muted-foreground/50" aria-hidden="true" />
+              <span className="max-w-xs text-sm leading-6 text-muted-foreground">
+                Фото пока не загружено. На сайте показывается фирменная иллюстрация.
+              </span>
+            </div>
+          )}
           {dragging && <div className="absolute inset-0 flex items-center justify-center bg-background/80 text-sm font-semibold">Отпустите для загрузки в R2</div>}
           {busy && <div className="absolute inset-0 flex items-center justify-center bg-background/70" role="status">
             <Loader2 className="h-7 w-7 animate-spin text-primary" />
@@ -100,7 +110,10 @@ function SlotCard({ slot, assigned, busy, disabled, onSave, onUpload }: SlotCard
             onChange={(event) => setDraft(event.target.value)}
             disabled={isBusy} placeholder="https://media.example.com/homepage/photo.webp"
             className="h-11 text-sm" />
-          <p className="text-xs text-muted-foreground">Пустое поле означает стандартное фото. Можно указать ссылку на изображение из галереи в том же R2-бакете.</p>
+          <p className="text-xs text-muted-foreground">
+            Пустое поле использует исходное фото из набора v4.3 либо фирменное оформление без фотографии.
+            Можно вставить URL из того же R2-бакета.
+          </p>
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2">
