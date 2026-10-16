@@ -533,7 +533,7 @@
 .storefront .brand-art-crop:hover .brand-panel-image,
 .storefront .brand-editorial-media:hover .brand-panel-image { transform: none !important; }
 
-/* Promotional imagery is never a canvas for duplicate baked English typography. */
+/* Preserve complete kit-banner colour panels; never cut off embedded artwork. */
 .storefront .brand-promo-media {
   position: relative;
   width: 100%;
@@ -553,15 +553,13 @@
   object-fit: cover;
   object-position: center;
 }
-.storefront .brand-promo-media--right img {
-  object-position: 100% center;
-  transform: scale(1.12);
-  transform-origin: right center;
+.storefront .brand-promo-media--kit img {
+  object-fit: contain;
+  object-position: center;
+  transform: none;
 }
-.storefront .brand-promo-media--left img {
-  object-position: 0 center;
-  transform: scale(1.12);
-  transform-origin: left center;
+.storefront .brand-promo-media--kit {
+  background: var(--tr-linen);
 }
 .storefront .brand-promo-card h3 { text-wrap: balance; }
 @media (max-width: 640px) {

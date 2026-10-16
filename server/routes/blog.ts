@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { blogPosts } from '../db/schema';
-import { eq, desc, ilike, sql } from 'drizzle-orm';
+import { eq, desc, ilike, sql, and, isNotNull } from 'drizzle-orm';
 import { validateRequest } from '../middleware/validation';
 import { adminAuthMiddleware } from '../middleware/auth';
 import { spawn } from 'child_process';
@@ -25,17 +25,15 @@ blogRouter.get(
     try {
       const { search, limit, offset } = req.query as any;
 
-      let query = db
-        .select()
-        .from(blogPosts)
-        .where(sql`${blogPosts.publishedAt} IS NOT NULL`)
-        .orderBy(desc(blogPosts.publishedAt));
-
-      if (search) {
-        query = query.where(ilike(blogPosts.title, `%${search}%`)) as any;
-      }
-
-      const posts = await query.limit(limit).offset(offset);
+      // A second .where() would otherwise replace the published-only filter,
+      // exposing unpublished journal drafts when a visitor searches.
+      const conditions = search
+        ? and(isNotNull(blogPosts.publishedAt), ilike(blogPosts.title, `%${search}%`))
+        : isNotNull(blogPosts.publishedAt);
+      const posts = await db.select().from(blogPosts)
+        .where(conditions)
+        .orderBy(desc(blogPosts.publishedAt))
+        .limit(limit).offset(offset);
       res.json(posts);
     } catch (error) {
       next(error);

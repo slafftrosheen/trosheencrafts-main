@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Plus, Edit, Trash2, Eye, Loader2 } from 'lucide-react';
-import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -94,9 +93,11 @@ export default function AdminBlog() {
                     <TableCell className="text-right px-8">
                       <div className="flex justify-end gap-2">
                         {post.publishedAt && (
-                          <Link href={`/blog/${post.slug}`}>
-                            <a target="_blank"><Button variant="ghost" size="icon" className="rounded-xl"><Eye size={18} /></Button></a>
-                          </Link>
+                          <a href={`/blog/${post.slug}`} target="_blank" rel="noopener noreferrer"
+                            className="inline-flex h-10 w-10 items-center justify-center rounded-xl hover:bg-muted"
+                            aria-label="Открыть опубликованную запись">
+                            <Eye size={18} />
+                          </a>
                         )}
                         <Button variant="ghost" size="icon" className="rounded-xl" onClick={() => handleEdit(post)}><Edit size={18} /></Button>
                         <Button 

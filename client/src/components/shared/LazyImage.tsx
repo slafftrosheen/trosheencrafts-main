@@ -32,7 +32,14 @@ export function LazyImage({
       return;
     }
 
+    setIsLoaded(false);
+    setHasError(false);
+    setIsInView(false);
     if (!imgRef.current) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setIsInView(true);
+      return;
+    }
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {

@@ -57,6 +57,15 @@ for (const route of ["/admin", "/admin/gallery", "/admin/constructor", "/admin/h
 
 const home = text("client/src/pages/home.tsx");
 expect(home.includes("useHomepageImages") && home.includes("image(\"hero\")"), "Keep R2-admin-editable homepage images");
+expect(home.includes('image("storyHeritage")') && home.includes('image("storyMakers")') && home.includes('image("shopFeature")'), "Home photography must be connected to editor slots");
+expect(!home.includes("FALLBACK_STRIP"), "Home must not fabricate portfolio imagery");
+expect(routes.includes('path="/admin/content"'), "The public-site copy editor must remain accessible from admin");
+const copyApi = text("server/routes/siteConfig.ts");
+expect(copyApi.includes("get('/content'") && copyApi.includes("'/admin/content'"), "Copy overrides must be wired to persistent site-config APIs");
+const v4Copy = text("client/src/lib/v4Copy.ts");
+for (const line of v4Copy.split("\n").filter(line => /^\s*"v4\./.test(line))) {
+  expect(/\bru:/.test(line) && /\bpl:/.test(line) && /\buk:/.test(line), "All five languages required: " + line.match(/"([^"]+)"/)?.[1]);
+}
 expect(/hero-mobile-\d+-1080\.webp/.test(home), "Keep responsive hero art direction");
 expect(home.includes("<PromotionalGallery embedded />"), "Keep promotions on homepage");
 expect(home.includes("className=\"hero\"") && home.includes("hero__content"), "Homepage hero must be kit v4 with live HTML copy");
@@ -66,7 +75,7 @@ const about = text("client/src/pages/about.tsx");
 expect(about.includes("chapter-nav") && about.includes("id=\"recepte\""), "Story page keeps its chapter navigation and recipe section");
 expect(about.includes("v4.story.c7.cta1"), "Story page keeps its closing visit call to action");
 const promotions = text("client/src/components/PromotionalGallery.tsx");
-expect(promotions.includes("kitBannerPhotoSide") && promotions.includes("brand-promo-media"), "Kit collection banners must show the photographic region, not baked text");
+expect(promotions.includes("isKitBanner") && promotions.includes("brand-promo-media--kit"), "Kit collection banners must preserve their complete artwork");
 expect(!promotions.includes('bg-gradient-to-t'), "Do not cover promo photography with heavy text gradients");
 const shop = text("client/src/pages/shop.tsx");
 expect(shop.includes("<CandleConstructor />"), "Keep full constructor embedded in shop");

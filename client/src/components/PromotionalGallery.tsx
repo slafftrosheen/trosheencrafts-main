@@ -18,13 +18,10 @@ interface Promotion {
   active: boolean;
 }
 
-/** The marketing-kit banners contain their own fixed English typesetting.
- * Crop to the photographic half. Headlines and CTAs always remain live HTML.
- * Unknown admin/R2 photos are shown without forced cropping. */
-export function kitBannerPhotoSide(src: string): "left" | "right" | null {
-  const match = /trosheen-collection-banner-0([1-5])(?:-|\.)/i.exec(src);
-  if (!match) return null;
-  return Number(match[1]) % 2 === 0 ? "left" : "right";
+/** Keep the full kit artwork, including its intentionally typeset colour panels.
+ * R2 photos remain editorial images with ordinary cover behaviour. */
+export function isKitBanner(src: string): boolean {
+  return /trosheen-collection-banner-0[1-5](?:-|\.)/i.test(src);
 }
 
 export function PromotionalGallery({ embedded = false }: { embedded?: boolean }) {
@@ -53,12 +50,12 @@ export function PromotionalGallery({ embedded = false }: { embedded?: boolean })
         )}
         <div className="grid gap-6 md:grid-cols-2">
           {activePromotions.map(promo => {
-            const side = !promo.videoUrl ? kitBannerPhotoSide(promo.imageUrl) : null;
+            const kitBanner = !promo.videoUrl && isKitBanner(promo.imageUrl);
             const href = promo.linkUrl?.trim() || "";
             const safeLink = /^(https?:\/\/|\/(?!\/)|#)/i.test(href);
             return (
               <article key={promo.id} className="brand-promo-card group flex min-w-0 flex-col overflow-hidden border border-border bg-card">
-                <div className={"brand-promo-media" + (side ? " brand-promo-media--" + side : "")}>
+                <div className={"brand-promo-media" + (kitBanner ? " brand-promo-media--kit" : "")}>
                   {promo.videoUrl ? (
                     <video src={promo.videoUrl} poster={promo.imageUrl}
                       autoPlay={!reduceMotion} muted loop playsInline preload="metadata"
