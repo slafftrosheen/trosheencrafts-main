@@ -48,6 +48,7 @@ import { useToast } from '@/hooks/use-toast';
 import { adminT as t } from "@/lib/adminI18n";
 import { DualFileUploader } from '@/components/admin/DualFileUploader';
 import { BatchPhotoUploader } from '@/components/admin/BatchPhotoUploader';
+import { LocalizedFields, type LocaleMap } from "@/components/admin/LocalizedFields";
 import { BatchEditDialog } from '@/components/admin/BatchEditDialog';
 import { apiClient } from '@/lib/apiClient';
 import { cn } from '@/lib/utils';
@@ -57,6 +58,8 @@ interface GalleryItem {
   title: string;
   slug: string;
   description?: string;
+  titleTranslations?: LocaleMap;
+  descriptionTranslations?: LocaleMap;
   type: '3d' | 'photo' | 'video';
   categoryId?: number;
   mediaUrl: string;
@@ -75,6 +78,8 @@ interface GalleryCategory {
   name: string;
   slug: string;
   description?: string;
+  nameTranslations?: LocaleMap;
+  descriptionTranslations?: LocaleMap;
   type: '3d' | 'photo' | 'video';
   featured: boolean;
   sortOrder: number;
@@ -97,6 +102,8 @@ function CategoryManager() {
     name: '',
     slug: '',
     description: '',
+    nameTranslations: {} as LocaleMap,
+    descriptionTranslations: {} as LocaleMap,
     type: '3d' as '3d' | 'photo' | 'video',
     featured: false,
     sortOrder: 0,
@@ -141,6 +148,8 @@ function CategoryManager() {
       name: '',
       slug: '',
       description: '',
+      nameTranslations: {} as LocaleMap,
+      descriptionTranslations: {} as LocaleMap,
       type: '3d',
       featured: false,
       sortOrder: 0,
@@ -154,6 +163,8 @@ function CategoryManager() {
       name: category.name,
       slug: category.slug,
       description: category.description || '',
+      nameTranslations: category.nameTranslations || {},
+      descriptionTranslations: category.descriptionTranslations || {},
       type: category.type,
       featured: category.featured,
       sortOrder: category.sortOrder,
@@ -244,7 +255,7 @@ function CategoryManager() {
         setIsDialogOpen(open);
         if (!open) resetForm();
       }}>
-        <DialogContent className="max-w-md rounded-3xl">
+        <DialogContent className="max-h-[90dvh] max-w-2xl overflow-y-auto rounded-3xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-2xl">
               {editingCategory ? t('admin.gallery.edit_category') : t('admin.gallery.add_category')}
@@ -279,6 +290,9 @@ function CategoryManager() {
                 rows={3}
               />
             </div>
+            <LocalizedFields names={formData.nameTranslations} descriptions={formData.descriptionTranslations}
+              onNameChange={value => setFormData(prev => ({ ...prev, nameTranslations: value }))}
+              onDescriptionChange={value => setFormData(prev => ({ ...prev, descriptionTranslations: value }))} />
             <div>
               <Label>{t('admin.category.type')}</Label>
               <Select
@@ -387,7 +401,8 @@ function ItemManager() {
   });
 
   const [formData, setFormData] = useState({
-    title: '', slug: '', description: '', type: '3d' as '3d' | 'photo' | 'video',
+    title: '', slug: '', description: '', titleTranslations: {} as LocaleMap,
+    descriptionTranslations: {} as LocaleMap, type: '3d' as '3d' | 'photo' | 'video',
     categoryId: null as number | null, mediaUrl: '', thumbnailUrl: '',
     tags: [] as string[], featured: false, published: true, sortOrder: 0, metadata: {},
   });
@@ -395,7 +410,8 @@ function ItemManager() {
 
   const resetForm = () => {
     setFormData({
-      title: '', slug: '', description: '', type: '3d', categoryId: null,
+      title: '', slug: '', description: '', titleTranslations: {} as LocaleMap,
+      descriptionTranslations: {} as LocaleMap, type: '3d', categoryId: null,
       mediaUrl: '', thumbnailUrl: '', tags: [], featured: false, published: true,
       sortOrder: 0, metadata: {},
     });
@@ -407,6 +423,7 @@ function ItemManager() {
     setEditingItem(item);
     setFormData({
       title: item.title, slug: item.slug, description: item.description || '',
+      titleTranslations: item.titleTranslations || {}, descriptionTranslations: item.descriptionTranslations || {},
       type: item.type, categoryId: item.categoryId || null, mediaUrl: item.mediaUrl,
       thumbnailUrl: item.thumbnailUrl || '', tags: item.tags || [],
       featured: item.featured, published: item.published, sortOrder: item.sortOrder,
@@ -427,7 +444,7 @@ function ItemManager() {
     setFormData({
       ...formData,
       title,
-      slug: slugify(title),
+      slug: editingItem ? formData.slug : slugify(title),
     });
   };
 
@@ -550,7 +567,7 @@ function ItemManager() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      onClick={() => deleteMutation.mutate(item.id)}
+                      onClick={() => { if (window.confirm('Удалить элемент галереи?')) deleteMutation.mutate(item.id); }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
@@ -604,7 +621,7 @@ function ItemManager() {
         setIsDialogOpen(open);
         if (!open) resetForm();
       }}>
-        <DialogContent className="max-w-2xl rounded-3xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl rounded-3xl max-h-[90dvh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="font-serif text-2xl">
               {editingItem ? t('admin.gallery.edit_item') : t('admin.gallery.add_item')}
@@ -640,6 +657,9 @@ function ItemManager() {
                   rows={3}
                 />
               </div>
+              <LocalizedFields names={formData.titleTranslations} descriptions={formData.descriptionTranslations}
+                onNameChange={value => setFormData(prev => ({ ...prev, titleTranslations: value }))}
+                onDescriptionChange={value => setFormData(prev => ({ ...prev, descriptionTranslations: value }))} />
               <div>
                 <Label>{t('admin.category.type')}</Label>
                 <Select
