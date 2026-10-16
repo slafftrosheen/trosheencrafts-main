@@ -92,6 +92,78 @@ siteConfigRouter.get('/homepage-images', async (_req, res, next) => {
   }
 });
 
+
+/**
+ * CMS copy overrides for the v4 storefront.
+ *
+ * Defaults live in version-controlled dictionaries and remain available when
+ * the database is empty. Editing one language/key never replaces another.
+ */
+const siteCopyLanguages = ['lv', 'en', 'ru', 'pl', 'uk'] as const;
+const siteCopyEntrySchema = z.object({
+  body: z.object({
+    key: z.string().regex(/^v4\.[A-Za-z0-9_.-]{1,100}$/),
+    language: z.enum(siteCopyLanguages),
+    value: z.string().max(4000).nullable(),
+  }).strict(),
+});
+
+siteConfigRouter.get('/content', async (_req, res, next) => {
+  try {
+    const record = await getConfigByKey('siteCopy');
+    const source = record?.value;
+    const copy: Record<string, Record<string, string>> = {};
+    if (source && typeof source === 'object' && !Array.isArray(source)) {
+      for (const [key, entry] of Object.entries(source)) {
+        if (!/^v4\.[A-Za-z0-9_.-]{1,100}$/.test(key) ||
+            !entry || typeof entry !== 'object' || Array.isArray(entry)) continue;
+        const localized: Record<string, string> = {};
+        for (const language of siteCopyLanguages) {
+          const value = (entry as Record<string, unknown>)[language];
+          if (typeof value === 'string' && value.length <= 4000 && value.trim()) {
+            localized[language] = value;
+          }
+        }
+        if (Object.keys(localized).length) copy[key] = localized;
+      }
+    }
+    res.setHeader('Cache-Control', 'no-store');
+    res.json(copy);
+  } catch (error) {
+    next(error);
+  }
+});
+
+siteConfigRouter.put('/admin/content', adminAuthMiddleware, validateRequest(siteCopyEntrySchema),
+  async (req, res, next) => {
+    try {
+      const { key, language, value } = req.body as {
+        key: string; language: typeof siteCopyLanguages[number]; value: string | null;
+      };
+      const textValue = value?.trim() || '';
+      // jsonb_set preserves all other keys; JSONB || preserves other languages
+      // for the same key, avoiding lost edits from two admin tabs.
+      const [record] = await db.insert(siteConfig)
+        .values({ key: 'siteCopy', value: { [key]: { [language]: textValue } } })
+        .onConflictDoUpdate({
+          target: siteConfig.key,
+          set: {
+            value: sql`jsonb_set(
+              COALESCE(${siteConfig.value}, '{}'::jsonb),
+              ARRAY[${key}]::text[],
+              COALESCE(${siteConfig.value} -> ${key}, '{}'::jsonb) || ${JSON.stringify({ [language]: textValue })}::jsonb,
+              true
+            )`,
+            updatedAt: new Date(),
+          },
+        }).returning();
+      res.json({ key, language, value: textValue || null, updatedAt: record.updatedAt });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 const homepageImageUpdateSchema = z.object({
   body: z.object({
     slot: z.enum(HOMEPAGE_IMAGE_SLOTS.map(({ key }) => key) as [HomepageImageSlot, ...HomepageImageSlot[]]),

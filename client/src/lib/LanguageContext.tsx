@@ -1,6 +1,8 @@
 import { brandCopy } from "./brandCopy";
 import { v4Copy } from "./v4Copy";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { apiClient } from "./apiClient";
 
 type Language = "en" | "lv" | "ru" | "pl" | "uk";
 
@@ -766,9 +768,18 @@ interface LanguageContextType {
   t: (key: string) => string;
 }
 
+export type SiteCopyOverrides = Record<string, Partial<Record<Language, string>>>;
+
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
+  const { data: siteCopy = {} } = useQuery<SiteCopyOverrides>({
+    queryKey: ["siteCopy"],
+    queryFn: () => apiClient.get<SiteCopyOverrides>("/site-config/content"),
+    staleTime: 60_000,
+    retry: 1,
+  });
+
   const [language, setLanguageState] = useState<Language>(() => {
     try {
       const savedLang = localStorage.getItem('trosheen-lang');
@@ -782,7 +793,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    document.documentElement.lang = language;
+    document.documentElement.lang = window.location.pathname.startsWith("/admin") ? "ru" : language;
   }, [language]);
 
   const setLanguage = (lang: Language) => {
@@ -799,7 +810,11 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       typeof window !== "undefined" && window.location.pathname.startsWith("/admin")
         ? "ru"
         : language;
-    return translations[key]?.[activeLanguage] || key;
+    return siteCopy[key]?.[activeLanguage]?.trim()
+      || translations[key]?.[activeLanguage]
+      || translations[key]?.lv
+      || translations[key]?.en
+      || key;
   };
 
   return (

@@ -1,9 +1,9 @@
 /**
  * Trosheen v4.3 storefront copy (from the kit's COPY-LV-EN.md and the prototype pages).
  *
- * Latvian + English cover every string. Short UI chrome (navigation, buttons, labels,
- * states) is also translated for ru / pl / uk; longer editorial prose falls back to
- * English there until a translator signs it off — the kit marks all copy as draft.
+ * Every v4 string is available in Latvian, English, Russian, Polish and Ukrainian.
+ * Editors can override public copy per language through /admin/content; when no
+ * override exists, this dictionary remains the deterministic fallback.
  */
 import type { translations } from "./LanguageContext";
 

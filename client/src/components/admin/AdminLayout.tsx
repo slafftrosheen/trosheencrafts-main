@@ -54,6 +54,7 @@ const navigationItems = [
     items: [
       { name: "Журнал", href: "/admin/blog", icon: FileText },
       { name: "Фото главной", href: "/admin/homepage-media", icon: ImageIcon },
+      { name: "Тексты сайта", href: "/admin/content", icon: FileText },
       { name: "Промо-блоки", href: "/admin/promotions", icon: BarChart3 },
       { name: "Галерея", href: "/admin/gallery", icon: ImageIcon },
     ],

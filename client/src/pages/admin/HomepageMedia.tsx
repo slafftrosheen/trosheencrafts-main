@@ -172,7 +172,9 @@ export default function HomepageMedia() {
 
   const migrateBundled = async () => {
     if (migrating || Object.values(busySlots).some(Boolean)) return;
-    const missing = HOMEPAGE_IMAGE_SLOTS.filter(({ key }) => !images[key]);
+    const missing = HOMEPAGE_IMAGE_SLOTS.filter(({ key }) =>
+      !images[key] && Boolean(DEFAULT_HOMEPAGE_IMAGES[key])
+    );
     if (!missing.length) {
       toast.info("Все изображения уже используют R2.");
       return;
@@ -233,7 +235,8 @@ export default function HomepageMedia() {
     }
   };
 
-  const migratedCount = HOMEPAGE_IMAGE_SLOTS.filter((slot) => Boolean(images[slot.key])).length;
+  const migratableSlots = HOMEPAGE_IMAGE_SLOTS.filter((slot) => Boolean(DEFAULT_HOMEPAGE_IMAGES[slot.key]));
+  const migratedCount = migratableSlots.filter((slot) => Boolean(images[slot.key])).length;
 
   return (
     <div className="space-y-8">
@@ -262,15 +265,15 @@ export default function HomepageMedia() {
               <div>
                 <div className="flex items-center gap-2 text-sm font-semibold">
                   <CloudUpload className="h-5 w-5 text-primary" />
-                  {migratedCount} из {HOMEPAGE_IMAGE_SLOTS.length} фотографий на R2
+                  {migratedCount} из {migratableSlots.length} стандартных фотографий на R2
                 </div>
                 <p className="mt-2 max-w-xl text-sm text-muted-foreground">
                   Перенести текущие стандартные фото из сборки сайта в облачный бакет одним действием. Уже заменённые фотографии не будут перезаписаны.
                 </p>
-                {migrating && <p className="mt-2 text-sm font-semibold" role="status">Перенос: {migrationStep} / {HOMEPAGE_IMAGE_SLOTS.length - migratedCount + migrationStep}</p>}
+                {migrating && <p className="mt-2 text-sm font-semibold" role="status">Перенос: {migrationStep} / {migratableSlots.length - migratedCount + migrationStep}</p>}
               </div>
               <Button type="button" onClick={() => void migrateBundled()}
-                disabled={migrating || migratingPromotions || migratedCount === HOMEPAGE_IMAGE_SLOTS.length || Object.values(busySlots).some(Boolean)}
+                disabled={migrating || migratingPromotions || migratedCount === migratableSlots.length || Object.values(busySlots).some(Boolean)}
                 className="min-h-11">
                 {migrating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <CloudUpload className="mr-2 h-4 w-4" />}
                 Перенести стандартные фото в R2
