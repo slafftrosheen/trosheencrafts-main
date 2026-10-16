@@ -1,5 +1,6 @@
-import { useRef } from 'react';
-import { Upload, X, Loader2 } from 'lucide-react';
+import { useRef, useState } from 'react';
+import { Upload, X, Loader2, FolderOpen } from 'lucide-react';
+import { R2MediaPicker } from '@/components/admin/R2MediaPicker';
 import { Button } from '@/components/ui/button';
 import { useImageUpload } from '@/hooks/useImageUpload';
 import { cn } from '@/lib/utils';
@@ -13,6 +14,7 @@ interface ImageUploadProps {
 
 export function ImageUpload({ value, onChange, onRemove, className }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const { uploadImage, uploading } = useImageUpload();
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,9 +22,8 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
     if (!file) return;
 
     const result = await uploadImage(file);
-    if (result) {
-      onChange(result.url);
-    }
+    if (result) onChange(result.url);
+    if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
   const handleClick = () => {
@@ -31,6 +32,7 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
 
   return (
     <div className={cn('relative', className)}>
+      <R2MediaPicker open={pickerOpen} onOpenChange={setPickerOpen} onSelect={onChange} kind="image" />
       <input
         ref={fileInputRef}
         type="file"
@@ -51,6 +53,7 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
             <Button
               variant="secondary"
               size="sm"
+              type="button"
               onClick={handleClick}
               disabled={uploading}
               className="rounded-xl"
@@ -62,6 +65,7 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
               <Button
                 variant="destructive"
                 size="sm"
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   onRemove();
@@ -97,6 +101,10 @@ export function ImageUpload({ value, onChange, onRemove, className }: ImageUploa
           )}
         </button>
       )}
+      <Button type="button" variant="outline" size="sm" className="mt-3 w-full"
+        disabled={uploading} onClick={() => setPickerOpen(true)}>
+        <FolderOpen className="mr-2 h-4 w-4" /> Выбрать из медиатеки R2
+      </Button>
     </div>
   );
 }
