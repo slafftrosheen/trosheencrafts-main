@@ -1,230 +1,256 @@
-import { useState } from "react";
-import { useRoute, Link } from "wouter";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Check, Package, Minus, Plus } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useCartStore } from "@/lib/stores/cartStore";
-import { PageLoader } from "@/components/shared/LoadingStates";
-import { OptimizedImage } from "@/components/shared/OptimizedImage";
+import { toast } from "sonner";
 import { useLanguage } from "@/lib/LanguageContext";
 import { apiClient } from "@/lib/apiClient";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
-import { BrandMotion } from "@/components/shared/BrandMotion";
+import { useCartStore } from "@/lib/stores/cartStore";
+import { useProducts, type Product } from "@/hooks/useApi";
+import { PageLoader } from "@/components/shared/LoadingStates";
+import { Lottie } from "@/components/brand/Lottie";
+import { Ornament } from "@/components/brand/Ornament";
+import { ProductCardV4, productTitle } from "@/components/brand/ProductCardV4";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/shop/:id");
   const id = params?.id;
   const { language, t } = useLanguage();
   const addItem = useCartStore((state) => state.addItem);
-  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [cartAnimation, setCartAnimation] = useState(0);
+  const [added, setAdded] = useState(0);
+  const [labelOverride, setLabelOverride] = useState(false);
 
-  const { data: product, isLoading, error } = useQuery({
+  const { data: product, isLoading, error } = useQuery<Product>({
     queryKey: ["/api/products/" + id],
-    queryFn: () => apiClient.get<any>("/products/" + id),
+    queryFn: () => apiClient.get<Product>("/products/" + id),
     enabled: !!id,
   });
+  const { data: allProducts } = useProducts();
+
+  useEffect(() => {
+    setQuantity(1);
+    setAdded(0);
+    setLabelOverride(false);
+  }, [id]);
+
+  const related = useMemo(
+    () =>
+      (allProducts || [])
+        .filter((item) => item.published && String(item.id) !== String(id))
+        .slice(0, 4),
+    [allProducts, id],
+  );
 
   if (isLoading) return <PageLoader />;
 
   if (error || !product) {
     return (
-      <div className="site-container page-shell flex min-h-[65vh] items-center justify-center">
-        <div className="max-w-md text-center">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-            <Package className="h-7 w-7 text-muted-foreground" />
-          </div>
-          <h1 className="mt-6 font-serif text-4xl font-semibold">{t("product.not_found")}</h1>
-          <p className="mt-3 text-muted-foreground">{t("product.not_found_desc")}</p>
-          <Button asChild className="mt-7">
-            <Link href="/shop">
-              <ArrowLeft className="h-4 w-4" />
-              {t("product.back_to_shop")}
-            </Link>
-          </Button>
-        </div>
+      <div className="wrap" style={{ padding: "clamp(4rem,10vw,8rem) 0", textAlign: "center" }}>
+        <Lottie file="trosheen-10-404-rolling-stone.json" mode="view" style={{ width: 160, height: 160, margin: "0 auto" }} />
+        <h1>{t("product.not_found")}</h1>
+        <p className="lead" style={{ marginInline: "auto" }}>
+          {t("product.not_found_desc")}
+        </p>
+        <Link className="btn" href="/shop">
+          {t("product.back_to_shop")}
+        </Link>
       </div>
     );
   }
 
-  const name = product.nameTranslations?.[language] || product.name;
+  const name = productTitle(product, language);
   const price = Number(product.price);
-  const images: string[] = product.images?.length ? product.images : product.image ? [product.image] : [];
-  const selectedImage = images[selectedImageIndex] || images[0] || "";
-
+  const images: string[] = product.images?.length
+    ? product.images
+    : product.image
+      ? [product.image]
+      : [];
+  const [heroImage, ...rest] = images;
   const availableStock = Math.max(0, Number(product.stock ?? 0));
-  const description = typeof product.description === "string" ? product.description : product.description?.[language] || product.description?.en || "";
+  const description =
+    typeof product.description === "string"
+      ? product.description
+      : product.description?.[language] || product.description?.en || "";
+  const metadata = Object.entries(product.metadata || {});
+
   const handleAddToCart = () => {
-    // Read the live basket, not a stale render closure.
-    const cartQuantity = useCartStore.getState().items
-      .filter((item) => item.id === product.id)
+    const cartQuantity = useCartStore
+      .getState()
+      .items.filter((item) => item.id === product.id)
       .reduce((sum, item) => sum + item.quantity, 0);
     const safeQuantity = Math.max(0, Math.min(quantity, availableStock - cartQuantity));
     if (safeQuantity === 0) {
       toast.error(t("product.stock_limit"));
       return;
     }
-    for (let i = 0; i < safeQuantity; i += 1) {
+    for (let index = 0; index < safeQuantity; index += 1) {
       addItem({
         id: product.id,
         name,
         price,
-        image: selectedImage || images[0],
+        image: heroImage || rest[0],
         maxStock: availableStock,
       });
     }
-    setCartAnimation((count) => count + 1);
+    setAdded((count) => count + 1);
+    setLabelOverride(true);
+    window.setTimeout(() => setLabelOverride(false), 2200);
     toast.success(t("product.added_to_cart"), {
       action: { label: t("constructor.view_cart"), onClick: () => window.location.assign("/cart") },
     });
   };
 
   return (
-    <div className="bg-background">
-      <div className="site-container py-8 sm:py-10">
-        <Link
-          href="/shop"
-          className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition-colors hover:text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          {t("product.back_to_shop")}
-        </Link>
-      </div>
+    <div>
+      <section className="section section--tight">
+        <div className="wrap">
+          <p className="note">
+            <Link href="/shop">{t("v4.pdp.crumb")}</Link>
+            {product.category ? ` / ${product.category}` : ""}
+          </p>
 
-      <section className="site-container pb-16 sm:pb-24">
-        <div className="grid gap-10 lg:grid-cols-[1.08fr_.92fr] lg:gap-16">
-          <div>
-            <div className="aspect-[4/5] overflow-hidden rounded-3xl bg-muted">
-              {selectedImage ? (
-                <OptimizedImage
-                  src={selectedImage}
-                  alt={name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">
-                  Trosheen
-                </div>
+          <div className="pdp" style={{ marginTop: "1.5rem" }}>
+            <div className="pdp__gallery">
+              <div className="frame">
+                {heroImage ? (
+                  <img src={heroImage} alt={name} />
+                ) : (
+                  <img src="/brand/icons/candle.svg" alt="" style={{ opacity: 0.3, padding: "30%" }} />
+                )}
+              </div>
+              {(rest.length ? rest : [heroImage, heroImage]).slice(0, 2).map((image, index) =>
+                image ? (
+                  <div className="frame" key={`${image}-${index}`}>
+                    <img src={image} alt="" loading="lazy" />
+                  </div>
+                ) : (
+                  <div className="frame" key={`empty-${index}`} aria-hidden="true" />
+                ),
               )}
             </div>
 
-            {images.length > 1 && (
-              <div className="mt-4 grid grid-cols-5 gap-3">
-                {images.map((image, index) => (
+            <div className="pdp__info">
+              <p className="eyebrow">{t("v4.tag.oneOfAKind")}</p>
+              <h1 style={{ fontSize: "var(--t-h2)" }}>{name}</h1>
+              {description && <p className="lead">{description}</p>}
+              <div className="price">{price > 0 ? `€${price.toFixed(2)}` : "€ —"}</div>
+
+              <div style={{ display: "flex", gap: ".75rem", flexWrap: "wrap", alignItems: "stretch" }}>
+                <div className="tabs" role="group" aria-label={t("product.increase_quantity")}>
                   <button
-                    key={image + index}
                     type="button"
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={cn(
-                      "aspect-square min-h-11 overflow-hidden rounded-xl border bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-primary",
-                      selectedImageIndex === index ? "border-primary" : "border-transparent hover:border-border"
-                    )}
-                    aria-label={t("product.view_image") + " " + (index + 1)}
-                    aria-pressed={selectedImageIndex === index}
+                    className="tab"
+                    onClick={() => setQuantity((value) => Math.max(1, value - 1))}
+                    disabled={quantity <= 1}
+                    aria-label={t("product.decrease_quantity")}
                   >
-                    <OptimizedImage src={image} alt="" className="h-full w-full object-cover" />
+                    −
                   </button>
-                ))}
+                  <span style={{ padding: ".75rem 1rem", font: "500 1rem/1 var(--f-body)" }}>
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    className="tab"
+                    onClick={() => setQuantity((value) => Math.min(value + 1, Math.max(1, availableStock)))}
+                    disabled={availableStock === 0 || quantity >= availableStock}
+                    aria-label={t("product.increase_quantity")}
+                  >
+                    +
+                  </button>
+                </div>
+
+                <button
+                  className="btn cart-btn"
+                  style={{ flex: "1 1 220px" }}
+                  onClick={handleAddToCart}
+                  disabled={availableStock === 0}
+                >
+                  <Lottie
+                    file="trosheen-02-add-to-cart.json"
+                    mode="manual"
+                    trigger={added}
+                    ariaHidden
+                  />
+                  <span>{labelOverride ? t("v4.pdp.added") : t("v4.pdp.addToCart")}</span>
+                </button>
               </div>
-            )}
-          </div>
 
-          <div className="lg:sticky lg:top-28 lg:self-start">
-            {product.category && <p className="eyebrow">{product.category}</p>}
-            <h1 className="mt-4 font-serif text-[clamp(2.8rem,6vw,5.6rem)] font-semibold leading-[.94] tracking-[-.045em]">
-              {name}
-            </h1>
-
-            <div className="mt-7 flex items-baseline gap-3">
-              <span className="font-serif text-3xl font-semibold text-primary sm:text-4xl">
-                €{price.toFixed(2)}
-              </span>
-              {product.compareAtPrice && Number(product.compareAtPrice) > price && (
-                <span className="text-lg text-muted-foreground line-through">
-                  €{Number(product.compareAtPrice).toFixed(2)}
-                </span>
-              )}
-            </div>
-
-            <div className="mt-5">
               {availableStock > 0 ? (
-                <span className="inline-flex items-center gap-2 text-sm font-semibold text-primary">
-                  <Check className="h-4 w-4" />
+                <p className="field-hint" style={{ marginTop: ".8rem" }}>
                   {t("product.in_stock")}
-                </span>
+                </p>
               ) : (
-                <span className="text-sm font-semibold text-destructive">{t("product.out_of_stock")}</span>
+                <p className="field-error" style={{ marginTop: ".8rem" }}>
+                  {t("product.out_of_stock")}
+                </p>
               )}
-            </div>
 
-            {description && (
-              <p className="mt-7 whitespace-pre-line text-base leading-8 text-muted-foreground sm:text-lg">{description}</p>
-            )}
+              <ul className="facts">
+                <li>
+                  <img src="/brand/icons/handmade.svg" alt="" />
+                  {t("v4.pdp.fact1")}
+                </li>
+                <li>
+                  <img src="/brand/icons/one-of-a-kind.svg" alt="" />
+                  {t("v4.pdp.fact2")}
+                </li>
+                <li>
+                  <img src="/brand/icons/parcel.svg" alt="" />
+                  {t("v4.pdp.fact3")}
+                </li>
+              </ul>
 
-            <div className="mt-8 flex gap-3">
-              <div className="flex h-12 items-center rounded-full border border-border bg-card">
-                <button
-                  type="button"
-                  className="min-h-11 min-w-11 px-4 text-muted-foreground hover:text-foreground disabled:opacity-40"
-                  onClick={() => setQuantity((value) => Math.max(1, value - 1))}
-                  aria-label={t("product.decrease_quantity")}
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="min-w-8 text-center text-sm font-semibold">{quantity}</span>
-                <button
-                  type="button"
-                  className="min-h-11 min-w-11 px-4 text-muted-foreground hover:text-foreground disabled:opacity-40"
-                  onClick={() => setQuantity((value) => Math.min(value + 1, availableStock))}
-                  disabled={availableStock === 0 || quantity >= availableStock}
-                  aria-label={t("product.increase_quantity")}
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-
-              <Button
-                size="lg"
-                onClick={handleAddToCart}
-                disabled={availableStock === 0}
-                className="flex-1"
-              >
-                <BrandMotion name="cart" mode="manual" trigger={cartAnimation} className="h-7 w-7" poster="/brand/icons/bag.svg" />
-                {t("product.add_to_cart")}
-              </Button>
-            </div>
-
-            {availableStock > 0 && availableStock <= 4 && (
-              <p className="mt-3 text-sm font-semibold text-accent">
-                {t("product.only_left").replace("{count}", String(availableStock))}
-              </p>
-            )}
-
-            <div className="surface-muted mt-8 p-5">
-              <p className="text-sm leading-6 text-muted-foreground">
-                {t("product.handcrafted_note")}
-              </p>
-            </div>
-
-            {product.metadata && Object.keys(product.metadata).length > 0 && (
-              <div className="mt-9 border-t border-border pt-7">
-                <h2 className="font-serif text-2xl font-semibold">{t("product.details")}</h2>
-                <dl className="mt-5">
-                  {Object.entries(product.metadata).map(([key, value]) => (
-                    <div key={key} className="flex justify-between gap-6 border-b border-border py-3 text-sm">
-                      <dt className="capitalize text-muted-foreground">{key}</dt>
-                      <dd className="text-right font-semibold">{String(value)}</dd>
-                    </div>
+              {metadata.length > 0 && (
+                <details className="acc" open>
+                  <summary>{t("v4.pdp.acc.materials")}</summary>
+                  {metadata.map(([key, value]) => (
+                    <p key={key}>
+                      <strong style={{ textTransform: "capitalize" }}>{key}</strong>: {String(value)}
+                    </p>
                   ))}
-                </dl>
+                </details>
+              )}
+
+              <details className="acc" open={metadata.length === 0}>
+                <summary>{t("v4.pdp.acc.care")}</summary>
+                <p>
+                  {t("v4.pdp.acc.careBody")}{" "}
+                  <Link href="/guide">{t("v4.pdp.acc.careLink")}</Link>
+                </p>
+              </details>
+
+              <details className="acc">
+                <summary>{t("v4.pdp.acc.shipping")}</summary>
+                <p>{t("v4.pdp.acc.shipBody")}</p>
+              </details>
+
+              <div className="letter" style={{ marginTop: "1.5rem", padding: "1.4rem" }}>
+                <p style={{ fontSize: "1rem", margin: 0 }}>{t("v4.pdp.quote")}</p>
               </div>
-            )}
+            </div>
           </div>
         </div>
       </section>
+
+      {related.length > 0 && (
+        <section className="section section--warm">
+          <div className="wrap">
+            <h2>{t("v4.pdp.related")}</h2>
+            <div className="rail" style={{ marginTop: "1.5rem" }}>
+              {related.map((item, index) => (
+                <ProductCardV4 key={item.id} product={item} delay={index * 90} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <div className="wrap" style={{ paddingBottom: "var(--s7)" }}>
+        <div className="divider" aria-hidden="true">
+          <Ornament name="auseklis" size="sm" draw />
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,200 +1,285 @@
 import { Link } from "wouter";
-import { ArrowRight, MapPin } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
-import { ScrollStoryPhotos, WorkshopTourPhotos } from "@/lib/imageAssets";
-import { BrandMotion } from "@/components/shared/BrandMotion";
+import { Lottie } from "@/components/brand/Lottie";
+import { Ornament } from "@/components/brand/Ornament";
+import { SplitWords } from "@/components/brand/SplitWords";
+import { CountUp } from "@/components/brand/CountUp";
+
+const Arrow = () => (
+  <svg
+    className="tr-arrow"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+  >
+    <path d="M4 12h15M13 6l6 6-6 6" />
+  </svg>
+);
+
+const CHAPTERS = [
+  { id: "pagalms", key: "v4.story.ch1" },
+  { id: "olegs", key: "v4.story.ch2" },
+  { id: "recepte", key: "v4.story.ch3" },
+  { id: "palig", key: "v4.story.ch4" },
+  { id: "cels", key: "v4.story.ch5" },
+  { id: "mantojums", key: "v4.story.ch6" },
+  { id: "ciemos", key: "v4.story.ch7" },
+];
+
+const MAKING_STEPS = [
+  { lottie: "trosheen-13-step-recipe.json", mode: "view" as const },
+  { lottie: "trosheen-14-step-pour.json", mode: "view" as const },
+  { lottie: "trosheen-15-step-sculpt.json", mode: "view" as const },
+  { lottie: "trosheen-16-step-rest.json", mode: "loop" as const },
+  { lottie: "trosheen-17-step-paint.json", mode: "view" as const },
+  { lottie: "trosheen-18-step-wrap.json", mode: "view" as const },
+];
+
+const TIMELINE: { year?: number; label?: string; title: string; desc: string }[] = [
+  { year: 1995, title: "v4.story.tl.1995.title", desc: "v4.story.tl.1995.desc" },
+  { year: 2005, title: "v4.story.tl.2005.title", desc: "v4.story.tl.2005.desc" },
+  { label: "2018–2019", title: "v4.story.tl.2018.title", desc: "v4.story.tl.2018.desc" },
+  { year: 2019, title: "v4.story.tl.2019.title", desc: "v4.story.tl.2019.desc" },
+  { year: 2023, title: "v4.story.tl.2023.title", desc: "v4.story.tl.2023.desc" },
+  { year: 2026, title: "v4.story.tl.2026.title", desc: "v4.story.tl.2026.desc" },
+];
 
 export default function AboutPage() {
   const { t } = useLanguage();
 
-  const timeline = [
-    { year: "1995", titleKey: "timeline.1995.title", descKey: "timeline.1995.desc" },
-    { year: "2005", titleKey: "timeline.2005.title", descKey: "timeline.2005.desc" },
-    { year: "2018", titleKey: "timeline.2018.title", descKey: "timeline.2018.desc" },
-    { year: "2019", titleKey: "timeline.2019_nikola.title", descKey: "timeline.2019_nikola.desc" },
-    { year: "2019", titleKey: "timeline.2019.title", descKey: "timeline.2019.desc" },
-    { year: "2023", titleKey: "timeline.2023.title", descKey: "timeline.2023.desc" },
-    { year: "2026", titleKey: "timeline.2026.title", descKey: "timeline.2026.desc" },
-  ];
-
-  const storySections = [
-    {
-      eyebrow: t("chapter_heritage_eyebrow"),
-      title: t("chapter_heritage_title"),
-      body: t("chapter_heritage_body_1"),
-      image: ScrollStoryPhotos.chapter1_heritage,
-    },
-    {
-      eyebrow: t("chapter_makers_eyebrow"),
-      title: t("chapter_makers_title"),
-      body: t("chapter_makers_body_1"),
-      image: WorkshopTourPhotos.finishingStudio,
-    },
-    {
-      eyebrow: t("chapter_legacy_eyebrow"),
-      title: t("chapter_legacy_title"),
-      body: t("chapter_legacy_body_1"),
-      image: ScrollStoryPhotos.chapter4_family,
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-background">
-      <section className="brand-panel brand-panel-dark brand-panel-about">
-        <div className="brand-panel-copy">
-          <p className="eyebrow mb-5">{t("nav_story")}</p>
-          <h1 className="text-[clamp(2.8rem,5vw,4.8rem)]">{t("brand.story_title")}</h1>
-          <p className="mt-6 max-w-prose leading-relaxed">{t("brand.story_desc")}</p>
-        </div>
-        <div className="brand-art-crop brand-art-crop--right">
-          <img src="/brand/about.webp" alt={t("brand.story_alt")} width="1920" height="900" fetchPriority="high" className="brand-panel-image" />
+    <div>
+      {/* ---------- hero ---------- */}
+      <section className="hero hero--page" style={{ "--focus": "50% 50%" } as React.CSSProperties}>
+        <picture className="hero__media">
+          <source
+            media="(max-width:700px)"
+            srcSet="/heroes/trosheen-hero-mobile-05-750.webp 750w, /heroes/trosheen-hero-mobile-05-1080.webp 1080w"
+            type="image/webp"
+          />
+          <source
+            srcSet="/heroes/trosheen-hero-desktop-04-1280.webp 1280w, /heroes/trosheen-hero-desktop-04-1920.webp 1920w, /heroes/trosheen-hero-desktop-04-2560.webp 2560w"
+            type="image/webp"
+          />
+          <img src="/heroes/trosheen-hero-desktop-04-1920.jpg" alt="" fetchPriority="high" />
+        </picture>
+        <div className="wrap hero__content">
+          <p className="eyebrow">{t("v4.story.hero.eyebrow")}</p>
+          <SplitWords text={t("v4.story.hero.title")} />
+          <p className="lead">{t("v4.story.hero.lead")}</p>
+          <div className="btn-row" />
         </div>
       </section>
 
-      <section className="section-space">
-        <div className="site-container">
-          <div className="grid gap-16">
-            {storySections.map((section, index) => (
+      <nav className="chapter-nav" aria-label={t("v4.story.nav.aria")}>
+        <div className="wrap">
+          <ol>
+            {CHAPTERS.map((chapter) => (
+              <li key={chapter.id}>
+                <a href={`#${chapter.id}`}>{t(chapter.key)}</a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </nav>
+
+      {/* ---------- 1. courtyard ---------- */}
+      <section className="section" id="pagalms">
+        <div className="wrap split">
+          <div data-reveal>
+            <Lottie
+              file="trosheen-25-courtyard-door.json"
+              mode="view"
+              className="chapter-art"
+            />
+            <p className="eyebrow">
+              <Ornament name="maras-zime" size="sm" draw /> 1. {t("v4.story.chapter")} ·{" "}
+              {t("v4.story.ch1")}
+            </p>
+            <h2>{t("v4.story.c1.title")}</h2>
+            <p className="lead">{t("v4.story.c1.lead")}</p>
+            <p>{t("v4.story.c1.body")}</p>
+          </div>
+          <figure
+            className="frame frame--arch frame--3x4"
+            data-reveal
+            style={{ margin: 0, maxWidth: 480, justifySelf: "center" }}
+          >
+            <img src="/photos/photo-g06.webp" alt={t("v4.story.c1.title")} loading="lazy" />
+          </figure>
+        </div>
+      </section>
+
+      {/* ---------- 2. Olegs ---------- */}
+      <section className="section section--warm" id="olegs">
+        <div className="wrap split split--flip">
+          <div data-reveal>
+            <p className="eyebrow">
+              <Ornament name="saule" size="sm" draw /> 2. {t("v4.story.chapter")} ·{" "}
+              {t("v4.story.ch2")}
+            </p>
+            <h2>{t("v4.story.c2.title")}</h2>
+            <p className="lead">{t("v4.story.c2.lead")}</p>
+            <p>{t("v4.story.c2.body")}</p>
+            <img
+              src="/brand/trosheen-signature-ar-siltam-rokam-olegs-animated.svg"
+              alt={t("v4.letter.signAlt")}
+              style={{ width: 240, marginTop: "1rem" }}
+            />
+          </div>
+          <figure
+            className="drawing"
+            data-ink
+            style={{ margin: 0, "--ar": "3/4", maxWidth: 480, justifySelf: "center" } as React.CSSProperties}
+          >
+            <img src="/photos/piece-02.webp" alt="" loading="lazy" />
+          </figure>
+        </div>
+      </section>
+
+      {/* ---------- 3. the recipe ---------- */}
+      <section className="section section--stone" id="recepte">
+        <div className="wrap">
+          <div className="center" data-reveal>
+            <p className="eyebrow">
+              <Ornament name="jumis" size="sm" draw /> 3. {t("v4.story.chapter")} ·{" "}
+              {t("v4.story.ch3")}
+            </p>
+            <h2>
+              {t("v4.story.c3.title")} <mark data-mark>{t("v4.story.c3.titleMark")}</mark>
+            </h2>
+            <p className="lead">{t("v4.story.c3.lead")}</p>
+          </div>
+
+          <div className="grid grid-4" style={{ marginTop: "2.5rem" }} data-stagger>
+            {[1, 2, 3, 4].map((index) => (
+              <article className="card" key={index}>
+                <h3>{t(`v4.story.rec${index}.title`)}</h3>
+                <p className="note">{t(`v4.story.rec${index}.desc`)}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="steps" style={{ marginTop: "3.5rem" }}>
+            {MAKING_STEPS.map((step, index) => (
               <article
-                key={section.title}
-                className="grid gap-9 lg:grid-cols-2 lg:items-center lg:gap-16"
+                className="step"
+                key={step.lottie}
+                data-reveal
+                style={{ "--delay": `${(index % 3) * 120}ms` } as React.CSSProperties}
               >
-                <div className={index % 2 === 1 ? "lg:order-2" : ""}>
-                  <p className="eyebrow">{section.eyebrow}</p>
-                  <h2 className="section-title mt-4">{section.title}</h2>
-                  <div className="mt-6 space-y-4 text-base leading-8 text-muted-foreground sm:text-lg">
-                    {section.body
-                      .split("\n")
-                      .filter(Boolean)
-                      .map((paragraph, paragraphIndex) => (
-                        <p key={paragraphIndex}>{paragraph}</p>
-                      ))}
-                  </div>
+                <div className="step__icon">
+                  <Lottie file={step.lottie} mode={step.mode} />
                 </div>
-                <div className={index % 2 === 1 ? "lg:order-1" : ""}>
-                  <div className="aspect-[5/4] overflow-hidden rounded-3xl bg-muted">
-                    <img
-                      src={section.image}
-                      alt={section.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                </div>
+                <h3>{t(`v4.step${index + 1}.title`)}</h3>
+                <p>{t(`v4.step${index + 1}.desc`)}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-y border-border bg-card">
-        <div className="site-container section-space">
-          <div className="max-w-3xl">
-            <p className="eyebrow">{t("material.precision")}</p>
-            <h2 className="section-title mt-4">{t("material.microscopic")}</h2>
-            <p className="lead mt-5">{t("material.desc")}</p>
-          </div>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["about.materials.concrete.name", "about.materials.concrete.desc"],
-              ["about.materials.gypsum.name", "about.materials.gypsum.desc"],
-              ["about.materials.acrylics.name", "about.materials.acrylics.desc"],
-              ["about.materials.resins.name", "about.materials.resins.desc"],
-            ].map(([nameKey, descKey]) => (
-              <div key={nameKey} className="surface-muted p-6">
-                <h3 className="font-serif text-2xl font-semibold">{t(nameKey)}</h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{t(descKey)}</p>
-              </div>
-            ))}
-          </div>
-
-          <Button asChild variant="outline" className="mt-8">
-            <Link href="/guide">
-              {t("guide_care_eyebrow")}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
-      </section>
-
-      <section className="section-space">
-        <div className="site-container">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="eyebrow">{t("timeline.tag")}</p>
-            <h2 className="section-title mt-4">{t("timeline.title")}</h2>
-            <p className="lead mt-5">{t("timeline.description")}</p>
-          </div>
-
-          <div className="mx-auto mt-12 max-w-5xl divide-y divide-border border-y border-border">
-            {timeline.map((item) => (
-              <div key={item.year + item.titleKey} className="grid gap-3 py-6 sm:grid-cols-[110px_1fr] sm:gap-8">
-                <div className="font-serif text-3xl font-semibold text-primary">{item.year}</div>
-                <div>
-                  <h3 className="font-serif text-2xl font-semibold">{t(item.titleKey)}</h3>
-                  <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">{t(item.descKey)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-secondary text-secondary-foreground">
-        <div className="site-container section-space grid gap-10 lg:grid-cols-[1fr_.9fr] lg:items-center lg:gap-16">
-          <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/50">
-              {t("chapter_philosophy_eyebrow")}
+      {/* ---------- 4. the little helpers ---------- */}
+      <section className="section" id="palig">
+        <div className="wrap split">
+          <div data-reveal>
+            <Lottie
+              file="trosheen-24-three-generations.json"
+              mode="view"
+              className="chapter-art"
+            />
+            <p className="eyebrow">
+              <Ornament name="krustu-krusts" size="sm" draw /> 4. {t("v4.story.chapter")} ·{" "}
+              {t("v4.story.ch4")}
             </p>
-            <h2 className="mt-4 font-serif text-[clamp(2.8rem,6vw,5.6rem)] font-semibold leading-[.94] tracking-[-.045em]">
-              {t("chapter_philosophy_title")}
-            </h2>
-            <div className="mt-6 space-y-4 text-base leading-8 text-white/70 sm:text-lg">
-              {t("chapter_philosophy_body_1")
-                .split("\n")
-                .filter(Boolean)
-                .map((paragraph, index) => <p key={index}>{paragraph}</p>)}
-            </div>
+            <h2>{t("v4.story.c4.title")}</h2>
+            <p className="lead">{t("v4.story.c4.lead")}</p>
+            <p>{t("v4.story.c4.body")}</p>
           </div>
-          <div className="aspect-square overflow-hidden rounded-3xl">
-            <img
-              src={ScrollStoryPhotos.chapter5_mastery}
-              alt={t("chapter_philosophy_title")}
-              loading="lazy"
-              className="h-full w-full object-cover"
+          <div className="photo-pair" data-reveal style={{ "--delay": "150ms" } as React.CSSProperties}>
+            <figure
+              className="polaroid"
+              style={{ "--tilt": "2deg", margin: 0, width: "78%" } as React.CSSProperties}
+            >
+              <img src="/photos/photo-g05.webp" alt={t("v4.story.c4.cap1")} loading="lazy" />
+              <figcaption>{t("v4.story.c4.cap1")}</figcaption>
+            </figure>
+            <figure className="polaroid" style={{ margin: 0 }}>
+              <img src="/photos/photo-i03.webp" alt={t("v4.story.c4.cap2")} loading="lazy" />
+              <figcaption>{t("v4.story.c4.cap2")}</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- 5. our path ---------- */}
+      <section className="section section--warm" id="cels">
+        <div className="wrap--narrow">
+          <div data-reveal>
+            <p className="eyebrow">
+              <Ornament name="austras-koks" size="sm" draw /> 5. {t("v4.story.chapter")} ·{" "}
+              {t("v4.story.ch5")}
+            </p>
+            <h2>{t("v4.story.c5.title")}</h2>
+          </div>
+          <div className="timeline" style={{ marginTop: "2rem" }}>
+            {TIMELINE.map((entry) => (
+              <div className="tl-item" key={entry.title} data-reveal>
+                <div className="tl-year">
+                  {entry.year ? <CountUp value={entry.year} /> : entry.label}
+                </div>
+                <h3>{t(entry.title)}</h3>
+                <p className="note" style={{ fontSize: "1rem" }}>
+                  {t(entry.desc)}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- 6. heirlooms ---------- */}
+      <section className="section section--spruce" id="mantojums">
+        <div className="wrap split">
+          <div data-reveal>
+            <p className="eyebrow">
+              <Ornament name="auseklis" size="sm" draw /> 6. {t("v4.story.chapter")} ·{" "}
+              {t("v4.story.ch6")}
+            </p>
+            <h2>{t("v4.story.c6.title")}</h2>
+            <p className="lead">{t("v4.story.c6.lead")}</p>
+            <p>{t("v4.story.c6.body")}</p>
+          </div>
+          <div className="center" data-reveal>
+            <Lottie
+              file="trosheen-05-living-candle.json"
+              mode="loop"
+              style={{ width: 220, height: 220, margin: "auto" }}
             />
           </div>
         </div>
       </section>
 
-      <section className="section-space border-b border-border">
-        <div className="site-container flex flex-col items-center text-center">
-          <img src="/brand/botanical/trosheen-fern.svg" alt="" loading="lazy" className="mb-6 h-24 w-24" />
-          <BrandMotion name="signature" mode="view" className="h-28 w-72 max-w-full" label="Ar siltām rokām, Oļegs" poster="/brand/signature-olegs.svg" />
-        </div>
-      </section>
-
-      <section className="section-space">
-        <div className="site-container max-w-4xl text-center">
-          <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-primary">
-            <MapPin className="h-3.5 w-3.5" />
-            {t("hero_location")}
-          </div>
-          <h2 className="section-title mt-5">
-            {t("about.visit_title")} <span className="italic text-primary">{t("common.studio")}</span>
-          </h2>
-          <p className="lead mx-auto mt-5 max-w-2xl">{t("about.visit_desc")}</p>
-          <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-            <Button asChild size="lg">
-              <Link href="/contact">
-                {t("nav_contact")}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link href="/shop">{t("about.browse_work")}</Link>
-            </Button>
+      {/* ---------- 7. come and visit ---------- */}
+      <section className="section" id="ciemos">
+        <div className="wrap center" data-reveal>
+          <Ornament name="saule" size="lg" draw />
+          <p className="eyebrow" style={{ marginTop: "1rem" }}>
+            7. {t("v4.story.chapter")} · {t("v4.story.ch7")}
+          </p>
+          <h2>{t("v4.story.c7.title")}</h2>
+          <p className="lead">{t("v4.story.c7.lead")}</p>
+          <div className="btn-row" style={{ justifyContent: "center" }}>
+            <Link className="btn" href="/contact">
+              {t("v4.story.c7.cta1")} <Arrow />
+            </Link>
+            <Link className="btn btn--ghost" href="/shop">
+              {t("v4.story.c7.cta2")}
+            </Link>
           </div>
         </div>
       </section>

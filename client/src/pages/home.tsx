@@ -1,116 +1,437 @@
+import { useMemo } from "react";
 import { Link } from "wouter";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useHomepageImages } from "@/hooks/useHomepageImages";
 import { DEFAULT_HOMEPAGE_IMAGES } from "@/lib/homepageImages";
+import { useProducts } from "@/hooks/useApi";
+import { Lottie } from "@/components/brand/Lottie";
+import { Ornament } from "@/components/brand/Ornament";
+import { SplitWords } from "@/components/brand/SplitWords";
+import { SeasonAmbient } from "@/components/brand/SeasonRibbon";
+import { NewsletterForm } from "@/components/brand/NewsletterForm";
+import { ProductCardV4, productImage } from "@/components/brand/ProductCardV4";
 import { PromotionalGallery } from "@/components/PromotionalGallery";
-import { NewsletterSubscribe } from "@/components/NewsletterSubscribe";
-import { BrandMotion } from "@/components/shared/BrandMotion";
+
+/** Real piece photography used until products with images exist in the API. */
+const FALLBACK_STRIP = [
+  "/photos/piece-01.webp",
+  "/photos/piece-02.webp",
+  "/photos/piece-03.webp",
+  "/photos/piece-04.webp",
+  "/photos/piece-05.webp",
+  "/photos/piece-06.webp",
+  "/photos/piece-07.webp",
+  "/photos/piece-08.webp",
+  "/photos/piece-09.webp",
+  "/photos/piece-10.webp",
+  "/photos/piece-11.webp",
+  "/photos/piece-12.webp",
+  "/photos/piece-13.webp",
+  "/photos/piece-14.webp",
+  "/photos/piece-15.webp",
+  "/photos/piece-16.webp",
+];
+
+const Arrow = () => (
+  <svg
+    className="tr-arrow"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+  >
+    <path d="M4 12h15M13 6l6 6-6 6" />
+  </svg>
+);
 
 export default function HomePage() {
   const { t } = useLanguage();
   const { image } = useHomepageImages();
+  const { data: products } = useProducts();
+
   const hero = image("hero");
-  const defaultHero = hero === DEFAULT_HOMEPAGE_IMAGES.hero;
-  const familyPhoto = image("familyFeature");
-  const bundledStoryPhoto = familyPhoto === DEFAULT_HOMEPAGE_IMAGES.familyFeature;
+  const bundledHero = hero === DEFAULT_HOMEPAGE_IMAGES.hero;
+
+  const published = useMemo(
+    () => (products || []).filter((product) => product.published),
+    [products],
+  );
+  const rail = useMemo(
+    () =>
+      [...published]
+        .sort(
+          (a, b) =>
+            Number(Boolean(b.featured)) - Number(Boolean(a.featured)) ||
+            Date.parse(b.createdAt) - Date.parse(a.createdAt),
+        )
+        .slice(0, 6),
+    [published],
+  );
+
+  const stripImages = useMemo(() => {
+    const withImages = published.filter((product) => productImage(product));
+    if (!withImages.length) return FALLBACK_STRIP;
+    return withImages.slice(0, 12).map((product) => productImage(product));
+  }, [published]);
+
   return (
     <div>
-      <section className="brand-hero brand-hero--editorial" aria-labelledby="trosheen-hero-heading">
-        <div className="brand-hero-photo">
-          <picture>
-            {defaultHero && <source media="(max-width: 767px)" type="image/webp" srcSet="/brand/hero-mobile.webp 720w, /brand/hero-mobile-1080.webp 1080w" sizes="100vw" />}
-            {defaultHero && <source media="(min-width: 768px)" type="image/webp" srcSet="/brand/hero-desktop-1280.webp 1280w, /brand/hero-desktop.webp 1920w" sizes="(min-width:768px) 58vw, 100vw" />}
-            <img src={hero} alt={t("brand.hero_alt")} fetchPriority="high" width="2560" height="1000"
-              onError={(event) => {
-                const target = event.currentTarget;
-                if (target.dataset.fallbackApplied) return;
-                target.dataset.fallbackApplied = "true";
-                target.parentElement?.querySelectorAll("source").forEach(source => source.remove());
-                target.src = DEFAULT_HOMEPAGE_IMAGES.hero;
-              }} />
-          </picture>
-        </div>
-        <div className="brand-hero-copy">
-          <p className="eyebrow mb-5">{t("brand.location")}</p>
-          <h1 id="trosheen-hero-heading">{t("brand.tagline")}</h1>
-          <p className="lead mt-5 max-w-prose">{t("brand.intro")}</p>
-          <div className="brand-hero-actions mt-7 flex flex-wrap gap-3">
-            <Button asChild size="lg" className="brand-gilt-button"><Link href="/shop">{t("brand.shop")}<ArrowRight className="h-4 w-4" /></Link></Button>
-            <Button asChild size="lg" variant="outline" className="brand-story-link"><Link href="/about">{t("nav_story")}</Link></Button>
-            <Button asChild size="lg" variant="outline" className="brand-story-link"><Link href="/constructor">{t("shop_custom_builder")}</Link></Button>
+      {/* ---------- hero ---------- */}
+      <section className="hero" style={{ "--focus": "50% 60%" } as React.CSSProperties}>
+        <picture className="hero__media">
+          {bundledHero && (
+            <source
+              media="(max-width:700px)"
+              srcSet="/heroes/trosheen-hero-mobile-12-750.webp 750w, /heroes/trosheen-hero-mobile-12-1080.webp 1080w"
+              type="image/webp"
+            />
+          )}
+          {bundledHero && (
+            <source
+              srcSet="/heroes/trosheen-hero-desktop-05-1280.webp 1280w, /heroes/trosheen-hero-desktop-05-1920.webp 1920w, /heroes/trosheen-hero-desktop-05-2560.webp 2560w"
+              type="image/webp"
+            />
+          )}
+          <img
+            src={bundledHero ? "/heroes/trosheen-hero-desktop-05-1920.jpg" : hero}
+            alt={t("v4.hero.alt")}
+            fetchPriority="high"
+          />
+        </picture>
+        <SeasonAmbient />
+
+        <div className="wrap hero__content">
+          <p className="eyebrow">{t("v4.hero.eyebrow")}</p>
+          <SplitWords text={t("brand.tagline")} />
+          <p className="lead">{t("v4.hero.lead")}</p>
+          <div className="btn-row">
+            <Link className="btn btn--linen" href="/shop">
+              {t("v4.hero.ctaPieces")} <Arrow />
+            </Link>
+            <Link className="btn btn--on-dark" href="/about">
+              {t("v4.hero.ctaFamily")}
+            </Link>
           </div>
-          <a className="brand-scroll-cue" href="#collection-title" aria-label={t("brand.collections")}><BrandMotion name="ripple" mode="loop" className="h-12 w-12" poster="/brand/icons/fountain.svg" /></a>
+        </div>
+
+        <Lottie
+          file="trosheen-01-seal-stamp-once.json"
+          mode="once"
+          className="hero__seal breathe"
+        />
+        <Lottie
+          file="trosheen-12-scroll-cue.json"
+          mode="loop"
+          className="hero__scroll"
+        />
+      </section>
+
+      {/* ---------- the letter ---------- */}
+      <section className="section">
+        <div className="wrap split">
+          <div className="photo-pair" data-reveal>
+            <figure className="polaroid" style={{ "--tilt": "-2.5deg", margin: 0, width: "78%" } as React.CSSProperties}>
+              <img src="/photos/photo-g05.webp" alt={t("v4.letter.caption1")} loading="lazy" />
+              <figcaption>{t("v4.letter.caption1")}</figcaption>
+            </figure>
+            <figure className="polaroid" style={{ margin: 0 }}>
+              <img src="/photos/photo-i03.webp" alt={t("v4.letter.caption2")} loading="lazy" />
+              <figcaption>{t("v4.letter.caption2")}</figcaption>
+            </figure>
+          </div>
+          <div className="letter" data-reveal style={{ "--delay": "150ms" } as React.CSSProperties}>
+            <p className="eyebrow">
+              <Ornament name="auseklis" size="sm" draw /> {t("v4.letter.eyebrow")}
+            </p>
+            <p>{t("v4.letter.p1")}</p>
+            <p>{t("v4.letter.p2")}</p>
+            <img
+              className="signature"
+              src="/brand/trosheen-signature-ar-siltam-rokam-olegs-animated.svg"
+              alt={t("v4.letter.signAlt")}
+            />
+          </div>
         </div>
       </section>
 
-      <section className="border-b border-border">
-        <ul className="site-container brand-trust">
-          {[
-            ["handmade", "brand.handmade", "/about"],
-            ["one-of-a-kind", "brand.unique", "/shop"],
-            ["natural-materials", "brand.materials", "/guide"],
-            ["parcel", "brand.packed", "/shop"],
-            ["secure-payment", "brand.payment", "/shop"],
-          ].map(([icon, key, href]) => <li key={key}><img src={`/brand/icons/${icon}.svg`} alt="" width="24" height="24" /><Link href={href} className="hover:underline underline-offset-4">{t(key)}</Link></li>)}
-        </ul>
-      </section>
-
-      <section className="section-space" aria-labelledby="collection-title">
-        <div className="site-container">
-          <p className="eyebrow">{t("brand.season")}</p>
-          <div className="mb-10 flex items-end justify-between gap-5"><h2 id="collection-title" className="section-title mt-4">{t("brand.collections")}</h2><img src="/brand/botanical/trosheen-lilac.svg" alt="" className="hidden h-16 w-16 opacity-60 sm:block" loading="lazy" /></div>
-          <PromotionalGallery embedded />
-          <div className="space-y-8">
+      {/* ---------- four pillars ---------- */}
+      <section className="section section--warm section--tight">
+        <div className="wrap">
+          <div className="center" data-reveal>
+            <p className="eyebrow">{t("v4.pillars.eyebrow")}</p>
+            <h2>{t("v4.pillars.title")}</h2>
+          </div>
+          <div className="grid grid-4" style={{ marginTop: "2.5rem" }} data-stagger>
             {[
-              { photo: "collection-mould", slot: "storyHeritage" as const, title: "brand.mould", body: "brand.mould_desc", dark: false },
-              { photo: "collection-heirloom", slot: "storyMakers" as const, title: "brand.heirloom", body: "brand.heirloom_desc", dark: true },
-            ].map((collection) => (
-              <article key={collection.photo} className={`brand-panel ${collection.dark ? "brand-panel-dark brand-panel-reverse" : "bg-card"}`}>
-                <div className="brand-panel-photo"><img src={image(collection.slot)} onError={(event) => { event.currentTarget.src = DEFAULT_HOMEPAGE_IMAGES[collection.slot]; }} alt={t(collection.title)} loading="lazy" width="960" height="640" className="brand-panel-image" /></div>
-                <div className="brand-panel-copy">
-                  <p className="eyebrow mb-5">Trosheen</p>
-                  <h3 className="!text-[clamp(2.25rem,4vw,3.8rem)]">{t(collection.title)}</h3>
-                  <p className="mt-5 leading-relaxed">{t(collection.body)}</p>
-                  <Button asChild className={`mt-7 ${collection.dark ? "brand-gilt-button" : ""}`}><Link href="/shop">{t("brand.shop")}<ArrowRight className="h-4 w-4" /></Link></Button>
-                </div>
+              { orn: "austras-koks", title: "v4.pillar1.title", desc: "v4.pillar1.desc" },
+              { orn: "jumis", title: "v4.pillar2.title", desc: "v4.pillar2.desc" },
+              { orn: "saule", title: "v4.pillar3.title", desc: "v4.pillar3.desc" },
+              { orn: "krustu-krusts", title: "v4.pillar4.title", desc: "v4.pillar4.desc" },
+            ].map((pillar) => (
+              <article className="card pillar" key={pillar.title}>
+                <Ornament name={pillar.orn} draw />
+                <h3>{t(pillar.title)}</h3>
+                <p>{t(pillar.desc)}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="story" className="border-y border-border">
-        <div className="brand-panel">
-          <div className={bundledStoryPhoto ? "brand-art-crop brand-art-crop--left" : "brand-editorial-media"}>
-            <img
-              src={familyPhoto}
-              onError={(event) => {
-                const target = event.currentTarget;
-                if (target.dataset.fallbackApplied) return;
-                target.dataset.fallbackApplied = "true";
-                const wrapper = target.closest(".brand-editorial-media");
-                wrapper?.classList.remove("brand-editorial-media");
-                wrapper?.classList.add("brand-art-crop", "brand-art-crop--left");
-                target.src = DEFAULT_HOMEPAGE_IMAGES.familyFeature;
-              }}
-              alt={t("brand.story_alt")}
-              width="1920" height="860" loading="lazy" className="brand-panel-image"
-            />
+      {/* ---------- three paths ---------- */}
+      <section className="section section--tight cats-sec" aria-label={t("v4.cats.title")}>
+        <div className="wrap">
+          <div className="center" data-reveal>
+            <p className="eyebrow">
+              <Ornament name="jumis" size="sm" draw /> {t("v4.cats.eyebrow")}
+            </p>
+            <h2>{t("v4.cats.title")}</h2>
           </div>
-          <div className="brand-panel-copy">
-            <p className="eyebrow mb-5">{t("nav_story")}</p>
-            <h2>{t("brand.story_title")}</h2>
-            <p className="mt-5 leading-relaxed">{t("brand.story_desc")}</p>
-            <img src="/brand/botanical/trosheen-divider-vine.svg" alt="" loading="lazy" className="mt-7 h-10 w-auto max-w-[220px]" />
-            <Button asChild variant="outline" className="mt-7"><Link href="/about">{t("nav_story")}<ArrowRight className="h-4 w-4" /></Link></Button>
+          <div className="grid grid-3 cats" data-stagger style={{ marginTop: "2.5rem" }}>
+            <Link className="card cat" href="/shop" data-lottie-host>
+              <Lottie
+                file="trosheen-19-candle-ignite.json"
+                mode="hover"
+                className="cat__art"
+                style={{ width: 120, height: 120 }}
+              />
+              <h3>{t("v4.cat1.title")}</h3>
+              <p className="note">{t("v4.cat1.note")}</p>
+              <span className="link-arrow">{t("v4.cat1.link")}</span>
+            </Link>
+            <Link className="card cat" href="/shop" data-lottie-host>
+              <Lottie
+                file="trosheen-21-rosette.json"
+                mode="view"
+                className="cat__art"
+                style={{ width: 120, height: 120 }}
+              />
+              <h3>{t("v4.cat2.title")}</h3>
+              <p className="note">{t("v4.cat2.note")}</p>
+              <span className="link-arrow">{t("v4.cat2.link")}</span>
+            </Link>
+            <Link className="card cat" href="/shop" data-lottie-host>
+              <Lottie
+                file="trosheen-20-leaf-stone.json"
+                mode="view"
+                className="cat__art"
+                style={{ width: 120, height: 120 }}
+              />
+              <h3>{t("v4.cat3.title")}</h3>
+              <p className="note">{t("v4.cat3.note")}</p>
+              <span className="link-arrow">{t("v4.cat3.link")}</span>
+            </Link>
           </div>
         </div>
       </section>
 
-      <section className="site-container py-16 sm:py-24">
-        <NewsletterSubscribe variant="hero" source="homepage" />
+      {/* ---------- photo strip ---------- */}
+      <section className="section section--tight marquee-sec" aria-label={t("v4.works.title")}>
+        <div className="wrap center" data-reveal>
+          <p className="eyebrow">{t("v4.works.eyebrow")}</p>
+          <h2>{t("v4.works.title")}</h2>
+        </div>
+        <div className="marquee">
+          <div className="marquee__track">
+            {[...stripImages, ...stripImages].map((src, index) => (
+              <figure className="marquee__item" key={`${src}-${index}`}>
+                <img src={src} alt="" loading="lazy" />
+              </figure>
+            ))}
+          </div>
+        </div>
+
+        {/* Admin-managed promotions stay on the homepage; hidden until one exists. */}
+        <div className="wrap" style={{ marginTop: "var(--s6)" }}>
+          <PromotionalGallery embedded />
+        </div>
+      </section>
+
+      {/* ---------- this season's pieces ---------- */}
+      <section className="section">
+        <div className="wrap">
+          <div
+            className="toolbar"
+            style={{ border: 0, padding: 0, marginBottom: "2rem" }}
+            data-reveal
+          >
+            <div>
+              <p className="eyebrow">{t("v4.fresh.eyebrow")}</p>
+              <h2 style={{ margin: 0 }}>{t("v4.fresh.title")}</h2>
+            </div>
+            <Link className="link-arrow" href="/shop">
+              {t("v4.fresh.all")} <Arrow />
+            </Link>
+          </div>
+
+          {rail.length ? (
+            <div className="rail">
+              {rail.map((product, index) => (
+                <ProductCardV4 key={product.id} product={product} delay={index * 90} />
+              ))}
+            </div>
+          ) : (
+            <div className="empty" data-reveal>
+              <Lottie
+                file="trosheen-11-empty-shop-plant.json"
+                mode="view"
+                className="empty__art"
+              />
+              <h3>{t("v4.shop.empty.title")}</h3>
+              <p>{t("v4.shop.empty.desc")}</p>
+              <div className="btn-row" style={{ justifyContent: "center" }}>
+                <Link className="btn" href="/constructor">
+                  {t("v4.shop.empty.cta1")}
+                </Link>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <div className="wrap">
+        <div className="band" data-reveal="fade" aria-hidden="true" />
+      </div>
+
+      {/* ---------- making steps ---------- */}
+      <section className="section">
+        <div className="wrap">
+          <div className="center" data-reveal>
+            <p className="eyebrow">
+              <Ornament name="jumis" size="sm" draw /> {t("v4.steps.eyebrow")}
+            </p>
+            <h2>
+              {t("v4.steps.title")} <mark data-mark>{t("v4.steps.titleMark")}</mark>
+            </h2>
+            <p className="lead">{t("v4.steps.lead")}</p>
+          </div>
+          <div className="steps" style={{ marginTop: "3rem" }}>
+            {[
+              { lottie: "trosheen-13-step-recipe.json", mode: "view" as const },
+              { lottie: "trosheen-14-step-pour.json", mode: "view" as const },
+              { lottie: "trosheen-15-step-sculpt.json", mode: "view" as const },
+              { lottie: "trosheen-16-step-rest.json", mode: "loop" as const },
+              { lottie: "trosheen-17-step-paint.json", mode: "view" as const },
+              { lottie: "trosheen-18-step-wrap.json", mode: "view" as const },
+            ].map((step, index) => (
+              <article
+                className="step"
+                key={step.lottie}
+                data-reveal
+                style={{ "--delay": `${(index % 3) * 120}ms` } as React.CSSProperties}
+              >
+                <div className="step__icon">
+                  <Lottie file={step.lottie} mode={step.mode} />
+                </div>
+                <h3>{t(`v4.step${index + 1}.title`)}</h3>
+                <p>{t(`v4.step${index + 1}.desc`)}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- story band ---------- */}
+      <section className="section section--spruce">
+        <div className="wrap split">
+          <figure
+            className="frame frame--arch frame--4x5"
+            data-reveal
+            style={{ margin: 0, maxWidth: 460 }}
+          >
+            <img
+              src="/heroes/trosheen-hero-mobile-04-750.webp"
+              alt={t("v4.band.title")}
+              loading="lazy"
+            />
+          </figure>
+          <div data-reveal style={{ "--delay": "150ms" } as React.CSSProperties}>
+            <p className="eyebrow">
+              <Ornament name="auseklis" size="sm" draw /> {t("v4.band.eyebrow")}
+            </p>
+            <h2>{t("v4.band.title")}</h2>
+            <p className="lead">{t("v4.band.lead")}</p>
+            <Link className="btn btn--on-dark" href="/about">
+              {t("v4.band.cta")} <Arrow />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- custom workshop ---------- */}
+      <section className="section">
+        <div className="wrap split split--flip">
+          <figure className="drawing" data-ink style={{ margin: 0, "--ar": "4/3" } as React.CSSProperties}>
+            <img src="/photos/piece-04.webp" alt="" loading="lazy" />
+          </figure>
+          <div data-reveal>
+            <p className="eyebrow">{t("v4.custom.eyebrow")}</p>
+            <h2>{t("v4.custom.title")}</h2>
+            <p className="lead">{t("v4.custom.lead")}</p>
+            <div className="btn-row">
+              <Link className="btn" href="/constructor">
+                {t("v4.custom.start")} <Arrow />
+              </Link>
+              <Link className="btn btn--ghost" href="/contact">
+                {t("v4.custom.ask")}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- gallery + journal ---------- */}
+      <section className="section section--warm">
+        <div className="wrap">
+          <div className="center" data-reveal>
+            <p className="eyebrow">{t("v4.duo.eyebrow")}</p>
+            <h2>{t("v4.duo.title")}</h2>
+          </div>
+          <div className="grid grid-2" style={{ marginTop: "2.5rem" }}>
+            <Link className="post card" href="/gallery" data-reveal>
+              <div className="frame">
+                <img src="/photos/photo-g06.webp" alt="" loading="lazy" />
+              </div>
+              <span className="post__meta">{t("v4.duo.gallery.meta")}</span>
+              <h3>{t("v4.duo.gallery.title")}</h3>
+              <p className="note">{t("v4.duo.gallery.note")}</p>
+            </Link>
+            <Link
+              className="post card"
+              href="/blog"
+              data-reveal
+              style={{ "--delay": "120ms" } as React.CSSProperties}
+            >
+              <div className="frame">
+                <img src="/photos/piece-02.webp" alt="" loading="lazy" />
+              </div>
+              <span className="post__meta">{t("v4.duo.journal.meta")}</span>
+              <h3>{t("v4.duo.journal.title")}</h3>
+              <p className="note">{t("v4.duo.journal.note")}</p>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- letters from the workshop ---------- */}
+      <section className="section" id="nl">
+        <div className="wrap">
+          <div className="newsletter" data-reveal>
+            <div>
+              <p className="eyebrow">
+                <Ornament name="saule" size="sm" draw /> {t("v4.news.eyebrow")}
+              </p>
+              <h2>{t("v4.news.title")}</h2>
+              <p className="lead" style={{ margin: 0 }}>
+                {t("v4.news.lead")}
+              </p>
+            </div>
+            <NewsletterForm source="homepage" />
+          </div>
+        </div>
       </section>
     </div>
   );

@@ -1,5 +1,5 @@
-import { BrandIcon } from "@/components/shared/BrandIcon";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { Link, useLocation } from "wouter";
 import { X, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -20,14 +20,12 @@ export function ShoppingCartComponent() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative" aria-label={t("cart.basket") || "Basket"}>
-          <BrandIcon name="bag" />
-          {totalItems > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-bold text-primary-foreground">
-              {totalItems}
-            </span>
-          )}
-        </Button>
+        <button className="icon-btn" aria-label={t("v4.nav.cart")}>
+          <img src="/brand/icons/bag.svg" alt="" />
+          <span className={cn("badge", totalItems > 0 && "is-on")} data-cart-count>
+            {totalItems}
+          </span>
+        </button>
       </SheetTrigger>
 
       <SheetContent className="flex w-full flex-col border-l border-border bg-background p-0 sm:max-w-md">

@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Grid3x3, Images, Heart, Search, X, Plus, Loader2, Play, RefreshCw } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { useLanguage } from "@/lib/LanguageContext";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Loader2, RefreshCw, X } from "lucide-react";
+import { useLanguage } from "@/lib/LanguageContext";
 import { apiClient } from "@/lib/apiClient";
-import { cn } from "@/lib/utils";
-import { BrandMotion } from "@/components/shared/BrandMotion";
+import { Lottie } from "@/components/brand/Lottie";
+import { Ornament } from "@/components/brand/Ornament";
 
 interface GalleryItem {
   id: number;
@@ -30,24 +28,19 @@ interface GalleryCategory {
   type: "3d" | "photo";
 }
 
-function TypeIcon({ type }: { type: GalleryItem["type"] }) {
-  if (type === "3d") return <Grid3x3 className="h-3.5 w-3.5" />;
-  if (type === "video") return <Play className="h-3.5 w-3.5" />;
-  return <Images className="h-3.5 w-3.5" />;
-}
-
 export default function GalleryPage() {
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all" | "3d" | "photo" | "video">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 12;
+
   useEffect(() => {
     const timer = window.setTimeout(() => setDebouncedSearch(searchQuery.trim()), 250);
     return () => window.clearTimeout(timer);
   }, [searchQuery]);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 12;
 
   const { data: categories = [] } = useQuery<GalleryCategory[]>({
     queryKey: ["galleryCategories"],
@@ -66,214 +59,225 @@ export default function GalleryPage() {
   });
 
   const filteredCategories = categories.filter(
-    (category) => activeTab === "all" || category.type === activeTab
+    (category) => activeTab === "all" || category.type === activeTab,
   );
-
   const items: GalleryItem[] = galleryData?.items || [];
 
+  const tabs = [
+    { id: "all", label: t("v4.gallery.filter.all") },
+    { id: "photo", label: t("v4.gallery.filter.photo") },
+    { id: "3d", label: t("gallery.model_label") },
+    { id: "video", label: t("v4.gallery.filter.video") },
+  ] as const;
+
+  const typeLabel = (type: GalleryItem["type"]) =>
+    type === "3d"
+      ? t("gallery.model_label")
+      : type === "photo"
+        ? t("v4.gallery.filter.photo")
+        : t("v4.gallery.filter.video");
+
   return (
-    <div className="min-h-screen bg-background">
-      <section className="page-shell border-b border-border">
-        <div className="site-container">
-          <p className="eyebrow">{t("gallery.eyebrow")}</p>
-          <div className="mt-4 grid gap-7 lg:grid-cols-[1fr_.8fr] lg:items-end">
-            <h1 className="display-title">{t("gallery.title")}</h1>
-            <p className="lead lg:pb-2">{t("gallery.subtitle")}</p>
-          </div>
-        </div>
-      </section>
+    <section className="section section--tight">
+      <div className="wrap">
+        <p className="eyebrow">
+          <Ornament name="maras-zime" size="sm" draw /> {t("v4.gallery.eyebrow")}
+        </p>
+        <h1>{t("v4.gallery.title")}</h1>
+        <p className="lead">{t("v4.gallery.lead")}</p>
 
-      <section className="section-space pt-8 sm:pt-10">
-        <div className="site-container">
-          <div className="border-b border-border pb-7">
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-              <div className="grid w-full grid-cols-4 border border-border bg-card p-1 lg:inline-flex lg:w-auto" role="group" aria-label={t("gallery.media_filter")}>
-                {[
-                  { id: "all", label: t("gallery.all") },
-                  { id: "3d", label: "3D" },
-                  { id: "photo", label: t("gallery.photos_label") },
-                  { id: "video", label: t("gallery.videos_label") },
-                ].map((tab) => (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => {
-                      setActiveTab(tab.id as typeof activeTab);
-                      setSelectedCategory(null);
-                      setPage(1);
-                    }}
-                    aria-pressed={activeTab === tab.id}
-                    className={cn(
-                      "min-h-11 min-w-0 px-2 py-2 text-xs font-medium transition-colors lg:flex-none lg:px-4",
-                      activeTab === tab.id
-                        ? "bg-foreground text-background"
-                        : "text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              <div className="relative w-full lg:max-w-sm">
-                <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  type="search"
-                  aria-label={t("gallery.search_placeholder")}
-                  value={searchQuery}
-                  onChange={(event) => {
-                    setSearchQuery(event.target.value);
-                    setPage(1);
-                  }}
-                  placeholder={t("gallery.search_placeholder")}
-                  className="h-11 rounded-full pl-10 pr-10"
-                />
-                {searchQuery && (
-                  <button
-                    type="button"
-                    onClick={() => { setSearchQuery(""); setDebouncedSearch(""); setPage(1); }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-1 text-muted-foreground hover:text-foreground"
-                    aria-label={t("shop.clear_filters")}
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                )}
-              </div>
-            </div>
-
+        <div className="toolbar">
+          <div className="chips" role="group" aria-label={t("gallery.media_filter")}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                className="chip"
+                aria-pressed={activeTab === tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setSelectedCategory(null);
+                  setPage(1);
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
             {filteredCategories.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedCategory(null);
-                    setPage(1);
-                  }}
-                  className={cn(
-                    "rounded-full border px-3 py-1.5 text-xs font-semibold",
-                    selectedCategory === null
-                      ? "border-primary bg-primary/8 text-primary"
-                      : "border-border text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  {t("gallery.all_categories")}
-                </button>
-                {filteredCategories.map((category) => (
-                  <button
-                    key={category.id}
-                    type="button"
-                    onClick={() => {
-                      setSelectedCategory(category.id);
-                      setPage(1);
-                    }}
-                    className={cn(
-                      "rounded-full border px-3 py-1.5 text-xs font-semibold",
-                      selectedCategory === category.id
-                        ? "border-primary bg-primary/8 text-primary"
-                        : "border-border text-muted-foreground hover:text-foreground"
-                    )}
-                  >
-                    {category.name}
-                  </button>
-                ))}
-              </div>
+              <button
+                type="button"
+                className="chip"
+                aria-pressed={selectedCategory === null}
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setPage(1);
+                }}
+              >
+                {t("gallery.all_categories")}
+              </button>
+            )}
+            {filteredCategories.map((category) => (
+              <button
+                key={category.id}
+                type="button"
+                className="chip"
+                aria-pressed={selectedCategory === category.id}
+                onClick={() => {
+                  setSelectedCategory(category.id);
+                  setPage(1);
+                }}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ position: "relative" }}>
+            <label className="sr-only" htmlFor="gallery-search">
+              {t("gallery.search_placeholder")}
+            </label>
+            <input
+              id="gallery-search"
+              type="search"
+              className="input"
+              value={searchQuery}
+              onChange={(event) => {
+                setSearchQuery(event.target.value);
+                setPage(1);
+              }}
+              placeholder={t("gallery.search_placeholder")}
+              style={{ borderRadius: "var(--r-pill)", paddingRight: "2.4rem" }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={() => {
+                  setSearchQuery("");
+                  setDebouncedSearch("");
+                  setPage(1);
+                }}
+                className="icon-btn"
+                style={{ position: "absolute", right: 0, top: 0, width: 40, height: 40 }}
+                aria-label={t("shop.clear_filters")}
+              >
+                <X className="h-4 w-4" />
+              </button>
             )}
           </div>
+        </div>
 
-          {isLoading ? (
-            <div className="grid gap-6 py-10 sm:grid-cols-2 lg:grid-cols-3">
-              {Array.from({ length: 6 }).map((_, index) => (
-                <div key={index} className="aspect-[4/3] animate-pulse rounded-3xl bg-muted" />
+        {isLoading ? (
+          <div className="empty" role="status">
+            <Lottie file="trosheen-28-loader-seal.json" mode="loop" className="empty__art" />
+            <p className="note" style={{ margin: 0 }}>
+              {t("common.loading")}
+            </p>
+          </div>
+        ) : isError ? (
+          <div className="empty" role="alert">
+            <Lottie file="trosheen-10-404-rolling-stone.json" mode="view" className="empty__art" />
+            <h3>{t("gallery.load_error")}</h3>
+            <button className="btn" onClick={() => void refetch()}>
+              <RefreshCw className="h-4 w-4" />
+              {t("v4.shop.retry")}
+            </button>
+          </div>
+        ) : items.length > 0 ? (
+          <>
+            <div className="masonry">
+              {items.map((item, index) => (
+                <figure key={item.id} data-reveal style={{ "--delay": `${(index % 3) * 80}ms` } as React.CSSProperties}>
+                  <Link href={"/gallery/" + item.slug} aria-label={item.title}>
+                    {item.type === "video" ? (
+                      <video
+                        src={item.mediaUrl}
+                        poster={item.thumbnailUrl}
+                        muted
+                        playsInline
+                        preload="metadata"
+                        style={{ width: "100%", height: "auto", display: "block" }}
+                      />
+                    ) : item.type === "3d" && !item.thumbnailUrl ? (
+                      <span
+                        style={{
+                          display: "grid",
+                          placeItems: "center",
+                          gap: ".6rem",
+                          aspectRatio: "4/3",
+                          background: "var(--linen-deep)",
+                          color: "var(--spruce)",
+                        }}
+                      >
+                        <Lottie
+                          file="trosheen-29-gallery-frame.json"
+                          mode="view"
+                          style={{ width: 96, height: 96 }}
+                        />
+                        <span className="note">{t("gallery.model_label")}</span>
+                      </span>
+                    ) : (
+                      <img
+                        src={item.thumbnailUrl || item.mediaUrl}
+                        alt={item.title}
+                        loading="lazy"
+                      />
+                    )}
+                    <span className="product__tag" style={{ left: ".8rem", top: ".8rem" }}>
+                      {typeLabel(item.type)}
+                    </span>
+                  </Link>
+                  <figcaption className="note" style={{ padding: ".7rem .2rem 0" }}>
+                    {item.title}
+                  </figcaption>
+                </figure>
               ))}
             </div>
-          ) : isError ? (
-            <div className="surface mx-auto my-16 max-w-xl px-7 py-12 text-center" role="alert">
-              <h2 className="font-serif text-3xl">{t("gallery.load_error")}</h2>
-              <button type="button" onClick={() => void refetch()} className="mt-6 inline-flex min-h-11 items-center gap-2 bg-primary px-6 text-sm font-medium text-primary-foreground">
-                <RefreshCw className="h-4 w-4" />{t("shop.retry")}
-              </button>
-            </div>
-          ) : items.length > 0 ? (
-            <>
-              <div className="grid gap-x-6 gap-y-10 py-10 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((item) => (
-                  <Link key={item.id} href={"/gallery/" + item.slug} className="group block">
-                    <article>
-                      <div className="relative aspect-[4/3] overflow-hidden rounded-3xl bg-muted">
-                        {item.type === "video" ? (
-                          <video
-                            src={item.mediaUrl}
-                            poster={item.thumbnailUrl}
-                            muted
-                            playsInline
-                            preload="metadata"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
-                          />
-                        ) : item.type === "3d" && !item.thumbnailUrl ? (
-                          <div className="flex h-full flex-col items-center justify-center gap-3 bg-muted text-primary">
-                            <BrandMotion name="imprint" className="h-20 w-20" mode="view" poster="/brand/icons/botanical.svg" />
-                            <span className="text-xs font-medium uppercase tracking-widest">{t("gallery.model_label")}</span>
-                          </div>
-                        ) : (
-                          <img
-                            src={item.thumbnailUrl || item.mediaUrl}
-                            alt={item.title}
-                            loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
-                          />
-                        )}
-                        <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-background/90 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.1em] backdrop-blur">
-                          <TypeIcon type={item.type} />
-                          {item.type === "3d" ? t("gallery.model_label") : item.type === "photo" ? t("gallery.photos_label") : t("gallery.videos_label")}
-                        </span>
-                      </div>
 
-                      <div className="pt-4">
-                        <div className="flex items-start justify-between gap-5">
-                          <div>
-                            <h2 className="font-serif text-2xl font-semibold tracking-tight group-hover:text-primary">
-                              {item.title}
-                            </h2>
-                            {item.description && (
-                              <p className="mt-2 line-clamp-2 text-sm leading-6 text-muted-foreground">
-                                {item.description}
-                              </p>
-                            )}
-                          </div>
-                          <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-muted-foreground">
-                            <Heart className="h-3.5 w-3.5" />
-                            {item.likes}
-                          </span>
-                        </div>
-                      </div>
-                    </article>
-                  </Link>
-                ))}
+            {galleryData?.total > items.length && (
+              <div className="center" style={{ marginTop: "2rem" }}>
+                <button
+                  className="btn"
+                  onClick={() => setPage((current) => current + 1)}
+                  disabled={isFetching}
+                >
+                  {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {t("common.load_more")}
+                </button>
               </div>
-
-              {galleryData?.total > items.length && (
-                <div className="text-center">
-                  <Button
-                    onClick={() => setPage((current) => current + 1)}
-                    disabled={isFetching}
-                    variant="outline"
-                    size="lg"
-                  >
-                    {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
-                    {t("common.load_more") || "Load more"}
-                  </Button>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="py-20 text-center">
-              <BrandMotion name="imprint" mode="view" className="mx-auto h-36 w-36" poster="/brand/icons/botanical.svg" />
-              <h2 className="mt-5 font-serif text-3xl font-semibold">{t("gallery.no_items")}</h2>
-              <p className="mt-2 text-muted-foreground">{t("gallery.try_different_filter")}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="divider" aria-hidden="true">
+              <Ornament name="auseklis" size="sm" draw />
             </div>
-          )}
-        </div>
-      </section>
-    </div>
+            <p className="eyebrow center" style={{ display: "block" }}>
+              {t("v4.gallery.empty.label")}
+            </p>
+            <div className="empty" data-reveal>
+              <Lottie file="trosheen-29-gallery-frame.json" mode="view" className="empty__art" />
+              <h3>
+                {searchQuery || selectedCategory !== null || activeTab !== "all"
+                  ? t("gallery.no_items")
+                  : t("v4.gallery.empty.title")}
+              </h3>
+              <p>
+                {searchQuery || selectedCategory !== null || activeTab !== "all"
+                  ? t("gallery.try_different_filter")
+                  : t("v4.gallery.empty.desc")}
+              </p>
+              <a
+                className="btn btn--ghost"
+                href="https://www.instagram.com/trosheencrafts"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t("v4.gallery.empty.cta")}
+              </a>
+            </div>
+          </>
+        )}
+      </div>
+    </section>
   );
 }

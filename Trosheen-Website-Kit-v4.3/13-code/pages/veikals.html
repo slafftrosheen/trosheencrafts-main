@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veikals — Trosheen</title>
+<meta name="description" content="Ar rokām veidoti akmens un ģipša darbi. Gatavie darbi un pielāgota darbnīca.">
+<meta name="theme-color" content="#24412F">
+<link rel="icon" href="../brand/favicon-32.png" sizes="32x32"><link rel="apple-touch-icon" href="../brand/apple-touch-icon-180.png">
+<link rel="stylesheet" href="../css/trosheen-v4.css">
+<script src="../vendor/lottie.min.js" defer></script>
+<script src="../js/demo-lottie-data.js" defer></script>
+<script src="../js/trosheen-ornaments.js" defer></script>
+<script src="../js/trosheen-v4.js" defer></script>
+</head>
+<body class="page-fade" data-page="shop">
+<a class="skip" href="#saturs">Pāriet uz saturu</a>
+<div class="season-ribbon"><span class="dot" aria-hidden="true"></span><span data-season-line>Sniegs krājas pie sētas. Darbnīcā deg sveces.</span></div>
+<header class="site-header"><div class="wrap">
+  <a class="brand" href="index.html" aria-label="Trosheen — sākums"><img src="../brand/trosheen-lockup-horizontal-spruce.svg" alt="Trosheen" width="190" height="42"></a>
+  <nav class="nav" aria-label="Galvenā navigācija"><a href="veikals.html" aria-current=page>Veikals</a><a href="stasts.html">Mūsu stāsts</a><a href="galerija.html">Galerija</a><a href="zurnals.html">Žurnāls</a><a href="kopsana.html">Kopšana</a><a href="kontakti.html">Kontakti</a></nav>
+  <div class="header-tools">
+    <button class="lang hide-sm" aria-label="Valoda: latviešu. Mainīt uz angļu">LV</button>
+    <a class="icon-btn hide-sm" href="#" aria-label="Meklēt"><img src="../brand/search.svg" alt=""></a>
+    <a class="icon-btn hide-sm" href="#" aria-label="Vēlmju saraksts"><img src="../brand/wishlist.svg" alt=""></a>
+    <a class="icon-btn" href="#" aria-label="Grozs"><img src="../brand/bag.svg" alt=""><span class="badge" data-cart-count>0</span></a>
+    <button class="icon-btn menu-btn" data-menu-open aria-expanded="false" aria-label="Atvērt izvēlni"><img src="../brand/menu.svg" alt=""></button>
+  </div>
+</div></header>
+<div class="drawer" aria-hidden="true"><div class="drawer__scrim" data-menu-close></div><nav class="drawer__panel" aria-label="Izvēlne">
+  <button class="icon-btn" data-menu-close aria-label="Aizvērt izvēlni" style="align-self:flex-end"><img src="../brand/close.svg" alt=""></button>
+  <a href="index.html">Sākums</a><a href="veikals.html">Veikals</a><a href="stasts.html">Mūsu stāsts</a><a href="galerija.html">Galerija</a><a href="zurnals.html">Žurnāls</a><a href="kopsana.html">Kopšana</a><a href="kontakti.html">Kontakti</a>
+  <a href="veikals.html#darbnica" style="font-size:1.1rem;color:var(--kiln)">Pielāgota darbnīca →</a>
+  <div style="display:flex;gap:.5rem;margin-top:1rem"><button class="lang">LV</button><button class="lang">EN</button><a class="icon-btn" href="#" aria-label="Meklēt"><img src="../brand/search.svg" alt=""></a><a class="icon-btn" href="#" aria-label="Vēlmju saraksts"><img src="../brand/wishlist.svg" alt=""></a></div>
+</nav></div>
+<main id="saturs">
+
+<section class="section--tight section" style="padding-bottom:0"><div class="wrap">
+  <p class="eyebrow"><span class="ornament ornament--sm" data-ornament="jumis" data-draw></span> Veikals</p>
+  <h1>Darbi mājai un dārzam</h1>
+  <p class="lead">Katrs darbs ir vienīgais eksemplārs — liets, veidots un krāsots ar rokām mūsu darbnīcā Daugavpilī.</p>
+  <div class="tabs" role="tablist" aria-label="Veikala sadaļas" style="margin-top:1.2rem">
+    <button class="tab" role="tab" id="t1" aria-controls="p-ready" data-hash="gatavie">Gatavie darbi</button>
+    <button class="tab" role="tab" id="t2" aria-controls="p-custom" data-hash="darbnica">Pielāgota darbnīca</button>
+  </div>
+</div></section>
+
+<section class="section" style="padding-top:1rem"><div class="wrap">
+  <div class="tab-panel" id="p-ready" role="tabpanel" aria-labelledby="t1">
+    <div class="toolbar">
+      <div class="chips" data-target="#grid"><button class="chip" aria-pressed="true" data-filter="all">Visi</button><button class="chip" aria-pressed="false" data-filter="candle">Sveces traukos</button><button class="chip" aria-pressed="false" data-filter="design">Dizaina elementi</button><button class="chip" aria-pressed="false" data-filter="garden">Dārza elementi</button></div>
+      <label class="sr-only" for="sort">Kārtot</label><select id="sort" class="select"><option>Ieteiktie</option><option>Jaunākie</option><option>Cena: no zemākās</option><option>Cena: no augstākās</option></select>
+    </div>
+    <div class="grid grid-4" id="grid" data-filterable><a class="product" data-kind="candle" href="darbs.html" data-reveal style="--delay:0ms">
+  <div class="product__media"><img src="../demo-assets/photo-g15.webp" alt="Sejas svece traukā — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Sejas svece traukā</h3>
+  <div class="product__meta"><span>Ģipsis · sojas vasks</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="candle" href="darbs.html" data-reveal style="--delay:90ms">
+  <div class="product__media"><img src="../demo-assets/photo-g09.webp" alt="Svece traukā — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Svece traukā</h3>
+  <div class="product__meta"><span>Akmens kompozīts · sojas vasks</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="design" href="darbs.html" data-reveal style="--delay:180ms">
+  <div class="product__media"><img src="../demo-assets/photo-g10.webp" alt="Dizaina elements — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Dizaina elements</h3>
+  <div class="product__meta"><span>Ģipsis · minerālkrāsa</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="design" href="darbs.html" data-reveal style="--delay:270ms">
+  <div class="product__media"><img src="../demo-assets/photo-g11.webp" alt="Dizaina elements — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Dizaina elements</h3>
+  <div class="product__meta"><span>Ģipsis · minerālkrāsa</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="design" href="darbs.html" data-reveal style="--delay:360ms">
+  <div class="product__media"><img src="../demo-assets/photo-g12.webp" alt="Dizaina elements — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Dizaina elements</h3>
+  <div class="product__meta"><span>Ģipsis · minerālkrāsa</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="garden" href="darbs.html" data-reveal style="--delay:450ms">
+  <div class="product__media"><img src="../demo-assets/photo-g14.webp" alt="Dārza elements — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Dārza elements</h3>
+  <div class="product__meta"><span>Akmens kompozīts</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="garden" href="darbs.html" data-reveal style="--delay:540ms">
+  <div class="product__media"><img src="../demo-assets/photo-g18.webp" alt="Dārza elements — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Dārza elements</h3>
+  <div class="product__meta"><span>Akmens kompozīts</span><span class="product__price">€ —</span></div>
+</a><a class="product" data-kind="garden" href="darbs.html" data-reveal style="--delay:630ms">
+  <div class="product__media"><img src="../demo-assets/photo-g20.webp" alt="Dārza elements — ar rokām veidots Trosheen darbnīcā" loading="lazy">
+    <span class="product__tag">Vienīgais eksemplārs</span>
+    <button class="icon-btn product__wish" data-wishlist aria-pressed="false" aria-label="Saglabāt vēlmju sarakstā"><span data-lottie="trosheen-03-wishlist-heart.json" data-play="manual" style="width:30px;height:30px"></span></button></div>
+  <h3 class="product__title">Dārza elements</h3>
+  <div class="product__meta"><span>Akmens kompozīts</span><span class="product__price">€ —</span></div>
+</a></div>
+    <div class="divider" aria-hidden="true"><span class="ornament ornament--sm" data-ornament="auseklis" data-draw></span></div>
+    <p class="eyebrow center" style="display:block">Tukšā veikala stāvoklis (kad plaukti ir tukši)</p>
+    <div class="empty" data-reveal><div class="empty__art" data-lottie="trosheen-11-empty-shop-plant.json" data-play="view" aria-hidden="true"></div>
+<h3>Plaukti atpūšas</h3><p>Jauni darbi šobrīd top darbnīcā. Pierakstieties vēstulēm — jūs uzzināsiet pirmie, vai izveidojiet savu darbu Pielāgotajā darbnīcā.</p><div class="btn-row" style="justify-content:center"><a class="btn" href="#darbnica" onclick="document.getElementById(&quot;t2&quot;).click()">Uz Pielāgoto darbnīcu</a><a class="btn btn--ghost" href="index.html#nl">Saņemt vēstules</a></div></div>
+  </div>
+
+  <div class="tab-panel" id="p-custom" role="tabpanel" aria-labelledby="t2" hidden>
+    <div class="split" style="margin-bottom:3rem">
+      <div><h2>Pielāgota darbnīca</h2><p class="lead">Izveidojiet darbu kopā ar mums. Jūs izvēlaties — mēs lejam, veidojam un krāsojam ar rokām.</p>
+      <ul class="facts"><li><img src="../brand/clock.svg" alt="">Izgatavošana: parasti 2–4 nedēļas</li><li><img src="../brand/chat.svg" alt="">Pirms darba sākšanas sazināmies ar jums</li><li><img src="../brand/gift-wrap.svg" alt="">Dāvanu iesaiņojums pēc vēlēšanās</li></ul></div>
+      <figure class="drawing" data-ink style="margin:0;--ar:4/3"><img src="../demo-assets/piece-05.webp" alt=""></figure>
+    </div>
+    <div class="wizard" data-wizard>
+      <ol class="wizard__steps"><li><span>1</span>Forma</li><li><span>2</span>Krāsa</li><li><span>3</span>Nospiedums</li><li><span>4</span>Jūsu vēlme</li></ol>
+      <div class="card" style="padding:2rem">
+        <div data-pane><h3>Izvēlieties formu</h3><div class="options"><label class="option"><input type="radio" name="f" checked><div class="frame frame--1x1" style="margin-bottom:.6rem"><img src="../demo-assets/photo-g15.webp" alt=""></div>Svece traukā</label><label class="option"><input type="radio" name="f" ><div class="frame frame--1x1" style="margin-bottom:.6rem"><img src="../demo-assets/photo-g10.webp" alt=""></div>Dizaina elements</label><label class="option"><input type="radio" name="f" ><div class="frame frame--1x1" style="margin-bottom:.6rem"><img src="../demo-assets/photo-g18.webp" alt=""></div>Dārza elements</label><label class="option"><input type="radio" name="f" ><div class="frame frame--1x1" style="margin-bottom:.6rem"><img src="../demo-assets/photo-g20.webp" alt=""></div>Puķu pods</label></div></div>
+        <div data-pane hidden><h3>Izvēlieties krāsu</h3><div class="options"><label class="option"><input type="radio" name="c" checked><div class="swatch" style="background:#EDE6DA"></div>Dabīgs akmens</label><label class="option"><input type="radio" name="c" ><div class="swatch" style="background:#24412F"></div>Egle</label><label class="option"><input type="radio" name="c" ><div class="swatch" style="background:#8E5636"></div>Māls</label><label class="option"><input type="radio" name="c" ><div class="swatch" style="background:#8C9A7B"></div>Ķērpis</label><label class="option"><input type="radio" name="c" ><div class="swatch" style="background:#B89150"></div>Zelts</label><label class="option"><input type="radio" name="c" ><div class="swatch" style="background:#1F1D1A"></div>Bazalts</label></div><p class="field-hint">Krāsas ekrānā var nedaudz atšķirties no īstā akmens.</p></div>
+        <div data-pane hidden><h3>Nospiedums vai raksts</h3><div class="options"><label class="option"><input type="radio" name="n" checked><span class="ornament" data-ornament="austras-koks" style="margin:.4rem auto .6rem;display:block"></span>Paparde vai lapa</label><label class="option"><input type="radio" name="n" ><span class="ornament" data-ornament="auseklis" style="margin:.4rem auto .6rem;display:block"></span>Auseklis</label><label class="option"><input type="radio" name="n" ><span class="ornament" data-ornament="saule" style="margin:.4rem auto .6rem;display:block"></span>Saule</label><label class="option"><input type="radio" name="n" ><span class="ornament" data-ornament="jumis" style="margin:.4rem auto .6rem;display:block"></span>Jumis</label><label class="option"><input type="radio" name="n" ><span class="ornament" data-ornament="krustu-krusts" style="margin:.4rem auto .6rem;display:block"></span>Bez raksta</label></div></div>
+        <div data-pane hidden><h3>Pastāstiet par savu ideju</h3>
+          <form data-friendly><div class="field"><label for="w1">Vārds</label><input id="w1" class="input" required><span class="field-error" hidden>Lūdzu, ierakstiet vārdu.</span></div>
+          <div class="field"><label for="w2">E-pasts</label><input id="w2" class="input" type="email" required><span class="field-error" hidden>Lūdzu, ierakstiet e-pastu.</span></div>
+          <div class="field"><label for="w3">Jūsu vēlme</label><textarea id="w3" class="textarea" placeholder="Kam darbs paredzēts? Izmērs, vārds, datums vai cita ideja…"></textarea></div>
+          <button class="btn">Nosūtīt pieprasījumu</button>
+          <div class="form-ok" role="status" style="margin-top:1rem"><span data-lottie="trosheen-08-wrapped-and-sealed.json" data-play="manual" style="width:40px;height:40px"></span>Paldies! Atbildēsim 1–2 darba dienu laikā.</div></form></div>
+        <div class="btn-row" style="margin-top:1.8rem;justify-content:space-between"><button class="btn btn--ghost" data-prev>Atpakaļ</button><button class="btn" data-next>Tālāk <svg class="tr-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 12h15M13 6l6 6-6 6"/></svg></button></div>
+      </div>
+    </div>
+  </div>
+</div></section>
+</main>
+<footer class="site-footer">
+  <div class="band band--linen" aria-hidden="true"></div>
+  <div class="wrap footer-grid">
+    <div>
+      <img src="../brand/trosheen-lockup-horizontal-linen.svg" alt="Trosheen" width="180" style="margin-bottom:1.2rem">
+      <p style="font-family:var(--f-display);font-size:1.15rem;color:#F2EDE3">Radīts, lai nodotu tālāk.</p>
+      <p class="note" style="color:#D9D2C3">Ģimenes darbnīca Daugavpilī. Akmens, ģipsis un krāsa — ar rokām, pēc mūsu pašu receptes.</p>
+    </div>
+    <div><h4>Izpētīt</h4><ul><li><a href="veikals.html">Veikals</a></li><li><a href="veikals.html#darbnica">Pielāgota darbnīca</a></li><li><a href="stasts.html">Mūsu stāsts</a></li><li><a href="galerija.html">Galerija</a></li><li><a href="zurnals.html">Žurnāls</a></li><li><a href="kopsana.html">Kopšana</a></li></ul></div>
+    <div><h4>Sazināties</h4><ul><li><a href="mailto:slaff.trosheen@gmail.com">slaff.trosheen@gmail.com</a></li><li><a href="tel:+37120678142">+371 20 678 142</a></li><li>Daugavpils, Latvija</li><li><a href="https://www.instagram.com/trosheencrafts">Instagram</a> · <a href="https://www.facebook.com/trosheencrafts">Facebook</a></li></ul></div>
+    <div><h4>Vēstules no darbnīcas</h4><p class="note" style="color:#D9D2C3">Jauni darbi un sezonas padomi — reizi mēnesī, ne biežāk.</p>
+      <form class="inline-form" data-friendly><label class="sr-only" for="fe">E-pasts</label><input id="fe" class="input" type="email" placeholder="jūsu@epasts.lv" required style="background:#FBF8F2"><button class="btn btn--linen">Pierakstīties</button></form></div>
+  </div>
+  <div class="wrap footer-base"><span>© 2026 Trosheen · Daugavpils, Latvija</span>
+    <nav aria-label="Juridiskā informācija"><a href="#">Atteikuma tiesības</a><a href="#">Privātums</a><a href="#">Pirkšanas noteikumi</a><a href="#">Sīkdatnes</a></nav></div>
+</footer>
+<div class="lightbox" role="dialog" aria-modal="true" aria-label="Attēls"><button class="icon-btn" data-close aria-label="Aizvērt"><img src="../brand/close.svg" alt="" style="filter:invert(1)"></button><img alt=""></div>
+</body></html>

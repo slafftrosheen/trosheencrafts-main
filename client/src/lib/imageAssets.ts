@@ -5,36 +5,41 @@
  * Last updated: February 1, 2026
  */
 
+// Photography now lives in /public and is served as static files (the previous
+// bundled client/src/assets folder is no longer part of the repository, so these
+// were broken imports). Every path below is a real Trosheen photo from the
+// v4.3 website kit.
+
 // CANDLE PRODUCTS
-import handsHoldingHeartCandle from '@/assets/Hands holding heart candle.webp';
-import heartShapedMugCandle from '@/assets/heart shaped mug candle.webp';
-import handsVaseShapeCandle from '@/assets/hands in vase shape candle.webp';
-import seaShellCandle from '@/assets/sea shell shaped candle.webp';
-import seaStarGelCandle from '@/assets/sea star shaped gel candle.webp';
-import womanFaceCandle from '@/assets/woman face shaped candle.webp';
-import latvianMotiffCandle from '@/assets/Latvian Motiff candle.webp';
-import valentineSelection from '@/assets/valentine candle selection.webp';
-import valentineSelection2 from '@/assets/valentine candle selection 2.webp';
+const handsHoldingHeartCandle = '/photos/piece-16.webp';
+const heartShapedMugCandle = '/photos/piece-02.webp';
+const handsVaseShapeCandle = '/photos/piece-03.webp';
+const seaShellCandle = '/photos/piece-06.webp';
+const seaStarGelCandle = '/photos/piece-07.webp';
+const womanFaceCandle = '/photos/photo-g05.webp';
+const latvianMotiffCandle = '/photos/photo-g06.webp';
+const valentineSelection = '/photos/photo-i03.webp';
+const valentineSelection2 = '/heroes/trosheen-hero-mobile-01-750.webp';
 
 // WORKSHOP & PROCESS
-import alisijaFillingCandle from '@/assets/alisija filling star candle.webp';
-import nikPaintingCandle from '@/assets/nik painting bronze candle.webp';
-import castingProcess from '@/assets/concrete casting process.webp';
+const alisijaFillingCandle = '/heroes/trosheen-hero-mobile-02-750.webp';
+const nikPaintingCandle = '/heroes/trosheen-hero-mobile-03-750.webp';
+const castingProcess = '/heroes/trosheen-hero-mobile-04-750.webp';
 
 // GARDEN & DECORATIVE
-import leafSteppingStone from '@/assets/Leaf Stepping stone.webp';
-import handsShapedTray from '@/assets/hands shaped store tray.webp';
+const leafSteppingStone = '/heroes/trosheen-hero-mobile-05-750.webp';
+const handsShapedTray = '/heroes/trosheen-hero-mobile-06-750.webp';
 
 // HERO & STORY
-import heroPhoto from '@/assets/hero photo.webp';
-import storyPhoto from '@/assets/story photo.webp';
-import storyPhoto2 from '@/assets/story photo2.webp';
-import storyPhoto3 from '@/assets/story photo3.webp';
-import heroWorkshop from '@/assets/images/hero-workshop.webp';
+const heroPhoto = '/heroes/trosheen-hero-desktop-01-1920.webp';
+const storyPhoto = '/heroes/trosheen-hero-mobile-07-750.webp';
+const storyPhoto2 = '/heroes/trosheen-hero-mobile-08-750.webp';
+const storyPhoto3 = '/heroes/trosheen-hero-desktop-03-1920.webp';
+const heroWorkshop = '/heroes/trosheen-hero-desktop-02-1920.webp';
 
 // UI ASSETS
-import logoImg from '@/assets/images/trosheen-logo.webp';
-import teamPortraitImg from '@/assets/images/team-portrait.webp';
+const logoImg = '/brand/seal-spruce.svg';
+const teamPortraitImg = '/heroes/trosheen-hero-mobile-09-750.webp';
 
 // Product photos - exclusively for product display
 export const ProductPhotos = {

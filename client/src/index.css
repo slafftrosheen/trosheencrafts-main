@@ -282,8 +282,7 @@
 .storefront :is(.display-title,.section-title) { color: var(--tr-spruce); }
 .storefront :is(.rounded-3xl,.rounded-2xl,.rounded-xl,.rounded-lg):not([role='switch']) { border-radius: 2px; }
 .storefront .font-semibold { font-weight: 500; }
-.storefront footer { --foreground: 40 37% 92%; --muted-foreground: 40 23% 82%; --primary: 40 37% 92%; --border: 139 17% 33%; --card: 143 29% 20%; background: var(--tr-spruce); color: var(--tr-linen); }
-.storefront footer .eyebrow { color: var(--tr-linen); }
+.storefront footer { --foreground: 40 37% 92%; --muted-foreground: 40 23% 82%; --primary: 40 37% 92%; --border: 139 17% 33%; --card: 143 29% 20%; }
 .storefront footer :is(input,button[type='submit']) { --primary: 38 42% 52%; --primary-foreground: 36 9% 11%; --primary-border: 38 42% 52%; }
 .brand-hero { display: grid; background: var(--tr-linen); }
 .brand-hero picture { display: block; min-width: 0; }
@@ -329,12 +328,11 @@
   --tr-dur-base:400ms;
   --tr-ease-calm:cubic-bezier(.45,0,.2,1);
 }
-.storefront .eyebrow { color:var(--tr-kiln); font-size:.8125rem; letter-spacing:.24em; }
 .storefront .page-shell { padding-block:clamp(3.5rem,7vw,6rem); }
 .storefront .section-space { padding-block:clamp(4.5rem,8vw,6rem); }
 .storefront .surface,.storefront .surface-muted { box-shadow:none; }
 .storefront :is(button,a) { transition-property:color,background-color,border-color,box-shadow,transform; transition-duration:var(--tr-dur-hover); transition-timing-function:var(--tr-ease-calm); }
-.storefront :is(button,a,input,select,textarea):focus-visible { outline:2px solid var(--tr-gilt); outline-offset:3px; }
+.storefront :is(button,a,input,select,textarea):focus-visible { outline:2px solid var(--kiln); outline-offset:3px; }
 .storefront .brand-panel-image { transition:transform 700ms var(--tr-ease-calm); }
 @media(hover:hover){.storefront .brand-panel:hover .brand-panel-image{transform:scale(1.018)}}
 .brand-motion { position:relative; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; vertical-align:middle; }

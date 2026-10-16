@@ -1,99 +1,131 @@
 import { Link } from "wouter";
-import { ArrowUpRight, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useBlogPosts } from "@/hooks/useApi";
-import { Spinner } from "@/components/shared/LoadingStates";
 import { useLanguage } from "@/lib/LanguageContext";
-import { BrandMotion } from "@/components/shared/BrandMotion";
+import { useBlogPosts } from "@/hooks/useApi";
+import { Lottie } from "@/components/brand/Lottie";
+import { Ornament } from "@/components/brand/Ornament";
+
+const Arrow = () => (
+  <svg
+    className="tr-arrow"
+    width="18"
+    height="18"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="1.6"
+    strokeLinecap="round"
+  >
+    <path d="M4 12h15M13 6l6 6-6 6" />
+  </svg>
+);
 
 export default function BlogPage() {
   const { data: posts = [], isLoading } = useBlogPosts();
   const { t, language } = useLanguage();
 
+  const localized = (post: any) => ({
+    title: post.titleTranslations?.[language] || post.title,
+    excerpt: post.excerptTranslations?.[language] || post.excerpt,
+    date: new Date(post.publishedAt || post.createdAt).toLocaleDateString(language, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    }),
+  });
+
+  const [feature, ...rest] = posts;
+
   return (
-    <div className="min-h-screen bg-background">
-      <section className="page-shell border-b border-border">
-        <div className="site-container">
-          <p className="eyebrow">{t("blog.journal_title")}</p>
-          <div className="mt-4 grid gap-7 lg:grid-cols-[1fr_.8fr] lg:items-end">
-            <h1 className="display-title">
-              {t("blog.notes_from")} <span className="italic text-primary">{t("blog.location")}</span>
-            </h1>
-            <p className="lead lg:pb-2">{t("blog.intro_text")}</p>
+    <section className="section section--tight">
+      <div className="wrap">
+        <p className="eyebrow">
+          <Ornament name="austras-koks" size="sm" draw /> {t("v4.journal.eyebrow")}
+        </p>
+        <h1>{t("v4.journal.title")}</h1>
+        <p className="lead">{t("v4.journal.lead")}</p>
+
+        {isLoading ? (
+          <div className="empty" role="status" style={{ marginTop: "2rem" }}>
+            <Lottie file="trosheen-28-loader-seal.json" mode="loop" className="empty__art" />
+            <p className="note" style={{ margin: 0 }}>
+              {t("common.loading")}
+            </p>
           </div>
-        </div>
-      </section>
+        ) : posts.length > 0 ? (
+          <>
+            {feature && (
+              <Link
+                className="post feature-post"
+                href={`/blog/${feature.slug}`}
+                data-reveal
+                style={{ marginTop: "2rem" }}
+              >
+                <div className="frame" style={{ aspectRatio: "16/10" }}>
+                  {feature.image ? (
+                    <img src={feature.image} alt={localized(feature).title} />
+                  ) : (
+                    <img src="/photos/piece-16.webp" alt="" />
+                  )}
+                </div>
+                <div>
+                  <span className="post__meta">
+                    {feature.author} · {localized(feature).date}
+                  </span>
+                  <h2 style={{ marginTop: ".6rem" }}>{localized(feature).title}</h2>
+                  <p className="lead">{localized(feature).excerpt}</p>
+                  <span className="link-arrow">
+                    {t("v4.journal.read")} <Arrow />
+                  </span>
+                </div>
+              </Link>
+            )}
 
-      <section className="section-space">
-        <div className="site-container">
-          {isLoading ? (
-            <div className="flex min-h-72 items-center justify-center">
-              <Spinner size="lg" />
+            {rest.length > 0 && (
+              <div className="grid grid-3" style={{ marginTop: "3.5rem" }}>
+                {rest.map((post, index) => (
+                  <Link
+                    className="post"
+                    href={`/blog/${post.slug}`}
+                    key={post.id}
+                    data-reveal
+                    style={{ "--delay": `${index * 100}ms` } as React.CSSProperties}
+                  >
+                    <div className="frame" data-ink>
+                      {post.image ? (
+                        <img src={post.image} alt={localized(post).title} loading="lazy" />
+                      ) : (
+                        <img src="/photos/piece-02.webp" alt="" loading="lazy" />
+                      )}
+                    </div>
+                    <span className="post__meta">
+                      {post.author} · {localized(post).date}
+                    </span>
+                    <h3>{localized(post).title}</h3>
+                    <p className="note">{localized(post).excerpt}</p>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="divider" aria-hidden="true">
+              <Ornament name="auseklis" size="sm" draw />
             </div>
-          ) : posts.length > 0 ? (
-            <div className="grid gap-x-7 gap-y-12 md:grid-cols-2 lg:grid-cols-3">
-              {posts.map((post) => {
-                const localizedPost = post as any;
-                const title = localizedPost.titleTranslations?.[language] || post.title;
-                const excerpt = localizedPost.excerptTranslations?.[language] || post.excerpt;
-                const date = new Date(post.publishedAt || post.createdAt).toLocaleDateString(language, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                });
-
-                return (
-                  <article key={post.id} className="group">
-                    <Link href={"/blog/" + post.slug} className="block">
-                      <div className="aspect-[4/3] overflow-hidden rounded-3xl bg-muted">
-                        {post.image ? (
-                          <img
-                            src={post.image}
-                            alt={title}
-                            loading="lazy"
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.025]"
-                          />
-                        ) : (
-                          <div className="flex h-full items-center justify-center">
-                            <BookOpen className="h-9 w-9 text-muted-foreground" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="pt-5">
-                        <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
-                          <span>{post.author}</span>
-                          <span className="h-1 w-1 rounded-full bg-border" />
-                          <span>{date}</span>
-                        </div>
-                        <h2 className="mt-3 font-serif text-2xl font-semibold leading-tight tracking-tight group-hover:text-primary">
-                          {title}
-                        </h2>
-                        <p className="mt-3 line-clamp-3 text-sm leading-7 text-muted-foreground">
-                          {excerpt}
-                        </p>
-                        <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                          {t("blog.browse")}
-                          <ArrowUpRight className="h-4 w-4" />
-                        </span>
-                      </div>
-                    </Link>
-                  </article>
-                );
-              })}
+            <p className="eyebrow center" style={{ display: "block" }}>
+              {t("v4.journal.empty.label")}
+            </p>
+            <div className="empty" data-reveal>
+              <Lottie file="trosheen-04-sprouting-planter.json" mode="view" className="empty__art" />
+              <h3>{t("v4.journal.empty.title")}</h3>
+              <p>{t("v4.journal.empty.desc")}</p>
+              <Link className="btn btn--ghost" href="/#nl">
+                {t("v4.journal.empty.cta")}
+              </Link>
             </div>
-          ) : (
-            <div className="surface mx-auto max-w-xl p-10 text-center">
-              <BrandMotion name="imprint" mode="view" className="mx-auto h-32 w-32" poster="/brand/icons/botanical.svg" />
-              <h2 className="mt-5 font-serif text-3xl font-semibold">{t("blog.journal_title")}</h2>
-              <p className="mt-3 text-muted-foreground">{t("blog.intro_text")}</p>
-              <Button asChild variant="outline" className="mt-6">
-                <Link href="/shop">{t("blog.webshop")}</Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
-    </div>
+          </>
+        )}
+      </div>
+    </section>
   );
 }

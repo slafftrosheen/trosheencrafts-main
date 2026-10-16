@@ -1,4 +1,5 @@
 import { brandCopy } from "./brandCopy";
+import { v4Copy } from "./v4Copy";
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 type Language = "en" | "lv" | "ru" | "pl" | "uk";
@@ -756,6 +757,7 @@ export const translations: Translations = {
   "constructor.custom_product_name": { en: "Custom Crafted Candle", lv: "Individuāli veidota svece", ru: "Свеча по индивидуальному дизайну", pl: "Świeca wykonana na zamówienie", uk: "Свічка за індивідуальним дизайном" },
   "constructor.custom_placeholder": { en: "e.g. Deep emerald green with copper speckles...", lv: "piem., dziļi smaragdzaļš ar vara akcentiem...", ru: "например, глубокий изумрудный с медными вкраплениями...", pl: "np. głęboka szmaragdowa zieleń z miedzianymi drobinkami...", uk: "наприклад, насичений смарагдовий із мідними вкрапленнями..." },
   ...brandCopy,
+  ...v4Copy,
 };
 
 interface LanguageContextType {

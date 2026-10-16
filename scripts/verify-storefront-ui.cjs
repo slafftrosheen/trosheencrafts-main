@@ -18,18 +18,22 @@ function expect(condition, message) {
 function exists(relativePath) {
   return fs.existsSync(path.join(root, relativePath));
 }
+// Kit v4.3 asset contracts: local fonts, the vendored Lottie runtime, the
+// transparent logos, the ornament band and the gypsum texture the CSS references.
 const kitAssets = [
-  "client/public/brand/lottie/lottie.min.js",
-  "client/public/brand/hero-desktop.webp",
-  "client/public/brand/hero-desktop-1280.webp",
-  "client/public/brand/hero-mobile.webp",
-  "client/public/brand/hero-mobile-1080.webp",
-  "client/public/brand/hero-wide.webp",
-  "client/public/brand/lockup-horizontal-spruce.svg",
-  "client/public/brand/seal-spruce.svg",
-  "client/public/brand/signature-olegs.svg",
-  "client/public/brand/signature-family.svg",
+  "client/public/vendor/lottie.min.js",
+  "client/public/fonts/Fraunces-Variable.ttf",
+  "client/public/fonts/Jost-Variable.ttf",
+  "client/public/heroes/trosheen-hero-desktop-05-1920.webp",
+  "client/public/heroes/trosheen-hero-mobile-12-1080.webp",
+  "client/public/brand/trosheen-lockup-horizontal-spruce.svg",
+  "client/public/brand/trosheen-lockup-horizontal-linen.svg",
+  "client/public/brand/trosheen-seal-spruce.svg",
+  "client/public/brand/trosheen-signature-ar-siltam-rokam-olegs-animated.svg",
   "client/public/brand/botanical/trosheen-divider-vine.svg",
+  "client/public/brand/lottie/trosheen-28-loader-seal.json",
+  "client/public/ornaments/svg/trosheen-jostas-raksts-band-spruce.svg",
+  "client/public/textures/trosheen-texture-gypsum-tile-1024.webp",
 ];
 kitAssets.forEach(asset => expect(exists(asset), "Brand asset absent: " + asset));
 
@@ -53,18 +57,21 @@ for (const route of ["/admin", "/admin/gallery", "/admin/constructor", "/admin/h
 
 const home = text("client/src/pages/home.tsx");
 expect(home.includes("useHomepageImages") && home.includes("image(\"hero\")"), "Keep R2-admin-editable homepage images");
-expect(home.includes("hero-mobile-1080.webp"), "Keep responsive no-text hero art direction");
+expect(/hero-mobile-\d+-1080\.webp/.test(home), "Keep responsive hero art direction");
 expect(home.includes("<PromotionalGallery embedded />"), "Keep promotions on homepage");
+expect(home.includes("className=\"hero\"") && home.includes("hero__content"), "Homepage hero must be kit v4 with live HTML copy");
+expect(home.includes("brand.tagline") && home.includes("v4.hero.lead"), "Homepage hero copy must stay translatable");
+expect(!/demo-assets|placeholder\./.test(home), "Never ship placeholder art on the homepage");
 const about = text("client/src/pages/about.tsx");
-expect(about.includes("brand-art-crop--right"), "About must crop baked-in English headline from composite asset");
-expect(home.includes("brand-art-crop--left"), "Home story must crop baked-in panel from default kit asset");
-expect(home.includes("brand-hero--editorial") && !home.includes("brand-hero--immersive"), "Homepage hero must separate photo from live copy");
+expect(about.includes("chapter-nav") && about.includes("id=\"recepte\""), "Story page keeps its chapter navigation and recipe section");
+expect(about.includes("v4.story.c7.cta1"), "Story page keeps its closing visit call to action");
 const promotions = text("client/src/components/PromotionalGallery.tsx");
 expect(promotions.includes("kitBannerPhotoSide") && promotions.includes("brand-promo-media"), "Kit collection banners must show the photographic region, not baked text");
 expect(!promotions.includes('bg-gradient-to-t'), "Do not cover promo photography with heavy text gradients");
 const shop = text("client/src/pages/shop.tsx");
 expect(shop.includes("<CandleConstructor />"), "Keep full constructor embedded in shop");
 expect(shop.includes("trosheen:shop-view"), "Keep shop tab/URL synchronization");
+expect(shop.includes("v4.shop.tab.custom") && shop.includes("CustomWorkshopWizard"), "Shop keeps the ready/custom tabs and the v4 request wizard");
 const gallery = text("client/src/pages/gallery.tsx");
 expect(gallery.includes('"/gallery/" + item.slug'), "Keep gallery detail navigation");
 expect(gallery.includes("selectedCategory") && gallery.includes("setPage("), "Keep gallery filtering and pagination");
@@ -83,7 +90,8 @@ expect(!seo.includes("window.location.href"), "Never publish checkout token in c
 
 // Prevent silent UI regressions where t("missing.key") prints the key verbatim.
 const translationText = text("client/src/lib/LanguageContext.tsx") + "\n" +
-  text("client/src/lib/brandCopy.ts");
+  text("client/src/lib/brandCopy.ts") + "\n" +
+  text("client/src/lib/v4Copy.ts");
 const translationKeys = new Set();
 for (const match of translationText.matchAll(/(?:^|[,\n])\s*(?:"([^"]+)"|'([^']+)'|([a-zA-Z_][\w.]*))\s*:\s*\{\s*["']?(?:en|lv|ru|pl|uk)["']?\s*:/g)) {
   translationKeys.add(match[1] || match[2] || match[3]);
@@ -101,8 +109,11 @@ const localizedPages = [
   "client/src/pages/withdrawal.tsx",
   "client/src/components/shared/Footer.tsx",
   "client/src/components/shared/Navigation.tsx",
-  "client/src/components/shared/MobileNavigation.tsx",
   "client/src/components/shared/Layout.tsx",
+  "client/src/components/brand/NewsletterForm.tsx",
+  "client/src/components/brand/ProductCardV4.tsx",
+  "client/src/components/brand/SeasonRibbon.tsx",
+  "client/src/components/brand/Ornament.tsx",
   "client/src/components/shared/LanguageSwitcher.tsx",
   "client/src/components/shared/LoadingStates.tsx",
   "client/src/components/features/ShoppingCart.tsx",
