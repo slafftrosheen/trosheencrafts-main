@@ -9,6 +9,7 @@ import { spawn } from 'child_process';
 import path from 'path';
 
 export const blogRouter = Router();
+const localizedField = z.record(z.enum(['en', 'lv', 'ru', 'pl', 'uk']), z.string().max(20000)).optional();
 
 const getBlogPostsSchema = z.object({
   query: z.object({
@@ -78,10 +79,13 @@ blogRouter.get(
 // Updated blog post schema with new social media fields
 const blogPostSchema = z.object({
   body: z.object({
-    title: z.string().min(1),
-    slug: z.string().min(1),
+    title: z.string().trim().min(1),
+    slug: z.string().trim().min(1),
     content: z.string().min(1),
     excerpt: z.string().min(1),
+    titleTranslations: localizedField,
+    excerptTranslations: localizedField,
+    contentTranslations: localizedField,
     image: z.string().optional(),
     video: z.string().optional(),
     mediaType: z.enum(['text', 'image', 'video']).default('text'),
@@ -111,7 +115,7 @@ async function executeSocialMediaPost(postData: any): Promise<SocialMediaResult>
       image: postData.image,
       video: postData.video,
       mediaType: postData.mediaType || 'text',
-      link: `${process.env.SITE_URL || 'https://trosheencrafts.vercel.app'}/blog/${postData.slug}`
+      link: `${process.env.SITE_URL || 'https://trosheen.shop'}/blog/${postData.slug}`
     };
 
     const pythonProcess = spawn('python3', [

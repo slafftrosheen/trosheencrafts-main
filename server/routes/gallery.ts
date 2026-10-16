@@ -7,6 +7,7 @@ import { validateRequest } from '../middleware/validation';
 import { adminAuthMiddleware } from '../middleware/auth';
 
 export const galleryRouter = Router();
+const localizedField = z.record(z.enum(['en', 'lv', 'ru', 'pl', 'uk']), z.string().max(20000)).optional();
 
 // ==================== PUBLIC ROUTES ====================
 
@@ -33,7 +34,7 @@ galleryRouter.get('/categories', async (req, res, next) => {
 // Get all gallery items (with filters)
 const getGalleryItemsSchema = z.object({
   query: z.object({
-    type: z.enum(['3d', 'photo']).optional(),
+    type: z.enum(['3d', 'photo', 'video']).optional(),
     categoryId: z.coerce.number().optional(),
     featured: z.coerce.boolean().optional(),
     search: z.string().optional(),
@@ -145,7 +146,9 @@ const createCategorySchema = z.object({
     name: z.string().min(1),
     slug: z.string().min(1),
     description: z.string().optional(),
-    type: z.enum(['3d', 'photo']),
+    nameTranslations: localizedField,
+    descriptionTranslations: localizedField,
+    type: z.enum(['3d', 'photo', 'video']),
     featured: z.boolean().default(false),
     sortOrder: z.number().default(0),
   }),
@@ -236,11 +239,13 @@ const createItemSchema = z.object({
     title: z.string().min(1),
     slug: z.string().min(1),
     description: z.string().optional(),
+    titleTranslations: localizedField,
+    descriptionTranslations: localizedField,
     categoryId: z.number().nullable().optional(),
-    type: z.enum(['3d', 'photo']),
+    type: z.enum(['3d', 'photo', 'video']),
     mediaUrl: z.string().min(1),
     thumbnailUrl: z.string().min(1).optional(),
-    metadata: z.any().optional(),
+    metadata: z.record(z.unknown()).nullable().optional(),
     tags: z.array(z.string()).default([]),
     featured: z.boolean().default(false),
     published: z.boolean().default(true),

@@ -94,6 +94,9 @@ export const blogPosts = pgTable('blog_posts', {
   slug: text('slug').notNull().unique(),
   content: text('content').notNull(),
   excerpt: text('excerpt').notNull(),
+  titleTranslations: jsonb('title_translations').$type<Record<string, string>>().default({}),
+  excerptTranslations: jsonb('excerpt_translations').$type<Record<string, string>>().default({}),
+  contentTranslations: jsonb('content_translations').$type<Record<string, string>>().default({}),
   image: text('image'),
   video: text('video'), // Video URL support
   mediaType: text('media_type').default('text'), // 'image', 'video', 'text'
@@ -130,8 +133,10 @@ export const contactSubmissions = pgTable('contact_submissions', {
 export const galleryCategories = pgTable('gallery_categories', {
   id: serial('id').primaryKey(),
   name: text('name').notNull(),
+  nameTranslations: jsonb('name_translations').$type<Record<string, string>>().default({}),
   slug: text('slug').notNull().unique(),
   description: text('description'),
+  descriptionTranslations: jsonb('description_translations').$type<Record<string, string>>().default({}),
   type: text('type').notNull(), // '3d' or 'photo'
   featured: boolean('featured').default(false),
   sortOrder: integer('sort_order').default(0),
@@ -147,6 +152,8 @@ export const galleryItems = pgTable('gallery_items', {
   title: text('title').notNull(),
   slug: text('slug').notNull().unique(),
   description: text('description'),
+  titleTranslations: jsonb('title_translations').$type<Record<string, string>>().default({}),
+  descriptionTranslations: jsonb('description_translations').$type<Record<string, string>>().default({}),
   categoryId: integer('category_id').references(() => galleryCategories.id, { onDelete: 'set null' }),
   type: text('type').notNull(), // '3d', 'photo', or 'video'
   mediaUrl: text('media_url').notNull(),
