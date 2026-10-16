@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
 import { useSiteConfig } from "@/hooks/useSiteConfig";
 import { NewsletterForm } from "@/components/brand/NewsletterForm";
+import { SiteLogo } from "@/components/shared/SiteLogo";
 
 /** Trosheen v4 site footer: band, four columns, legal base. */
 export function Footer() {
@@ -36,12 +37,8 @@ export function Footer() {
       <div className="band band--linen" aria-hidden="true" />
       <div className="wrap footer-grid">
         <div>
-          <img
-            src="/brand/trosheen-lockup-horizontal-linen.svg"
-            alt="Trosheen"
-            width={180}
-            style={{ marginBottom: "1.2rem" }}
-          />
+          <SiteLogo variant="lockup-horizontal" tone="linen"
+            alt="Trosheen" width={180} style={{ marginBottom: "1.2rem" }} />
           <p style={{ fontFamily: "var(--f-display)", fontSize: "1.15rem", color: "#F2EDE3" }}>
             {t("brand.tagline")}
           </p>

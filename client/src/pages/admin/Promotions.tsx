@@ -157,7 +157,7 @@ export default function AdminPromotions() {
                     <TableCell className="px-8 font-medium">
                       <div className="flex items-center gap-4">
                         <div className="w-16 h-12 rounded-xl bg-muted overflow-hidden">
-                           <OptimizedImage src={promo.imageUrl} className="w-full h-full object-cover" />
+                           <OptimizedImage src={promo.imageUrl} alt={promo.title} className="w-full h-full object-cover" />
                         </div>
                         {promo.title}
                       </div>

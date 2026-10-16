@@ -126,7 +126,7 @@ export function Lottie({
     if (trigger <= 0 || prefersReducedMotion()) return;
     const host = hostRef.current;
     const animation = (host as unknown as { _lottie?: LottieAnimation })?._lottie;
-    if (animation?.isLoaded) {
+    if (animation && animation.isLoaded !== false) {
       animation.goToAndPlay(0, true);
     } else {
       pendingManual.current = true;
