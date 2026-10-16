@@ -1,6 +1,6 @@
-import { useState } from "react";
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useWishlist } from "@/lib/wishlist";
 import { Lottie } from "./Lottie";
 import type { Product } from "@/hooks/useApi";
 
@@ -28,7 +28,8 @@ export function formatPrice(product: Product): string {
 /** v4 `.product` card: media, one-of-a-kind tag, wishlist heart, title, meta. */
 export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) {
   const { t, language } = useLanguage();
-  const [wished, setWished] = useState(false);
+  const wished = useWishlist(state => state.ids.includes(product.id));
+  const toggleWishlist = useWishlist(state => state.toggle);
   const image = productImage(product);
 
   return (
@@ -53,7 +54,7 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
           onClick={(event) => {
             event.preventDefault();
             event.stopPropagation();
-            setWished((value) => !value);
+            toggleWishlist(product.id);
           }}
         >
           <Lottie

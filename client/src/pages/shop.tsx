@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
+import { useWishlist } from "@/lib/wishlist";
 import { useProducts, useContactForm, type Product } from "@/hooks/useApi";
 import { cn } from "@/lib/utils";
 import { Lottie } from "@/components/brand/Lottie";
@@ -54,6 +55,7 @@ export default function ShopPage() {
   const [location] = useLocation();
   const { data: products, isLoading, isError, refetch } = useProducts();
   const contactForm = useContactForm();
+  const wishedIds = useWishlist(state => state.ids);
 
   const [activeTab, setActiveTab] = useState<ShopTab>(() =>
     typeof window !== "undefined" &&
@@ -64,6 +66,9 @@ export default function ShopPage() {
   const [chip, setChip] = useState(0);
   const [sort, setSort] = useState<SortOrder>("featured");
   const [search, setSearch] = useState("");
+  const [savedOnly, setSavedOnly] = useState(() =>
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "saved"
+  );
 
   useEffect(() => {
     const syncTab = (event?: Event) => {
@@ -77,10 +82,16 @@ export default function ShopPage() {
       );
     };
     syncTab();
+    const syncSaved = () => setSavedOnly(
+      new URLSearchParams(window.location.search).get("view") === "saved"
+    );
+    syncSaved();
+    window.addEventListener("popstate", syncSaved);
     window.addEventListener("popstate", syncTab);
     window.addEventListener("trosheen:shop-view", syncTab);
     return () => {
       window.removeEventListener("popstate", syncTab);
+      window.removeEventListener("popstate", syncSaved);
       window.removeEventListener("trosheen:shop-view", syncTab);
     };
   }, [location]);
@@ -90,8 +101,26 @@ export default function ShopPage() {
     const url = new URL(window.location.href);
     if (tab === "custom") url.searchParams.set("view", "custom");
     else url.searchParams.delete("view");
+    setSavedOnly(false);
     window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
     window.dispatchEvent(new CustomEvent("trosheen:shop-view", { detail: tab }));
+  };
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get("focus") !== "search") return;
+    const frame = requestAnimationFrame(() => {
+      document.getElementById("shop-search")?.focus({ preventScroll: false });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [location, activeTab]);
+
+  const toggleSaved = () => {
+    const next = !savedOnly;
+    changeTab("collections");
+    setSavedOnly(next);
+    const url = new URL(window.location.href);
+    if (next) url.searchParams.set("view", "saved");
+    window.history.replaceState(window.history.state, "", url.pathname + url.search + url.hash);
   };
 
   const published = useMemo(
@@ -103,6 +132,7 @@ export default function ShopPage() {
     const term = search.trim().toLocaleLowerCase();
     const matcher = COLLECTIONS[chip]?.match ?? (() => true);
     return published
+      .filter((product) => !savedOnly || wishedIds.includes(product.id))
       .filter((product) => matcher(product))
       .filter((product) => {
         if (!term) return true;
@@ -123,11 +153,12 @@ export default function ShopPage() {
           Date.parse(b.createdAt) - Date.parse(a.createdAt)
         );
       });
-  }, [published, chip, sort, search, language]);
+  }, [published, chip, sort, search, language, savedOnly, wishedIds]);
 
   // Only show collection chips that actually match something in the catalogue.
   const chips = useMemo(
-    () => COLLECTIONS.filter((entry, index) => index === 0 || published.some(entry.match)),
+    () => COLLECTIONS.map((entry, index) => ({ ...entry, index }))
+      .filter((entry) => entry.index === 0 || published.some(entry.match)),
     [published],
   );
 
@@ -186,13 +217,16 @@ export default function ShopPage() {
                   <button
                     key={entry.chip}
                     className="chip"
-                    aria-pressed={chip === index}
-                    data-filter={index}
-                    onClick={() => setChip(index)}
+                    aria-pressed={chip === entry.index}
+                    data-filter={entry.index}
+                    onClick={() => setChip(entry.index)}
                   >
                     {t(entry.chip)}
                   </button>
                 ))}
+                <button type="button" className="chip" aria-pressed={savedOnly} onClick={toggleSaved}>
+                  {t("v4.shop.saved")}
+                </button>
               </div>
               <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
                 <label className="sr-only" htmlFor="shop-search">
@@ -258,10 +292,10 @@ export default function ShopPage() {
                     className="empty__art"
                   />
                   <h3>
-                    {published.length ? t("v4.shop.noResults") : t("v4.shop.empty.title")}
+                    {savedOnly ? t("v4.shop.savedEmpty") : published.length ? t("v4.shop.noResults") : t("v4.shop.empty.title")}
                   </h3>
                   <p>
-                    {published.length ? t("v4.shop.noResultsDesc") : t("v4.shop.empty.desc")}
+                    {savedOnly ? t("v4.shop.savedEmptyDesc") : published.length ? t("v4.shop.noResultsDesc") : t("v4.shop.empty.desc")}
                   </p>
                   <div className="btn-row" style={{ justifyContent: "center" }}>
                     {published.length ? (
@@ -270,6 +304,7 @@ export default function ShopPage() {
                         onClick={() => {
                           setChip(0);
                           setSearch("");
+                          if (savedOnly) toggleSaved();
                         }}
                       >
                         {t("v4.shop.filter.all")}

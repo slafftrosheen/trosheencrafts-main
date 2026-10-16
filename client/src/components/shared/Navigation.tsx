@@ -106,10 +106,10 @@ export function Navigation() {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link className="icon-btn hide-sm" href="/shop" aria-label={t("v4.nav.search")}>
+            <Link className="icon-btn hide-sm" href="/shop?focus=search" aria-label={t("v4.nav.search")}>
               <img src={ICONS.search} alt="" />
             </Link>
-            <Link className="icon-btn hide-sm" href="/shop" aria-label={t("v4.nav.wishlist")}>
+            <Link className="icon-btn hide-sm" href="/shop?view=saved" aria-label={t("v4.nav.wishlist")}>
               <img src={ICONS.wishlist} alt="" />
             </Link>
 
@@ -158,10 +158,10 @@ export function Navigation() {
                 {item.code.toUpperCase()}
               </button>
             ))}
-            <Link className="icon-btn" href="/shop" aria-label={t("v4.nav.search")}>
+            <Link className="icon-btn" href="/shop?focus=search" aria-label={t("v4.nav.search")}>
               <img src={ICONS.search} alt="" />
             </Link>
-            <Link className="icon-btn" href="/shop" aria-label={t("v4.nav.wishlist")}>
+            <Link className="icon-btn" href="/shop?view=saved" aria-label={t("v4.nav.wishlist")}>
               <img src={ICONS.wishlist} alt="" />
             </Link>
           </div>
