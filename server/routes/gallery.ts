@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { galleryCategories, galleryItems } from '../db/schema';
-import { eq, desc, sql, and, ilike } from 'drizzle-orm';
+import { eq, desc, sql, and, ilike, or } from 'drizzle-orm';
 import { validateRequest } from '../middleware/validation';
 import { adminAuthMiddleware } from '../middleware/auth';
 
@@ -55,7 +55,10 @@ galleryRouter.get(
       if (type) conditions.push(eq(galleryItems.type, type));
       if (categoryId) conditions.push(eq(galleryItems.categoryId, parseInt(categoryId)));
       if (featured) conditions.push(eq(galleryItems.featured, true));
-      if (search) conditions.push(ilike(galleryItems.title, `%${search}%`));
+      if (search) conditions.push(or(
+        ilike(galleryItems.title, `%${search}%`),
+        sql`${galleryItems.titleTranslations}::text ILIKE ${'%'+search+'%'}`,
+      )!);
 
       const items = await db
         .select()

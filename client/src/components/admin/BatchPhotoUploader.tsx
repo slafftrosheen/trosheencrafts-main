@@ -121,8 +121,10 @@ export function BatchPhotoUploader({ open, onOpenChange }: { open: boolean, onOp
     mutationFn: (data: { items: any[], autoName: boolean }) => apiClient.post('/gallery/admin/items/batch', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['adminGalleryItems'] });
+      queryClient.invalidateQueries({ queryKey: ['galleryItems'] });
       toast.success(`Сохранено фотографий в галерею: ${pendingItems.length}`);
       onOpenChange(false);
+      pendingItems.forEach(item => URL.revokeObjectURL(item.preview));
       setPendingItems([]);
     },
     onError: (error: any) => {

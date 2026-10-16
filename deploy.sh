@@ -11,6 +11,20 @@ git pull --ff-only origin main
 docker compose build app
 docker compose up -d postgres
 
+# Wait for PostgreSQL to accept connections before running migrations.
+db_ready=0
+for attempt in $(seq 1 30); do
+  if docker compose exec -T postgres pg_isready -U postgres -d trosheencrafts >/dev/null 2>&1; then
+    db_ready=1
+    break
+  fi
+  sleep 2
+done
+if [ "$db_ready" -ne 1 ]; then
+  echo "PostgreSQL did not become ready; deployment aborted." >&2
+  exit 1
+fi
+
 # Abort deployment if a SQL migration fails. Real customer/R2 data is preserved.
 docker compose run --rm --no-deps -T app node scripts/migrate.cjs
 

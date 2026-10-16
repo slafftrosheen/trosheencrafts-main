@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { db } from '../db';
 import { blogPosts } from '../db/schema';
-import { eq, desc, ilike, and, isNotNull } from 'drizzle-orm';
+import { eq, desc, ilike, and, isNotNull, or, sql } from 'drizzle-orm';
 import { validateRequest } from '../middleware/validation';
 import { adminAuthMiddleware } from '../middleware/auth';
 import { spawn } from 'child_process';
@@ -29,7 +29,10 @@ blogRouter.get(
       // A second .where() would otherwise replace the published-only filter,
       // exposing unpublished journal drafts when a visitor searches.
       const conditions = search
-        ? and(isNotNull(blogPosts.publishedAt), ilike(blogPosts.title, `%${search}%`))
+        ? and(isNotNull(blogPosts.publishedAt), or(
+            ilike(blogPosts.title, `%${search}%`),
+            sql`${blogPosts.titleTranslations}::text ILIKE ${'%'+search+'%'}`,
+          ))
         : isNotNull(blogPosts.publishedAt);
       const posts = await db.select().from(blogPosts)
         .where(conditions)
