@@ -16,6 +16,21 @@ docker compose run --rm --no-deps -T app node scripts/migrate.cjs
 
 # Restart only after successful database migration.
 docker compose up -d --remove-orphans
-curl --fail --silent --show-error http://localhost:5000/api/health
+
+# Health is not instantaneous after container recreation. This is used only
+# during an explicit manual deployment, never in source-only coding passes.
+healthy=0
+for attempt in $(seq 1 30); do
+  if curl --fail --silent --show-error http://localhost:5000/api/health >/dev/null 2>&1; then
+    healthy=1
+    break
+  fi
+  sleep 2
+done
+if [ "$healthy" -ne 1 ]; then
+  echo "Deployment failed: the app did not become healthy." >&2
+  docker compose logs --tail=80 app >&2
+  exit 1
+fi
 
 echo "Trosheen deployment complete."
