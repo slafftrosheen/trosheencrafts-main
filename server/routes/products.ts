@@ -241,6 +241,7 @@ productsRouter.put(
       };
 
       if (data.name !== undefined) updateData.name = data.name;
+      if (data.slug !== undefined) updateData.slug = data.slug;
       if (data.description !== undefined) updateData.description = data.description;
       if (data.price !== undefined) updateData.price = String(data.price);
       if (data.category !== undefined) updateData.category = data.category;
