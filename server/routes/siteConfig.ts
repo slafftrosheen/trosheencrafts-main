@@ -374,6 +374,7 @@ siteConfigRouter.put(
 const updatePromotionalGallerySchema = z.object({
   body: z.object({
     heading: z.string().optional(),
+    headingTranslations: z.record(z.enum(['lv', 'en', 'ru', 'pl', 'uk']), z.string().max(4000)).optional(),
   }),
 });
 

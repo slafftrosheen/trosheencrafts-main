@@ -10,14 +10,24 @@ import { ImageUpload } from '@/components/shared/ImageUpload';
 import { VideoUpload } from '@/components/shared/VideoUpload';
 import { apiClient } from '@/lib/apiClient';
 import { toast } from 'sonner';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 
+const LANGUAGES = [
+  { code: "lv", label: "Latviešu" }, { code: "en", label: "English" },
+  { code: "ru", label: "Русский" }, { code: "pl", label: "Polski" },
+  { code: "uk", label: "Українська" },
+] as const;
+type Lang = (typeof LANGUAGES)[number]["code"];
+
 const schema = z.object({
   title: z.string().min(1, 'Укажите заголовок'),
   description: z.string().optional(),
+  titleTranslations: z.record(z.string()).default({}),
+  descriptionTranslations: z.record(z.string()).default({}),
+  linkTextTranslations: z.record(z.string()).default({}),
   imageUrl: z.string().min(1, 'Добавьте изображение'),
   videoUrl: z.string().optional(),
   linkUrl: z.string().optional(),
@@ -30,16 +40,22 @@ type FormData = z.infer<typeof schema>;
 
 export function PromotionDialog({ open, onOpenChange, promotion }: { open: boolean, onOpenChange: (open: boolean) => void, promotion?: any }) {
   const queryClient = useQueryClient();
+  const [language, setLanguage] = useState<Lang>("lv");
   const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: { active: true, sortOrder: 0 }
   });
 
   useEffect(() => {
+    if (!open) return;
+    setLanguage("lv");
     if (promotion) {
       reset({
         title: promotion.title,
         description: promotion.description || '',
+        titleTranslations: promotion.titleTranslations || {},
+        descriptionTranslations: promotion.descriptionTranslations || {},
+        linkTextTranslations: promotion.linkTextTranslations || {},
         imageUrl: promotion.imageUrl,
         videoUrl: promotion.videoUrl || '',
         linkUrl: promotion.linkUrl || '',
@@ -48,9 +64,13 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
         sortOrder: promotion.sortOrder || 0
       });
     } else {
-      reset({ active: true, sortOrder: 0, title: '', description: '', imageUrl: '', videoUrl: '', linkUrl: '', linkText: '' });
+      reset({
+        active: true, sortOrder: 0, title: '', description: '',
+        titleTranslations: {}, descriptionTranslations: {}, linkTextTranslations: {},
+        imageUrl: '', videoUrl: '', linkUrl: '', linkText: '',
+      });
     }
-  }, [promotion, reset]);
+  }, [open, promotion, reset]);
 
   const mutation = useMutation({
     mutationFn: (data: FormData) => {
@@ -74,7 +94,7 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl rounded-3xl">
+      <DialogContent className="max-h-[92dvh] max-w-2xl overflow-y-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="font-serif text-2xl">{promotion ? 'Редактировать промо-блок' : 'Добавить промо-блок'}</DialogTitle>
           <DialogDescription className="text-muted-foreground">
@@ -99,17 +119,44 @@ export function PromotionDialog({ open, onOpenChange, promotion }: { open: boole
             <Textarea id="description" {...register('description')} />
           </div>
 
+          <section className="space-y-4 rounded-2xl border border-border bg-muted/30 p-4">
+            <h3 className="font-serif text-xl">Переводы промо-карточки</h3>
+            <div className="flex flex-wrap gap-2" role="group" aria-label="Язык перевода">
+              {LANGUAGES.map(({ code, label }) => (
+                <Button key={code} type="button" size="sm"
+                  variant={language === code ? "default" : "outline"}
+                  aria-pressed={language === code} onClick={() => setLanguage(code)}>{label}</Button>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground">Пустые поля используют основной текст карточки.</p>
+            <div>
+              <Label htmlFor="promotion-translated-title">Заголовок · {language.toUpperCase()}</Label>
+              <Input id="promotion-translated-title" className="mt-2"
+                {...register(`titleTranslations.${language}`)} />
+            </div>
+            <div>
+              <Label htmlFor="promotion-translated-description">Описание · {language.toUpperCase()}</Label>
+              <Textarea id="promotion-translated-description" className="mt-2"
+                {...register(`descriptionTranslations.${language}`)} />
+            </div>
+            <div>
+              <Label htmlFor="promotion-translated-button">Текст кнопки · {language.toUpperCase()}</Label>
+              <Input id="promotion-translated-button" className="mt-2"
+                {...register(`linkTextTranslations.${language}`)} />
+            </div>
+          </section>
+
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="imageUrl">Изображение-превью</Label>
               <p className="text-xs leading-5 text-muted-foreground">
-                Используйте фото без готовых надписей и цветных рекламных полей:
-                заголовок, описание и кнопка отображаются отдельно на сайте.
+                Для новых фотографий рекомендуем изображения без встроенных надписей.
+                Фирменные баннеры из набора v4.3 отображаются целиком, без обрезки.
               </p>
               <ImageUpload 
                 value={watch('imageUrl')} 
-                onChange={url => setValue('imageUrl', url)} 
-                onRemove={() => setValue('imageUrl', '')} 
+                onChange={url => setValue('imageUrl', url, { shouldDirty: true })} 
+                onRemove={() => setValue('imageUrl', '', { shouldDirty: true })} 
               />
                {errors.imageUrl && <p className="text-destructive text-sm">{errors.imageUrl.message}</p>}
             </div>

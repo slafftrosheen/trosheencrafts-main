@@ -32,9 +32,14 @@ router.get('/all', requireAdmin, async (req, res, next) => {
   }
 });
 
+const localizedField = z.record(z.enum(['en', 'lv', 'ru', 'pl', 'uk']), z.string().max(20000)).optional();
+
 const promotionSchema = z.object({
   title: z.string().min(1),
   description: z.string().optional(),
+  titleTranslations: localizedField,
+  descriptionTranslations: localizedField,
+  linkTextTranslations: localizedField,
   imageUrl: z.string().min(1),
   videoUrl: z.string().optional(),
   linkUrl: z.string().optional(),

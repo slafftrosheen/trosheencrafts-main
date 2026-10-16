@@ -24,6 +24,13 @@ export default function AdminPromotions() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingPromo, setEditingPromo] = useState<any>(null);
   const [heading, setHeading] = useState('');
+  const [headingTranslations, setHeadingTranslations] = useState<Record<string, string>>({});
+  const [headingLocale, setHeadingLocale] = useState("lv");
+  const headingLanguages = [
+    { code: "lv", label: "Latviešu" }, { code: "en", label: "English" },
+    { code: "ru", label: "Русский" }, { code: "pl", label: "Polski" },
+    { code: "uk", label: "Українська" },
+  ];
   const queryClient = useQueryClient();
 
   const { data: config } = useQuery({
@@ -32,15 +39,13 @@ export default function AdminPromotions() {
   });
 
   useEffect(() => {
-    if (config?.value?.heading) {
-      setHeading(config.value.heading);
-    } else {
-      setHeading('Избранные коллекции');
-    }
+    setHeading(config?.value?.heading || "Избранные коллекции");
+    setHeadingTranslations(config?.value?.headingTranslations || {});
   }, [config]);
 
   const updateConfigMutation = useMutation({
-    mutationFn: (newHeading: string) => apiClient.put('/site-config/admin/promotional-gallery', { heading: newHeading }),
+    mutationFn: (data: { heading: string; headingTranslations: Record<string, string> }) =>
+      apiClient.put('/site-config/admin/promotional-gallery', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['site-config-gallery'] });
       toast.success('Настройки блока обновлены');
@@ -99,13 +104,29 @@ export default function AdminPromotions() {
             />
           </div>
           <Button 
-            onClick={() => updateConfigMutation.mutate(heading)}
+            onClick={() => updateConfigMutation.mutate({ heading, headingTranslations })}
             disabled={updateConfigMutation.isPending}
             className="rounded-xl"
           >
             {updateConfigMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             Сохранить настройки
           </Button>
+        </div>
+        <div className="mt-5 space-y-3 border-t border-border pt-5">
+          <p className="text-sm font-semibold">Переводы заголовка промо-раздела</p>
+          <div className="flex flex-wrap gap-2">
+            {headingLanguages.map(({ code, label }) => (
+              <Button type="button" size="sm" key={code}
+                variant={headingLocale === code ? "default" : "outline"}
+                onClick={() => setHeadingLocale(code)}>{label}</Button>
+            ))}
+          </div>
+          <Input value={headingTranslations[headingLocale] || ""}
+            aria-label={"Заголовок " + headingLocale}
+            placeholder="Пустое поле — основной заголовок"
+            onChange={event => setHeadingTranslations(prev => ({
+              ...prev, [headingLocale]: event.target.value,
+            }))} />
         </div>
       </Card>
 
