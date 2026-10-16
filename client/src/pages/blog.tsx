@@ -1,7 +1,8 @@
 import { Link } from "wouter";
 import { useLanguage } from "@/lib/LanguageContext";
 import { localizedText } from "@/lib/localizedContent";
-import { useBlogPosts } from "@/hooks/useApi";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { apiClient } from "@/lib/apiClient";
 import { Lottie } from "@/components/brand/Lottie";
 import { Ornament } from "@/components/brand/Ornament";
 
@@ -20,9 +21,22 @@ const Arrow = () => (
   </svg>
 );
 
+const PAGE_SIZE = 12;
+
 export default function BlogPage() {
-  const { data: posts = [], isLoading } = useBlogPosts();
   const { t, language } = useLanguage();
+  const {
+    data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ["blog-posts", "infinite"],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => apiClient.get<any[]>("/blog", {
+      params: { offset: pageParam, limit: PAGE_SIZE },
+    }),
+    getNextPageParam: (lastPage, pages) =>
+      lastPage.length === PAGE_SIZE ? pages.length * PAGE_SIZE : undefined,
+  });
+  const posts = data?.pages.flat() || [];
 
   const localized = (post: any) => ({
     title: localizedText(post.title, post.titleTranslations, language),
@@ -51,6 +65,14 @@ export default function BlogPage() {
             <p className="note" style={{ margin: 0 }}>
               {t("common.loading")}
             </p>
+          </div>
+        ) : isError && !posts.length ? (
+          <div className="empty" role="alert">
+            <Lottie file="trosheen-10-404-rolling-stone.json" mode="view" className="empty__art" />
+            <p>{t("v4.journal.loadError")}</p>
+            <button type="button" className="btn btn--ghost" onClick={() => void refetch()}>
+              {t("v4.shop.retry")}
+            </button>
           </div>
         ) : posts.length > 0 ? (
           <>
@@ -107,6 +129,15 @@ export default function BlogPage() {
                 ))}
               </div>
             )}
+            {hasNextPage && (
+              <div className="center" style={{ marginTop: "2.5rem" }}>
+                <button type="button" className="btn btn--ghost" disabled={isFetchingNextPage}
+                  onClick={() => void fetchNextPage()} aria-busy={isFetchingNextPage}>
+                  {isFetchingNextPage ? t("common.loading") : t("v4.journal.more")}
+                </button>
+              </div>
+            )}
+            {isError && <p role="alert" className="center note">{t("v4.journal.loadError")}</p>}
           </>
         ) : (
           <>

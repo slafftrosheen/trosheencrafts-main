@@ -339,6 +339,8 @@ const raw: Record<string, Entry> = {
   "v4.journal.eyebrow": { lv: "Žurnāls", en: "Journal", ru: "Журнал", pl: "Dziennik", uk: "Журнал" },
   "v4.journal.title": { lv: "Piezīmes no darbnīcas", en: "Notes from the workshop", ru: "Заметки из мастерской", pl: "Notatki z warsztatu", uk: "Нотатки з майстерні" },
   "v4.journal.lead": { lv: "Par materiāliem, gadalaikiem un to, kā top katrs darbs. Rakstām tad, kad ir ko pastāstīt.", en: "About materials, seasons and how each piece comes to be. We write when there is something to say.", ru: "О материалах, временах года и о том, как рождается каждая вещь. Пишем, когда есть что рассказать.", pl: "O materiałach, porach roku i powstawaniu każdej rzeczy. Piszemy, gdy mamy coś do powiedzenia.", uk: "Про матеріали, пори року та те, як народжується кожна річ. Пишемо, коли є чим поділитися." },
+  "v4.journal.more": { lv: "Vairāk piezīmju", en: "More stories", ru: "Показать ещё", pl: "Więcej historii", uk: "Більше історій" },
+  "v4.journal.loadError": { lv: "Neizdevās ielādēt žurnālu. Mēģiniet vēlreiz.", en: "Could not load the journal. Please try again.", ru: "Не удалось загрузить журнал. Попробуйте снова.", pl: "Nie udało się wczytać dziennika. Spróbuj ponownie.", uk: "Не вдалося завантажити журнал. Спробуйте ще раз." },
   "v4.journal.read": { lv: "Lasīt", en: "Read", ru: "Читать", pl: "Czytaj", uk: "Читати" },
   "v4.journal.empty.label": { lv: "Tukša žurnāla stāvoklis", en: "Empty journal state", ru: "Состояние пустого журнала", pl: "Stan pustego dziennika", uk: "Стан порожнього журналу" },
   "v4.journal.empty.title": { lv: "Pirmās piezīmes top", en: "The first notes are being written", ru: "Первые заметки пишутся", pl: "Pierwsze notatki powstają", uk: "Перші нотатки пишуться" },
