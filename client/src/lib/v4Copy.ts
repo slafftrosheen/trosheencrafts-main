@@ -123,6 +123,8 @@ const raw: Record<string, Entry> = {
   "v4.news.thanks": { lv: "Paldies! Pirmā vēstule būs ceļā drīz.", en: "Thank you! Your first letter is on its way.", ru: "Спасибо! Первое письмо уже в пути.", pl: "Dziękujemy! Pierwszy list jest w drodze.", uk: "Дякуємо! Перший лист уже в дорозі." },
   "v4.news.error": { lv: "Lūdzu, ierakstiet e-pasta adresi.", en: "Please enter your email address.", ru: "Введите адрес эл. почты.", pl: "Podaj adres e-mail.", uk: "Введіть адресу ел. пошти." },
 
+  "v4.confirm.signature": { lv: "Ar siltām rokām, Trosheen ģimene", en: "With warm hands, the Trosheen family", ru: "С теплом наших рук, семья Trosheen", pl: "Z ciepłem naszych dłoni, rodzina Trosheen", uk: "З теплом наших рук, родина Trosheen" },
+
   /* ---------- footer ---------- */
   "v4.footer.about": { lv: "Ģimenes darbnīca Daugavpilī. Akmens, ģipsis un krāsa — ar rokām, pēc mūsu pašu receptes.", en: "A family workshop in Daugavpils. Stone, gypsum and colour, by hand, to our own recipe.", ru: "Семейная мастерская в Даугавпилсе. Камень, гипс и краски — вручную, по нашему рецепту.", pl: "Rodzinna pracownia w Dyneburgu. Kamień, gips i kolory — ręcznie, według naszej receptury.", uk: "Сімейна майстерня в Даугавпілсі. Камінь, гіпс і фарби — вручну, за нашим рецептом." },
   "v4.footer.explore": { lv: "Izpētīt", en: "Explore", ru: "Изучить", pl: "Odkryj", uk: "Дослідити" },

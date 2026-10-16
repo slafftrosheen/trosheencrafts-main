@@ -57,7 +57,7 @@ export default function OrderConfirmation() {
         <h1 className="mt-7 font-serif text-4xl font-semibold tracking-tight sm:text-5xl">{title}</h1>
         <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted-foreground">{description}</p>
         {validRequest && !isError && <p className="mt-3 text-sm text-muted-foreground">{t("confirm.order_number")} #{orderId}</p>}
-        {paid && <BrandMotion name="familySignature" mode="view" className="mx-auto mt-5 h-24 w-64" label="Ar siltām rokām, Trosheen ģimene" poster="/brand/signature-family.svg" />}
+        {paid && <BrandMotion name="familySignature" mode="view" className="mx-auto mt-5 h-24 w-64" label={t("v4.confirm.signature")} poster="/brand/signature-family.svg" />}
         {paid && (
           <div className="surface-muted mx-auto mt-8 max-w-xl p-6">
             <p className="text-sm leading-7 text-muted-foreground">{t("confirm.desc")}</p>
