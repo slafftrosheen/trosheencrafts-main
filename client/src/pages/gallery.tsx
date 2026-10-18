@@ -22,6 +22,7 @@ interface GalleryCategory {
 }
 
 function getSavedView(): GalleryViewMode {
+  if (typeof window === "undefined") return "masonry";
   try {
     const saved = window.localStorage.getItem("trosheen-gallery-view");
     if (saved === "masonry" || saved === "grid" || saved === "list") return saved;
