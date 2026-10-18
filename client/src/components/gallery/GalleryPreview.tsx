@@ -6,7 +6,7 @@ import { apiClient } from "@/lib/apiClient";
 import { GalleryMediaCard, type PublicGalleryResponse } from "@/components/gallery/GalleryMediaCard";
 
 /** Only real, admin-published gallery entries. Prefer explicitly featured work. */
-export function GalleryPreview() {
+export function GalleryPreview({ editorialImage }: { editorialImage?: string }) {
   const { t } = useLanguage();
   const featured = useQuery<PublicGalleryResponse>({
     queryKey: ["galleryPreview", "featured"],
@@ -32,6 +32,7 @@ export function GalleryPreview() {
             <h2 id="home-gallery-heading">{t("v4.gallery.preview.title")}</h2>
             <p className="lead">{t("v4.gallery.preview.lead")}</p>
           </div>
+          {editorialImage && <img className="gallery-preview__editorial" src={editorialImage} alt="" loading="lazy" decoding="async" />}
           <Link href="/gallery" className="link-arrow">
             {t("v4.gallery.preview.cta")} <ArrowRight size={18} aria-hidden="true" />
           </Link>
