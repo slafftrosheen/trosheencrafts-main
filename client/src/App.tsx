@@ -11,6 +11,7 @@ import { PageLoader } from "@/components/shared/LoadingStates";
 
 const Home = lazy(() => import("@/pages/home"));
 const Shop = lazy(() => import("@/pages/shop"));
+const Constructor = lazy(() => import("@/components/shop/CandleConstructor").then(module => ({ default: module.CandleConstructor })));
 const ProductDetail = lazy(() => import("@/pages/product-detail"));
 const Cart = lazy(() => import("@/pages/cart"));
 const Checkout = lazy(() => import("@/pages/checkout"));
@@ -73,7 +74,7 @@ function Router() {
         <Route path="/admin/categories"><AdminLayout><AdminCategories /></AdminLayout></Route>
 
         <Route path="/"><Layout><Home /></Layout></Route>
-        <Route path="/constructor"><Redirect to="/shop?view=custom" /></Route>
+        <Route path="/constructor"><Layout><section className="section section--tight"><div className="wrap"><Constructor /></div></section></Layout></Route>
         <Route path="/shop"><Layout><Shop /></Layout></Route>
         <Route path="/shop/:id"><Layout><ProductDetail /></Layout></Route>
         <Route path="/gallery"><Layout><Gallery /></Layout></Route>
