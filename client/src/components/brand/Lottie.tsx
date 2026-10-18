@@ -50,6 +50,7 @@ export function Lottie({
     let loaded = false;
     let loading = false;
     let played = false;
+    let finished = false;
     let disposed = false;
     const hoverTarget = mode === "hover" && !touch
       ? host.closest<HTMLElement>("[data-lottie-host]") ?? host
@@ -67,9 +68,13 @@ export function Lottie({
       }
       if (repeat) {
         animation.play();
-      } else if (playOnView && !played) {
-        played = true;
-        animation.goToAndPlay(0, true);
+      } else if (playOnView) {
+        if (!played) {
+          played = true;
+          animation.goToAndPlay(0, true);
+        } else if (!finished) {
+          animation.play();
+        }
       } else if (mode === "hover" && hovered) {
         hovered = false;
         animation.goToAndPlay(0, true);
@@ -95,6 +100,7 @@ export function Lottie({
           },
         });
         (host as unknown as { _lottie?: LottieAnimation })._lottie = animation;
+        animation.addEventListener("complete", () => { finished = true; });
         animation.addEventListener("DOMLoaded", () => {
           loaded = true;
           syncPlayback();
