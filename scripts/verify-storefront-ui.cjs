@@ -99,8 +99,20 @@ expect(!care.includes('className="hero hero--page"'), "Care page must not reintr
 const lottie = text("client/src/components/brand/Lottie.tsx");
 expect(lottie.includes('IntersectionObserver') && lottie.includes('animation.pause()'), "Lottie player should lazy-load and pause offscreen");
 const gallery = text("client/src/pages/gallery.tsx");
-expect(gallery.includes('"/gallery/" + item.slug'), "Keep gallery detail navigation");
-expect(gallery.includes("selectedCategory") && gallery.includes("setPage("), "Keep gallery filtering and pagination");
+const galleryCard = text("client/src/components/gallery/GalleryMediaCard.tsx");
+const galleryPreview = text("client/src/components/gallery/GalleryPreview.tsx");
+expect(galleryCard.includes('"/gallery/" + encodeURIComponent(item.slug)'), "Gallery cards must link to the published detail route");
+expect(galleryPreview.includes('featured: true') && galleryPreview.includes('"/gallery/items"'),
+  "Homepage gallery preview must consume published featured entries through the existing API");
+expect(home.includes("<GalleryPreview editorialImage={galleryFeature} />"),
+  "Homepage gallery preview must retain the admin-managed image slot");
+expect(gallery.includes("selectedCategory") && gallery.includes("useInfiniteQuery") && gallery.includes("fetchNextPage()"),
+  "Keep gallery categories and offset pagination beyond the 100-item API limit");
+expect(gallery.includes('type GalleryViewMode') && gallery.includes("changeView(id)"),
+  "Gallery must offer accessible Masonry, Grid and List modes");
+const navigation = text("client/src/components/shared/Navigation.tsx");
+expect(navigation.includes('{ href: "/", label: t("v4.nav.home") }'),
+  "Home should be present in the desktop and mobile navigation");
 const detail = text("client/src/pages/galleryDetail.tsx");
 expect(detail.includes("<GltfModel url={modelUrl} />"), "Keep actual GLTF model rendering");
 expect(detail.includes('"/gallery/items/" + id + "/like"'), "Keep gallery like API");
@@ -124,6 +136,7 @@ for (const match of translationText.matchAll(/(?:^|[,\n])\s*(?:"([^"]+)"|'([^']+
 }
 const localizedPages = [
   "client/src/pages/home.tsx", "client/src/pages/shop.tsx",
+  "client/src/components/gallery/GalleryMediaCard.tsx", "client/src/components/gallery/GalleryPreview.tsx",
   "client/src/pages/gallery.tsx", "client/src/pages/galleryDetail.tsx",
   "client/src/pages/product-detail.tsx", "client/src/pages/cart.tsx",
   "client/src/pages/checkout.tsx", "client/src/pages/contact.tsx",
