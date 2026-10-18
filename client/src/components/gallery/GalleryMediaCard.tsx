@@ -44,7 +44,7 @@ export function GalleryMediaCard({ item, compact = false }: { item: PublicGaller
           ) : item.type === "3d" ? (
             <span className="gallery-piece__fallback" aria-hidden="true"><Box size={40} strokeWidth={1.3} /></span>
           ) : item.type === "video" ? (
-            <video src={item.mediaUrl} muted playsInline preload="metadata" aria-label={title} />
+            <span className="gallery-piece__fallback" aria-hidden="true"><Film size={40} strokeWidth={1.3} /></span>
           ) : (
             <img src={item.mediaUrl} alt={title} loading="lazy" decoding="async" />
           )}
