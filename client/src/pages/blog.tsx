@@ -144,9 +144,6 @@ export default function BlogPage() {
             <div className="divider" aria-hidden="true">
               <Ornament name="auseklis" size="sm" draw />
             </div>
-            <p className="eyebrow center" style={{ display: "block" }}>
-              {t("v4.journal.empty.label")}
-            </p>
             <div className="empty" data-reveal>
               <Lottie file="trosheen-04-sprouting-planter.json" mode="view" className="empty__art" />
               <h3>{t("v4.journal.empty.title")}</h3>
