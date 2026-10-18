@@ -230,9 +230,6 @@ export default function ProductDetail() {
                 <p>{t("v4.pdp.acc.shipBody")}</p>
               </details>
 
-              <div className="letter" style={{ marginTop: "1.5rem", padding: "1.4rem" }}>
-                <p style={{ fontSize: "1rem", margin: 0 }}>{t("v4.pdp.quote")}</p>
-              </div>
             </div>
           </div>
         </div>
