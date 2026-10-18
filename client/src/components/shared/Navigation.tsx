@@ -139,7 +139,6 @@ export function Navigation() {
           >
             <img src={ICONS.close} alt="" />
           </button>
-          <Link href="/">{t("v4.nav.home")}</Link>
           {links.map((link) => (
             <Link key={link.href} href={link.href}>
               {link.label}
