@@ -266,9 +266,7 @@ export default function HomePage() {
               <h3>{t("v4.shop.empty.title")}</h3>
               <p>{t("v4.shop.empty.desc")}</p>
               <div className="btn-row" style={{ justifyContent: "center" }}>
-                <Link className="btn" href="/constructor">
-                  {t("v4.shop.empty.cta1")}
-                </Link>
+                <Link className="btn" href="/contact">{t("v4.shop.empty.cta1")}</Link>
               </div>
             </div>
           )}
@@ -340,28 +338,6 @@ export default function HomePage() {
             <Link className="btn btn--on-dark" href="/about">
               {t("v4.band.cta")} <Arrow />
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- custom workshop ---------- */}
-      <section className="section">
-        <div className="wrap split split--flip">
-          <figure className="drawing" data-ink style={{ margin: 0, "--ar": "4/3" } as React.CSSProperties}>
-            <img src={image("shopFeature")} alt={t("v4.custom.title")} loading="lazy" />
-          </figure>
-          <div data-reveal>
-            <p className="eyebrow">{t("v4.custom.eyebrow")}</p>
-            <h2>{t("v4.custom.title")}</h2>
-            <p className="lead">{t("v4.custom.lead")}</p>
-            <div className="btn-row">
-              <Link className="btn" href="/constructor">
-                {t("v4.custom.start")} <Arrow />
-              </Link>
-              <Link className="btn btn--ghost" href="/contact">
-                {t("v4.custom.ask")}
-              </Link>
-            </div>
           </div>
         </div>
       </section>
