@@ -27,3 +27,13 @@ No visual pixel-perfect claim is possible until these viewport screenshots and f
 - `/shop?view=custom` and the marketing request wizard were not approved and must not be reintroduced. `/constructor` is retained solely for the existing real priced candle configurator and its admin-managed options; no homepage/menu/footer custom-wizard promotion.
 - Public copy is editable under Russian admin `/admin/content`; existing database overrides take precedence over bundled translations. Review those overrides following deployment because older CMS text can still appear even when source strings are corrected.
 - Source edits are not a substitute for a built/deployed device-matrix audit. Check 320, 360, 390, 768 and 1280px, five languages, reduced motion, scroll, focus, accessibility and no horizontal overflow.
+
+## Gallery and editorial pass — October 18, 2026
+
+- Homepage gallery now queries `GET /api/gallery/items?featured=true&limit=6` and falls back to the normal published listing when there are no featured entries. If the gallery is empty, do not render example cards. Preserve the existing editable `galleryFeature` media slot.
+- Gallery layout controls: Masonry, Grid and List. Verify labels in LV/EN/RU/PL/UK, keyboard operation, touch targets, responsive widths and persistence of the selected layout in local storage.
+- Verify `/gallery` type and category filters, debounced search, direct item links and 12-item offset pagination across more than 100 published records. API maximum per request is 100; never request `limit=page*12`.
+- Check photo thumbnails, video thumbnails/videos, and 3D entries without a thumbnail. Cards must show only published R2-backed content and never manufacture an image. Detail pages retain the real photo/video/GLTF viewer, likes and sharing.
+- Home is explicitly present in both desktop navigation and mobile drawer, with one active state and no duplicate drawer entry. The desktop menu switches to the drawer when available width is insufficient.
+- Source translations are the fallback but previously saved CMS overrides may continue to surface the older text. Review `/admin/content` in Russian, especially gallery, journal, hero and footer; use the per-key Restore action after confirming the edited text is obsolete.
+- Content principles: describe the actual media and products; no fictitious customer stories, made-up timeframes, guaranteed one-of-a-kind stock, or raw internal placeholders. Audit each language on narrow mobile widths.
