@@ -18,7 +18,6 @@ export function Footer() {
 
   const explore = [
     { href: "/shop", label: t("v4.nav.shop") },
-    { href: "/constructor", label: t("v4.nav.custom") },
     { href: "/about", label: t("v4.nav.story") },
     { href: "/gallery", label: t("v4.nav.gallery") },
     { href: "/blog", label: t("v4.nav.journal") },
