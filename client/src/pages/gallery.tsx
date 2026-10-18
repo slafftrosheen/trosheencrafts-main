@@ -1,28 +1,17 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { Loader2, RefreshCw, X } from "lucide-react";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { Grid3X3, LayoutGrid, List, Loader2, RefreshCw, X } from "lucide-react";
 import { useLanguage } from "@/lib/LanguageContext";
 import { localizedText } from "@/lib/localizedContent";
 import { apiClient } from "@/lib/apiClient";
 import { Lottie } from "@/components/brand/Lottie";
 import { Ornament } from "@/components/brand/Ornament";
-
-interface GalleryItem {
-  id: number;
-  title: string;
-  slug: string;
-  description?: string;
-  titleTranslations?: Record<string, string>;
-  descriptionTranslations?: Record<string, string>;
-  type: "3d" | "photo" | "video";
-  mediaUrl: string;
-  thumbnailUrl?: string;
-  tags: string[];
-  featured: boolean;
-  viewCount: number;
-  likes: number;
-}
+import {
+  GalleryMediaCard,
+  type GalleryViewMode,
+  type PublicGalleryResponse,
+} from "@/components/gallery/GalleryMediaCard";
 
 interface GalleryCategory {
   id: number;
@@ -32,13 +21,23 @@ interface GalleryCategory {
   type: "3d" | "photo" | "video";
 }
 
+function getSavedView(): GalleryViewMode {
+  try {
+    const saved = window.localStorage.getItem("trosheen-gallery-view");
+    if (saved === "masonry" || saved === "grid" || saved === "list") return saved;
+  } catch {
+    // The gallery remains usable when storage is unavailable.
+  }
+  return "masonry";
+}
+
 export default function GalleryPage() {
   const { t, language } = useLanguage();
   const [activeTab, setActiveTab] = useState<"all" | "3d" | "photo" | "video">("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [page, setPage] = useState(1);
+  const [view, setView] = useState<GalleryViewMode>(getSavedView);
   const itemsPerPage = 12;
 
   useEffect(() => {
@@ -46,26 +45,53 @@ export default function GalleryPage() {
     return () => window.clearTimeout(timer);
   }, [searchQuery]);
 
+  const changeView = (next: GalleryViewMode) => {
+    setView(next);
+    try { window.localStorage.setItem("trosheen-gallery-view", next); } catch { /* optional */ }
+  };
+
   const { data: categories = [] } = useQuery<GalleryCategory[]>({
     queryKey: ["galleryCategories"],
     queryFn: () => apiClient.get("/gallery/categories"),
   });
 
-  const { data: galleryData, isLoading, isFetching, isError, refetch } = useQuery({
-    queryKey: ["galleryItems", activeTab, debouncedSearch, selectedCategory, page],
-    queryFn: () => {
-      const params: Record<string, string | number> = { limit: page * itemsPerPage };
+  const {
+    data: galleryData,
+    isPending,
+    isError,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useInfiniteQuery<PublicGalleryResponse>({
+    queryKey: ["galleryItems", activeTab, debouncedSearch, selectedCategory],
+    initialPageParam: 0,
+    queryFn: ({ pageParam }) => {
+      const params: Record<string, string | number> = { limit: itemsPerPage, offset: Number(pageParam) };
       if (activeTab !== "all") params.type = activeTab;
       if (debouncedSearch) params.search = debouncedSearch;
-      if (selectedCategory) params.categoryId = selectedCategory;
-      return apiClient.get<any>("/gallery/items", { params });
+      if (selectedCategory !== null) params.categoryId = selectedCategory;
+      return apiClient.get<PublicGalleryResponse>("/gallery/items", { params });
+    },
+    getNextPageParam: (lastPage) => {
+      const next = Number(lastPage.offset) + lastPage.items.length;
+      return lastPage.items.length > 0 && next < Number(lastPage.total) ? next : undefined;
     },
   });
 
+  const items = galleryData?.pages.flatMap((page) => page.items) ?? [];
+  const total = Number(galleryData?.pages[0]?.total ?? 0);
   const filteredCategories = categories.filter(
     (category) => activeTab === "all" || category.type === activeTab,
   );
-  const items: GalleryItem[] = galleryData?.items || [];
+  const filtered = Boolean(searchQuery.trim() || selectedCategory !== null || activeTab !== "all");
+
+  const resetFilters = () => {
+    setActiveTab("all");
+    setSelectedCategory(null);
+    setSearchQuery("");
+    setDebouncedSearch("");
+  };
 
   const tabs = [
     { id: "all", label: t("v4.gallery.filter.all") },
@@ -74,212 +100,123 @@ export default function GalleryPage() {
     { id: "video", label: t("v4.gallery.filter.video") },
   ] as const;
 
-  const typeLabel = (type: GalleryItem["type"]) =>
-    type === "3d"
-      ? t("gallery.model_label")
-      : type === "photo"
-        ? t("v4.gallery.filter.photo")
-        : t("v4.gallery.filter.video");
+  const views = [
+    { id: "masonry", icon: LayoutGrid, label: t("v4.gallery.view.masonry") },
+    { id: "grid", icon: Grid3X3, label: t("v4.gallery.view.grid") },
+    { id: "list", icon: List, label: t("v4.gallery.view.list") },
+  ] as const;
 
   return (
-    <section className="section section--tight">
+    <section className="section section--tight gallery-page">
       <div className="wrap">
-        <p className="eyebrow">
-          <Ornament name="maras-zime" size="sm" draw /> {t("v4.gallery.eyebrow")}
-        </p>
+        <p className="eyebrow"><Ornament name="maras-zime" size="sm" draw /> {t("v4.gallery.eyebrow")}</p>
         <h1>{t("v4.gallery.title")}</h1>
         <p className="lead">{t("v4.gallery.lead")}</p>
 
-        <div className="toolbar">
-          <div className="chips" role="group" aria-label={t("gallery.media_filter")}>
+        <div className="toolbar gallery-toolbar">
+          <div className="chips gallery-filters" role="group" aria-label={t("gallery.media_filter")}>
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 type="button"
                 className="chip"
                 aria-pressed={activeTab === tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  setSelectedCategory(null);
-                  setPage(1);
-                }}
+                onClick={() => { setActiveTab(tab.id); setSelectedCategory(null); }}
               >
                 {tab.label}
               </button>
             ))}
-            {filteredCategories.length > 0 && (
-              <button
-                type="button"
-                className="chip"
-                aria-pressed={selectedCategory === null}
-                onClick={() => {
-                  setSelectedCategory(null);
-                  setPage(1);
-                }}
-              >
-                {t("gallery.all_categories")}
-              </button>
-            )}
+          </div>
+          <div className="gallery-toolbar__right">
+            <div className="gallery-search">
+              <label className="sr-only" htmlFor="gallery-search">{t("gallery.search_placeholder")}</label>
+              <input
+                id="gallery-search"
+                type="search"
+                className="input"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={t("gallery.search_placeholder")}
+              />
+              {searchQuery && (
+                <button className="gallery-search__clear" type="button" onClick={() => { setSearchQuery(""); setDebouncedSearch(""); }} aria-label={t("shop.clear_filters")}>
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+            <div className="gallery-views" role="group" aria-label={t("v4.gallery.view.label")}>
+              {views.map(({ id, icon: Icon, label }) => (
+                <button type="button" key={id} className="gallery-views__button" aria-pressed={view === id} aria-label={label} title={label} onClick={() => changeView(id)}>
+                  <Icon size={19} aria-hidden="true" />
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {filteredCategories.length > 0 && (
+          <div className="chips gallery-categories" role="group" aria-label={t("gallery.all_categories")}>
+            <button className="chip" type="button" aria-pressed={selectedCategory === null} onClick={() => setSelectedCategory(null)}>
+              {t("gallery.all_categories")}
+            </button>
             {filteredCategories.map((category) => (
               <button
+                className="chip"
                 key={category.id}
                 type="button"
-                className="chip"
                 aria-pressed={selectedCategory === category.id}
-                onClick={() => {
-                  setSelectedCategory(category.id);
-                  setPage(1);
-                }}
+                onClick={() => setSelectedCategory(category.id)}
               >
                 {localizedText(category.name, category.nameTranslations, language)}
               </button>
             ))}
           </div>
+        )}
 
-          <div style={{ position: "relative" }}>
-            <label className="sr-only" htmlFor="gallery-search">
-              {t("gallery.search_placeholder")}
-            </label>
-            <input
-              id="gallery-search"
-              type="search"
-              className="input"
-              value={searchQuery}
-              onChange={(event) => {
-                setSearchQuery(event.target.value);
-                setPage(1);
-              }}
-              placeholder={t("gallery.search_placeholder")}
-              style={{ borderRadius: "var(--r-pill)", paddingRight: "2.4rem" }}
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => {
-                  setSearchQuery("");
-                  setDebouncedSearch("");
-                  setPage(1);
-                }}
-                className="icon-btn"
-                style={{ position: "absolute", right: 0, top: 0, width: 40, height: 40 }}
-                aria-label={t("shop.clear_filters")}
-              >
-                <X className="h-4 w-4" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {isLoading ? (
+        {isPending ? (
           <div className="empty" role="status">
             <Lottie file="trosheen-28-loader-seal.json" mode="loop" className="empty__art" />
-            <p className="note" style={{ margin: 0 }}>
-              {t("common.loading")}
-            </p>
+            <p className="note">{t("common.loading")}</p>
           </div>
         ) : isError ? (
           <div className="empty" role="alert">
-            <Lottie file="trosheen-10-404-rolling-stone.json" mode="view" className="empty__art" />
             <h3>{t("gallery.load_error")}</h3>
-            <button className="btn" onClick={() => void refetch()}>
-              <RefreshCw className="h-4 w-4" />
-              {t("v4.shop.retry")}
+            <button className="btn" type="button" onClick={() => void refetch()}>
+              <RefreshCw size={17} aria-hidden="true" /> {t("v4.shop.retry")}
             </button>
           </div>
-        ) : items.length > 0 ? (
+        ) : items.length ? (
           <>
-            <div className="masonry">
-              {items.map((item, index) => (
-                <figure key={item.id} data-reveal style={{ "--delay": `${(index % 3) * 80}ms` } as React.CSSProperties}>
-                  <Link href={"/gallery/" + item.slug} aria-label={localizedText(item.title, item.titleTranslations, language)}>
-                    {item.type === "video" ? (
-                      <video
-                        src={item.mediaUrl}
-                        poster={item.thumbnailUrl}
-                        muted
-                        playsInline
-                        preload="metadata"
-                        style={{ width: "100%", height: "auto", display: "block" }}
-                      />
-                    ) : item.type === "3d" && !item.thumbnailUrl ? (
-                      <span
-                        style={{
-                          display: "grid",
-                          placeItems: "center",
-                          gap: ".6rem",
-                          aspectRatio: "4/3",
-                          background: "var(--linen-deep)",
-                          color: "var(--spruce)",
-                        }}
-                      >
-                        <Lottie
-                          file="trosheen-29-gallery-frame.json"
-                          mode="view"
-                          style={{ width: 96, height: 96 }}
-                        />
-                        <span className="note">{t("gallery.model_label")}</span>
-                      </span>
-                    ) : (
-                      <img
-                        src={item.thumbnailUrl || item.mediaUrl}
-                        alt={localizedText(item.title, item.titleTranslations, language)}
-                        loading="lazy"
-                      />
-                    )}
-                    <span className="product__tag" style={{ left: ".8rem", top: ".8rem" }}>
-                      {typeLabel(item.type)}
-                    </span>
-                  </Link>
-                  <figcaption className="note" style={{ padding: ".7rem .2rem 0" }}>
-                    {localizedText(item.title, item.titleTranslations, language)}
-                  </figcaption>
-                </figure>
-              ))}
+            <div className="gallery-result-count" role="status">
+              {t("v4.gallery.shown")} {items.length} / {total}
             </div>
-
-            {galleryData?.total > items.length && (
-              <div className="center" style={{ marginTop: "2rem" }}>
+            <div className={"gallery-results gallery-results--" + view}>
+              {items.map((item) => <GalleryMediaCard key={item.id} item={item} />)}
+            </div>
+            {hasNextPage && (
+              <div className="center gallery-load-more">
                 <button
                   className="btn"
-                  onClick={() => setPage((current) => current + 1)}
-                  disabled={isFetching}
+                  type="button"
+                  onClick={() => void fetchNextPage()}
+                  disabled={isFetchingNextPage}
                 >
-                  {isFetching ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  {isFetchingNextPage && <Loader2 size={17} className="animate-spin" aria-hidden="true" />}
                   {t("common.load_more")}
                 </button>
               </div>
             )}
           </>
         ) : (
-          <>
-            <div className="divider" aria-hidden="true">
-              <Ornament name="auseklis" size="sm" draw />
-            </div>
-            <p className="eyebrow center" style={{ display: "block" }}>
-              {t("v4.gallery.empty.label")}
-            </p>
-            <div className="empty" data-reveal>
-              <Lottie file="trosheen-29-gallery-frame.json" mode="view" className="empty__art" />
-              <h3>
-                {searchQuery || selectedCategory !== null || activeTab !== "all"
-                  ? t("gallery.no_items")
-                  : t("v4.gallery.empty.title")}
-              </h3>
-              <p>
-                {searchQuery || selectedCategory !== null || activeTab !== "all"
-                  ? t("gallery.try_different_filter")
-                  : t("v4.gallery.empty.desc")}
-              </p>
-              <a
-                className="btn btn--ghost"
-                href="https://www.instagram.com/trosheencrafts"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {t("v4.gallery.empty.cta")}
-              </a>
-            </div>
-          </>
+          <div className="empty gallery-empty">
+            <h3>{filtered ? t("gallery.no_items") : t("v4.gallery.empty.title")}</h3>
+            <p>{filtered ? t("gallery.try_different_filter") : t("v4.gallery.empty.desc")}</p>
+            {filtered ? (
+              <button className="btn" type="button" onClick={resetFilters}>{t("shop.clear_filters")}</button>
+            ) : (
+              <Link className="btn btn--ghost" href="/contact">{t("v4.gallery.empty.contact")}</Link>
+            )}
+          </div>
         )}
       </div>
     </section>
