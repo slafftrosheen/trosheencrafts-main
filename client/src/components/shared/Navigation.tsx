@@ -54,6 +54,7 @@ export function Navigation() {
   }, []);
 
   const links = [
+    { href: "/", label: t("v4.nav.home") },
     { href: "/shop", label: t("v4.nav.shop") },
     { href: "/about", label: t("v4.nav.story") },
     { href: "/gallery", label: t("v4.nav.gallery") },
