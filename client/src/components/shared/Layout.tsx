@@ -41,6 +41,16 @@ export function Layout({ children }: LayoutProps) {
     "/checkout": "checkout.title",
     "/order-confirmation": "confirm.title",
   };
+  const seoDescriptions: Record<string, string> = {
+    "/shop": "v4.shop.lead",
+    "/gallery": "v4.gallery.lead",
+    "/blog": "v4.journal.lead",
+    "/guide": "v4.care.hero.lead",
+    "/contact": "v4.contact.lead",
+    "/about": "v4.story.hero.lead",
+  };
+  const seoDescriptionKey = seoDescriptions[location] || "brand.intro";
+
   const seoKey = location.startsWith("/shop/")
     ? "nav_shop"
     : location.startsWith("/gallery/")
@@ -57,7 +67,7 @@ export function Layout({ children }: LayoutProps) {
 
       <SEO
         title={location === "/" ? t("brand.seo_home") : t(seoKey || "brand.tagline")}
-        description={t("brand.intro")}
+        description={t(seoDescriptionKey)}
       />
 
       <SeasonRibbon />
