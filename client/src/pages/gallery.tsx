@@ -61,6 +61,7 @@ export default function GalleryPage() {
     isPending,
     isError,
     isFetchingNextPage,
+    isFetchNextPageError,
     hasNextPage,
     fetchNextPage,
     refetch,
@@ -179,7 +180,7 @@ export default function GalleryPage() {
             <Lottie file="trosheen-28-loader-seal.json" mode="loop" className="empty__art" />
             <p className="note">{t("common.loading")}</p>
           </div>
-        ) : isError ? (
+        ) : isError && !items.length ? (
           <div className="empty" role="alert">
             <h3>{t("gallery.load_error")}</h3>
             <button className="btn" type="button" onClick={() => void refetch()}>
@@ -194,16 +195,17 @@ export default function GalleryPage() {
             <div className={"gallery-results gallery-results--" + view}>
               {items.map((item) => <GalleryMediaCard key={item.id} item={item} />)}
             </div>
-            {hasNextPage && (
+            {(hasNextPage || isFetchNextPageError) && (
               <div className="center gallery-load-more">
+                {isFetchNextPageError && <p role="alert">{t("v4.gallery.more.error")}</p>}
                 <button
                   className="btn"
                   type="button"
                   onClick={() => void fetchNextPage()}
                   disabled={isFetchingNextPage}
                 >
-                  {isFetchingNextPage && <Loader2 size={17} className="animate-spin" aria-hidden="true" />}
-                  {t("common.load_more")}
+                  {isFetchingNextPage ? <Loader2 size={17} className="animate-spin" aria-hidden="true" /> : isFetchNextPageError ? <RefreshCw size={17} aria-hidden="true" /> : null}
+                  {isFetchNextPageError ? t("v4.shop.retry") : t("common.load_more")}
                 </button>
               </div>
             )}
