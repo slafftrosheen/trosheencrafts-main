@@ -96,14 +96,14 @@ const raw: Record<string, Entry> = {
   "v4.band.eyebrow": { lv: "Mūsu stāsts", en: "Our story", ru: "Наша история", pl: "Nasza historia", uk: "Наша історія" },
   "v4.band.title": { lv: "Ģimenes darbnīca Daugavpilī", en: "A family workshop in Daugavpils", ru: "Семейная мастерская в Даугавпилсе", pl: "Rodzinna pracownia w Dyneburgu", uk: "Сімейна майстерня в Даугавпілсі" },
   "v4.band.lead": { lv: "Mūsu darba pamatā ir liešanas tehnika, rūpīga apdare un interese par materiāliem. Iepazīstiet Trosheen tuvāk.", en: "We work with casting, hand finishing and thoughtful material choices. Discover the workshop behind Trosheen.", ru: "Работаем с литьём, ручной отделкой и подбором материалов. Узнайте больше о мастерской Trosheen.", pl: "Zajmujemy się odlewaniem, ręcznym wykańczaniem i doborem materiałów. Poznaj pracownię Trosheen.", uk: "Працюємо з литтям, ручним оздобленням і добором матеріалів. Дізнайтеся більше про Trosheen." },
-  "v4.band.cta": { lv: "Lasīt mūsu stāstu", en: "Read our story", ru: "Читать нашу историю", pl: "Poznaj naszą historię", uk: "Читати нашу історію" },
+  "v4.band.cta": { lv: "Par mūsu darbnīcu", en: "About our workshop", ru: "О нашей мастерской", pl: "O naszej pracowni", uk: "Про нашу майстерню" },
 
 
   "v4.duo.journal.meta": { lv: "Žurnāls", en: "Journal", ru: "Журнал", pl: "Dziennik", uk: "Журнал" },
   "v4.duo.journal.title": { lv: "Piezīmes no darbnīcas", en: "Workshop notes", ru: "Заметки мастерской", pl: "Notatki z pracowni", uk: "Нотатки майстерні" },
   "v4.duo.journal.note": { lv: "Raksti par izstrādājumiem, materiāliem un to, ko apgūstam darba procesā.", en: "Articles on our pieces, materials and the techniques we use in the workshop.", ru: "Статьи о наших изделиях, материалах и приёмах, которые мы используем в мастерской.", pl: "Teksty o naszych wyrobach, materiałach i technikach stosowanych w pracowni.", uk: "Матеріали про наші вироби, матеріали та прийоми, які використовуємо в майстерні." },
 
-  "v4.news.eyebrow": { lv: "Vēstules no darbnīcas", en: "Letters from the workshop", ru: "Письма из мастерской", pl: "Listy z warsztatu", uk: "Листи з майстерні" },
+  "v4.news.eyebrow": { lv: "Jaunumi pa e-pastu", en: "Email updates", ru: "Новости по почте", pl: "Wiadomości e-mail", uk: "Новини електронною поштою" },
   "v4.news.title": { lv: "Jaunumi no Trosheen", en: "Updates from Trosheen", ru: "Новости Trosheen", pl: "Nowości Trosheen", uk: "Новини Trosheen" },
   "v4.news.lead": { lv: "Jauni izstrādājumi un darbnīcas jaunumi e-pastā. Rakstām tikai tad, kad ir ko pastāstīt.", en: "New pieces and occasional workshop news by email. We write when we have something to share.", ru: "Новые изделия и новости мастерской по почте. Пишем, когда действительно есть чем поделиться.", pl: "Nowe wyroby i wiadomości z pracowni e-mailem. Piszemy, gdy mamy coś do przekazania.", uk: "Нові вироби та новини майстерні електронною поштою. Пишемо, коли маємо чим поділитися." },
   "v4.news.label": { lv: "E-pasts", en: "Email", ru: "Эл. почта", pl: "E-mail", uk: "Ел. пошта" },
@@ -116,7 +116,7 @@ const raw: Record<string, Entry> = {
   "v4.confirm.signature": { lv: "Ar siltām rokām, Trosheen ģimene", en: "With warm hands, the Trosheen family", ru: "С теплом наших рук, семья Trosheen", pl: "Z ciepłem naszych dłoni, rodzina Trosheen", uk: "З теплом наших рук, родина Trosheen" },
 
   /* ---------- footer ---------- */
-  "v4.footer.about": { lv: "Ģimenes darbnīca Daugavpilī. Lietas un ar rokām apstrādātas sveces, dekori un dārza izstrādājumi.", en: "A family workshop in Daugavpils making cast décor, candles and garden pieces with hand-finished details.", ru: "Семейная мастерская в Даугавпилсе. Изготавливаем литой декор, свечи и изделия для сада с ручной отделкой.", pl: "Rodzinna pracownia w Dyneburgu. Tworzymy odlewane dekoracje, świece i wyroby ogrodowe z ręcznym wykończeniem.", uk: "Сімейна майстерня в Даугавпілсі. Виготовляємо литий декор, свічки та вироби для саду з ручним оздобленням." },
+  "v4.footer.about": { lv: "Ģimenes darbnīca Daugavpilī. Izgatavojam lietus dekorus, sveces un dārza izstrādājumus ar roku apdari.", en: "A family workshop in Daugavpils making cast décor, candles and garden pieces with hand-finished details.", ru: "Семейная мастерская в Даугавпилсе. Изготавливаем литой декор, свечи и изделия для сада с ручной отделкой.", pl: "Rodzinna pracownia w Dyneburgu. Tworzymy odlewane dekoracje, świece i wyroby ogrodowe z ręcznym wykończeniem.", uk: "Сімейна майстерня в Даугавпілсі. Виготовляємо литий декор, свічки та вироби для саду з ручним оздобленням." },
   "v4.footer.explore": { lv: "Izpētīt", en: "Explore", ru: "Изучить", pl: "Odkryj", uk: "Дослідити" },
   "v4.footer.contact": { lv: "Sazināties", en: "Get in touch", ru: "Связаться", pl: "Kontakt", uk: "Зв'язатися" },
   "v4.footer.news.title": { lv: "Jaunumi no darbnīcas", en: "Workshop updates", ru: "Новости мастерской", pl: "Wiadomości z pracowni", uk: "Новини майстерні" },
@@ -160,14 +160,14 @@ const raw: Record<string, Entry> = {
   /* ---------- product ---------- */
   "v4.pdp.crumb": { lv: "Veikals", en: "Shop", ru: "Магазин", pl: "Sklep", uk: "Магазин" },
   "v4.pdp.image": { lv: "Foto", en: "Photo", ru: "Фото", pl: "Zdjęcie", uk: "Фото" },
-  "v4.pdp.fact1": { lv: "Lieta un krāsota ar rokām Daugavpilī", en: "Cast and painted by hand in Daugavpils", ru: "Отлито и окрашено вручную в Даугавпилсе", pl: "Odlewane i malowane ręcznie w Dyneburgu", uk: "Відлито й розписано вручну в Даугавпілсі" },
+  "v4.pdp.fact1": { lv: "Izgatavots vai apstrādāts ar rokām mūsu darbnīcā", en: "Made or hand-finished in our workshop", ru: "Изготовлено или отделано вручную в нашей мастерской", pl: "Wykonane lub ręcznie wykończone w naszej pracowni", uk: "Виготовлено або оздоблено вручну в нашій майстерні" },
   "v4.pdp.fact2": { lv: "Roku darbam raksturīgas nelielas atšķirības", en: "Small variations are part of handmade work", ru: "Небольшие отличия — особенность ручной работы", pl: "Niewielkie różnice są cechą ręcznego wykonania", uk: "Невеликі відмінності — особливість ручної роботи" },
-  "v4.pdp.fact3": { lv: "Rūpīgi iesaiņota, ar kopšanas kartīti", en: "Carefully wrapped, with a care card", ru: "Бережная упаковка и памятка по уходу", pl: "Starannie zapakowane, z instrukcją pielęgnacji", uk: "Дбайливе пакування та пам'ятка з догляду" },
+  "v4.pdp.fact3": { lv: "Lūdzu, pārbaudiet materiāla kopšanas norādes", en: "Check the care advice for this material", ru: "Ознакомьтесь с рекомендациями по уходу за материалом", pl: "Sprawdź zalecenia pielęgnacji danego materiału", uk: "Ознайомтеся з рекомендаціями щодо догляду за матеріалом" },
   "v4.pdp.acc.materials": { lv: "Materiāli", en: "Materials", ru: "Материалы", pl: "Materiały", uk: "Матеріали" },
   "v4.pdp.acc.care": { lv: "Kopšana", en: "Care", ru: "Уход", pl: "Pielęgnacja", uk: "Догляд" },
   "v4.pdp.acc.shipping": { lv: "Piegāde un atgriešana", en: "Shipping and returns", ru: "Доставка и возврат", pl: "Dostawa i zwroty", uk: "Доставка та повернення" },
   "v4.pdp.acc.careBody": { lv: "Kopšana atkarīga no materiāla un apdares. Izmantojiet mīkstu drānu un ievērojiet konkrētā izstrādājuma instrukciju.", en: "Care depends on the material and finish. Use a soft cloth and follow any product-specific instructions.", ru: "Уход зависит от материала и покрытия. Используйте мягкую ткань и следуйте инструкции для конкретного изделия.", pl: "Pielęgnacja zależy od materiału i wykończenia. Używaj miękkiej ściereczki i stosuj instrukcje produktu.", uk: "Догляд залежить від матеріалу й покриття. Використовуйте м'яку тканину та дотримуйтеся інструкції до виробу." },
-  "v4.pdp.acc.careLink": { lv: "Pilns kopšanas ceļvedis", en: "Full care guide", ru: "Полное руководство по уходу", pl: "Pełny poradnik pielęgnacji", uk: "Повний посібник з догляду" },
+  "v4.pdp.acc.careLink": { lv: "Kopšanas norādījumi", en: "Care instructions", ru: "Инструкция по уходу", pl: "Instrukcja pielęgnacji", uk: "Інструкція з догляду" },
   "v4.pdp.acc.shipBody": { lv: "Sūtām visā Eiropā. 14 dienu atteikuma tiesības gataviem darbiem.", en: "We ship across Europe. 14-day right of withdrawal on ready pieces.", ru: "Доставляем по Европе. Для готовых изделий действует право на отказ в течение 14 дней.", pl: "Wysyłamy w całej Europie. Gotowe przedmioty można zwrócić w ciągu 14 dni.", uk: "Доставляємо по Європі. Для готових виробів діє право на повернення протягом 14 днів." },
   "v4.pdp.related": { lv: "Arī no darbnīcas", en: "Also from the workshop", ru: "Ещё из мастерской", pl: "Także z warsztatu", uk: "Також з майстерні" },
   "v4.pdp.addToCart": { lv: "Ielikt grozā", en: "Add to basket", ru: "В корзину", pl: "Do koszyka", uk: "До кошика" },
@@ -275,9 +275,9 @@ const raw: Record<string, Entry> = {
   "v4.gallery.photoAlt": { lv: "Trosheen darbnīca — fotogrāfija", en: "Trosheen workshop — photograph", ru: "Мастерская Trosheen — фотография", pl: "Pracownia Trosheen — fotografia", uk: "Майстерня Trosheen — світлина" },
 
   /* ---------- journal ---------- */
-  "v4.journal.eyebrow": { lv: "Žurnāls", en: "Journal", ru: "Журнал", pl: "Dziennik", uk: "Журнал" },
-  "v4.journal.title": { lv: "Piezīmes no darbnīcas", en: "Notes from the workshop", ru: "Заметки из мастерской", pl: "Notatki z warsztatu", uk: "Нотатки з майстерні" },
-  "v4.journal.lead": { lv: "Par materiāliem, gadalaikiem un to, kā top katrs darbs. Rakstām tad, kad ir ko pastāstīt.", en: "About materials, seasons and how each piece comes to be. We write when there is something to say.", ru: "О материалах, временах года и о том, как рождается каждая вещь. Пишем, когда есть что рассказать.", pl: "O materiałach, porach roku i powstawaniu każdej rzeczy. Piszemy, gdy mamy coś do powiedzenia.", uk: "Про матеріали, пори року та те, як народжується кожна річ. Пишемо, коли є чим поділитися." },
+  "v4.journal.eyebrow": { lv: "Darbnīcas žurnāls", en: "Workshop journal", ru: "Журнал мастерской", pl: "Dziennik pracowni", uk: "Журнал майстерні" },
+  "v4.journal.title": { lv: "Raksti un jaunumi", en: "Stories and updates", ru: "Статьи и новости", pl: "Artykuły i aktualności", uk: "Статті та новини" },
+  "v4.journal.lead": { lv: "Piezīmes par izstrādājumiem, materiāliem un darbu mūsu darbnīcā. Redzami tikai publicētie raksti.", en: "Notes on our products, materials and workshop processes. Browse the articles we have published.", ru: "Заметки об изделиях, материалах и процессах нашей мастерской. Здесь размещены опубликованные статьи.", pl: "Informacje o wyrobach, materiałach i pracy w naszej pracowni. Tu znajdziesz opublikowane artykuły.", uk: "Нотатки про вироби, матеріали й роботу нашої майстерні. Тут розміщені опубліковані статті." },
   "v4.journal.more": { lv: "Vairāk piezīmju", en: "More stories", ru: "Показать ещё", pl: "Więcej historii", uk: "Більше історій" },
   "v4.journal.loadError": { lv: "Neizdevās ielādēt žurnālu. Mēģiniet vēlreiz.", en: "Could not load the journal. Please try again.", ru: "Не удалось загрузить журнал. Попробуйте снова.", pl: "Nie udało się wczytać dziennika. Spróbuj ponownie.", uk: "Не вдалося завантажити журнал. Спробуйте ще раз." },
   "v4.journal.read": { lv: "Lasīt", en: "Read", ru: "Читать", pl: "Czytaj", uk: "Читати" },
