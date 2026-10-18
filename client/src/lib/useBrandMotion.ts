@@ -14,6 +14,7 @@ export function useBrandMotion(rootRef: React.RefObject<HTMLElement | null>) {
     const root = rootRef.current;
     if (!root || typeof window === "undefined") return;
     const reduced = prefersReducedMotion();
+    const mobileLite = window.matchMedia("(max-width:767px), (pointer:coarse)").matches;
 
     /* ---------- scroll progress bar ---------- */
     let bar = document.querySelector<HTMLDivElement>(".scroll-progress");
@@ -107,7 +108,7 @@ export function useBrandMotion(rootRef: React.RefObject<HTMLElement | null>) {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       progressBar.style.setProperty("--sp", max > 0 ? (window.scrollY / max).toFixed(4) : "0");
 
-      if (!reduced) {
+      if (!reduced && !mobileLite) {
         const heroImg = root.querySelector<HTMLElement>(".hero__media img");
         if (heroImg && window.scrollY < window.innerHeight * 1.2) {
           heroImg.style.setProperty("--py", `${(window.scrollY * 0.25).toFixed(1)}px`);
