@@ -49,7 +49,7 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
         ) : (
           <img src="/brand/icons/candle.svg" alt="" style={{ opacity: 0.35, padding: "30%" }} />
         )}
-        <span className="product__tag">{t("v4.tag.oneOfAKind")}</span>
+        {product.featured && <span className="product__tag">{t("v4.tag.featured")}</span>}
         </Link>
         <button
           type="button"
@@ -72,7 +72,7 @@ export function ProductCardV4({ product, delay = 0, kind }: ProductCardV4Props) 
         <Link href={`/shop/${product.id}`}>{productTitle(product, language)}</Link>
       </h3>
       <div className="product__meta">
-        <span>{kind || product.category || t("v4.tag.oneOfAKind")}</span>
+        <span>{kind || t("v4.tag.handmade")}</span>
         <span className="product__price">{formatPrice(product)}</span>
       </div>
     </article>
