@@ -11,6 +11,7 @@ import { SeasonAmbient } from "@/components/brand/SeasonRibbon";
 import { NewsletterForm } from "@/components/brand/NewsletterForm";
 import { ProductCardV4, productImage } from "@/components/brand/ProductCardV4";
 import { PromotionalGallery } from "@/components/PromotionalGallery";
+import { GalleryPreview } from "@/components/gallery/GalleryPreview";
 
 const Arrow = () => (
   <svg
@@ -342,44 +343,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ---------- gallery + journal ---------- */}
+      {/* ---------- real gallery items + journal ---------- */}
+      <GalleryPreview editorialImage={galleryFeature} />
       <section className="section section--warm">
-        <div className="wrap">
-          <div className="center" data-reveal>
-            <p className="eyebrow">{t("v4.duo.eyebrow")}</p>
-            <h2>{t("v4.duo.title")}</h2>
-          </div>
-          <div className="grid grid-2" style={{ marginTop: "2.5rem" }}>
-            <Link className="post card" href="/gallery" data-reveal>
-              <div className="frame">
-                {galleryFeature ? (
-                  <img src={galleryFeature} alt={t("v4.duo.gallery.title")} loading="lazy" />
-                ) : (
-                  <span className="empty__art" aria-hidden="true"><Lottie file="trosheen-29-gallery-frame.json" mode="view" /></span>
-                )}
-              </div>
-              <span className="post__meta">{t("v4.duo.gallery.meta")}</span>
-              <h3>{t("v4.duo.gallery.title")}</h3>
-              <p className="note">{t("v4.duo.gallery.note")}</p>
-            </Link>
-            <Link
-              className="post card"
-              href="/blog"
-              data-reveal
-              style={{ "--delay": "120ms" } as React.CSSProperties}
-            >
-              <div className="frame">
-                {journalFeature ? (
-                  <img src={journalFeature} alt={t("v4.duo.journal.title")} loading="lazy" />
-                ) : (
-                  <span className="empty__art" aria-hidden="true"><Lottie file="trosheen-04-sprouting-planter.json" mode="view" /></span>
-                )}
-              </div>
-              <span className="post__meta">{t("v4.duo.journal.meta")}</span>
-              <h3>{t("v4.duo.journal.title")}</h3>
-              <p className="note">{t("v4.duo.journal.note")}</p>
+        <div className="wrap split">
+          <div data-reveal>
+            <p className="eyebrow">{t("v4.duo.journal.meta")}</p>
+            <h2>{t("v4.duo.journal.title")}</h2>
+            <p className="lead">{t("v4.duo.journal.note")}</p>
+            <Link className="link-arrow" href="/blog">
+              {t("v4.duo.journal.cta")} <Arrow />
             </Link>
           </div>
+          <Link className="post card" href="/blog" data-reveal style={{ "--delay": "120ms", minWidth: 0 } as React.CSSProperties}>
+            <div className="frame">
+              {journalFeature ? (
+                <img src={journalFeature} alt={t("v4.duo.journal.title")} loading="lazy" />
+              ) : (
+                <span className="empty__art" aria-hidden="true"><Lottie file="trosheen-04-sprouting-planter.json" mode="view" /></span>
+              )}
+            </div>
+            <span className="post__meta">{t("v4.duo.journal.meta")}</span>
+            <h3>{t("v4.duo.journal.title")}</h3>
+          </Link>
         </div>
       </section>
 
