@@ -144,9 +144,6 @@ export function Navigation() {
               {link.label}
             </Link>
           ))}
-          <Link href="/constructor" style={{ fontSize: "1.1rem", color: "var(--kiln)" }}>
-            {t("v4.nav.custom")} →
-          </Link>
           <div style={{ display: "flex", gap: ".5rem", marginTop: "1rem" }}>
             {LANGUAGES.map((item) => (
               <button
