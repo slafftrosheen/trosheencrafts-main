@@ -57,7 +57,7 @@ for (const route of ["/admin", "/admin/gallery", "/admin/constructor", "/admin/h
 
 const home = text("client/src/pages/home.tsx");
 expect(home.includes("useHomepageImages") && home.includes("image(\"hero\")"), "Keep R2-admin-editable homepage images");
-expect(home.includes('image("storyHeritage")') && home.includes('image("storyMakers")') && home.includes('image("shopFeature")'), "Home photography must be connected to editor slots");
+expect(home.includes('image("storyHeritage")') && home.includes('image("storyMakers")'), "Home workshop photographs must retain admin-editable media slots");
 expect(!home.includes("FALLBACK_STRIP"), "Home must not fabricate portfolio imagery");
 expect(routes.includes('path="/admin/content"'), "The public-site copy editor must remain accessible from admin");
 const editor = text("client/src/pages/admin/WebsiteContent.tsx");
@@ -82,15 +82,22 @@ expect(home.includes("className=\"hero\"") && home.includes("hero__content"), "H
 expect(home.includes("brand.tagline") && home.includes("v4.hero.lead"), "Homepage hero copy must stay translatable");
 expect(!/demo-assets|placeholder\./.test(home), "Never ship placeholder art on the homepage");
 const about = text("client/src/pages/about.tsx");
-expect(about.includes("chapter-nav") && about.includes("id=\"recepte\""), "Story page keeps its chapter navigation and recipe section");
+expect(about.includes("v4.story.c1.title") && about.includes("v4.story.c2.title") && about.includes("v4.story.c3.title"), "About page must cover workshop, process and design inspiration");
+expect(!about.includes("TIMELINE"), "Never publish an unverified family-history timeline");
 expect(about.includes("v4.story.c7.cta1"), "Story page keeps its closing visit call to action");
 const promotions = text("client/src/components/PromotionalGallery.tsx");
 expect(promotions.includes("isKitBanner") && promotions.includes("brand-promo-media--kit"), "Kit collection banners must preserve their complete artwork");
 expect(!promotions.includes('bg-gradient-to-t'), "Do not cover promo photography with heavy text gradients");
 const shop = text("client/src/pages/shop.tsx");
-expect(shop.includes("<CandleConstructor />"), "Keep full constructor embedded in shop");
-expect(shop.includes("trosheen:shop-view"), "Keep shop tab/URL synchronization");
-expect(shop.includes("v4.shop.tab.custom") && shop.includes("CustomWorkshopWizard"), "Shop keeps the ready/custom tabs and the v4 request wizard");
+expect(routes.includes('path="/constructor"') && routes.includes("<Constructor />"), "The existing stock-aware candle constructor remains at its dedicated route");
+expect(!shop.includes("CustomWorkshopWizard") && !shop.includes("v4.shop.tab.custom"), "Remove the unapproved custom-shop request wizard");
+expect(shop.includes('url.searchParams.get("view") === "custom"'), "Retired custom-shop deep links must normalize to the catalogue");
+expect(shop.includes('url.searchParams.get("view") === "saved"'), "Preserve the saved-products deep link");
+const care = text("client/src/pages/guide.tsx");
+expect(care.includes("v4.care.materials.note") && care.includes("v4.care.candle.warning"), "Care page must explain material-specific limits and candle-vessel safety");
+expect(!care.includes('className="hero hero--page"'), "Care page must not reintroduce overlapping photographic hero content");
+const lottie = text("client/src/components/brand/Lottie.tsx");
+expect(lottie.includes('IntersectionObserver') && lottie.includes('animation.pause()'), "Lottie player should lazy-load and pause offscreen");
 const gallery = text("client/src/pages/gallery.tsx");
 expect(gallery.includes('"/gallery/" + item.slug'), "Keep gallery detail navigation");
 expect(gallery.includes("selectedCategory") && gallery.includes("setPage("), "Keep gallery filtering and pagination");
