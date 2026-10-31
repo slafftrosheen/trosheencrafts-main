@@ -70,7 +70,18 @@ export async function workshopSettings() {
     "SELECT id, chat_id, display_name, telegram_username, enabled " +
     "FROM telegram_workshop_recipients ORDER BY id"
   );
+  const delivery = await pool.query<{
+    pending: string; retrying: string; last_sent_at: Date | null;
+  }>(
+    "SELECT COUNT(*) FILTER (WHERE o.sent_at IS NULL) AS pending, " +
+    "COUNT(*) FILTER (WHERE o.sent_at IS NULL AND o.attempts > 0) AS retrying, " +
+    "MAX(o.sent_at) AS last_sent_at FROM telegram_workshop_outbox o " +
+    "JOIN telegram_workshop_recipients r ON r.id = o.recipient_id AND r.enabled = TRUE"
+  );
+  const stats = delivery.rows[0];
   return { configured: Boolean(config), enabled: config?.enabled ?? false,
+    delivery: { pending: Number(stats?.pending ?? 0), retrying: Number(stats?.retrying ?? 0),
+      lastSentAt: stats?.last_sent_at?.toISOString() ?? null },
     username: config?.bot_username || null, lastError: config?.last_error || null,
     recipients: recipients.rows.map((r) => ({ id: r.id, displayName: r.display_name,
       telegramUsername: r.telegram_username, enabled: r.enabled })) };
@@ -182,7 +193,7 @@ function details(order: Order, page: number) {
   for (const item of order.items.slice(active * 4, (active + 1) * 4)) {
     const custom = item.productSlug === "custom-candle-builder";
     lines.push("• <b>" + safe(custom ? "Свеча на заказ" : item.productName || "Товар") +
-      "</b> × " + item.quantity);
+      "</b> × " + item.quantity + " · " + eur(item.price) + " / шт.");
     if (item.variant) {
       const parts = item.variant.split(" / ");
       if (custom && parts.length === 4) {
@@ -209,8 +220,8 @@ function details(order: Order, page: number) {
 function contacts(order: Order) {
   const a = order.shippingAddress;
   return ["☎️ <b>ЗАКАЗ № " + order.id + " · КОНТАКТЫ</b>", "",
-    "👤 " + safe(a.name), a.phone ? "📱 " + safe(a.phone, 40) : "📱 Телефон не указан",
-    a.email ? "✉️ " + safe(a.email, 254) : "✉️ Почта не указана",
+    "👤 " + safe(a.name), a.phone ? "📱 <code>" + safe(a.phone, 40) + "</code>" : "📱 Телефон не указан",
+    a.email ? "✉️ <code>" + safe(a.email, 254) + "</code>" : "✉️ Почта не указана",
     "📍 " + [a.street, a.postalCode, a.city, a.country].filter(Boolean).map((x) => safe(x)).join(", "),
   ].join("\n");
 }
@@ -332,13 +343,16 @@ export async function queuePaidWorkshopOrder(tx: any, orderId: number, event: Ev
   if (!Number.isSafeInteger(orderId) || orderId < 1 || !["paid", "payment_review"].includes(event)) {
     throw new Error("Invalid workshop event");
   }
-  // Dynamic parts are strictly validated numeric ID and a closed event enumeration.
-  await tx.execute(sql.raw(
-    "INSERT INTO telegram_workshop_outbox (order_id, recipient_id, event_type) " +
-    "SELECT " + orderId + ", r.id, '" + event + "' FROM telegram_workshop_recipients r " +
-    "JOIN telegram_workshop_config c ON c.id = 1 AND c.enabled = TRUE WHERE r.enabled = TRUE " +
-    "ON CONFLICT (order_id, recipient_id, event_type) DO NOTHING"
-  ));
+  // Queue on confirmed payment even if the bot is temporarily disabled.
+  // Deliveries resume automatically once enabled; SQL values are parameterized.
+  await tx.execute(sql`
+    INSERT INTO telegram_workshop_outbox (order_id, recipient_id, event_type)
+    SELECT ${orderId}, r.id, ${event}
+    FROM telegram_workshop_recipients r
+    JOIN telegram_workshop_config c ON c.id = 1
+    WHERE r.enabled = TRUE
+    ON CONFLICT (order_id, recipient_id, event_type) DO NOTHING
+  `);
 }
 let polling = false;
 async function poll() {
@@ -362,7 +376,9 @@ async function poll() {
     for (const update of updates) {
       try { await onUpdate(token, update); }
       catch (error) {
+        // Never acknowledge a failed update: retry on the next poll, preserving invite/callback actions.
         console.error("Telegram update", update.update_id, error instanceof Error ? error.message : error);
+        break;
       }
       await client.query(
         "UPDATE telegram_workshop_config SET update_offset = GREATEST(update_offset, $1), last_error = NULL " +
