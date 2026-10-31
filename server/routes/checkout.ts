@@ -307,6 +307,11 @@ checkoutRouter.post(
           callbackUrl: publicBaseUrl + "/api/checkout/webhook",
         });
 
+        // Store the issued payment session before sending the buyer to SumUp.
+        await db.update(orders)
+          .set({ paymentMethodId: checkout.id, updatedAt: new Date() })
+          .where(and(eq(orders.id, order.id), eq(orders.status, "pending")));
+
         return res.json({
           orderId: order.id,
           sessionId: checkout.id,
@@ -338,20 +343,39 @@ checkoutRouter.post("/webhook", async (req, res, next) => {
     }
 
     const checkout: any = await verifySumupCheckout(checkoutId);
-    const orderId = Number.parseInt(String(checkout?.checkout_reference || ""), 10);
-
-    if (!Number.isFinite(orderId)) {
+    const reference = String(checkout?.checkout_reference ?? "");
+    if (!/^[1-9][0-9]*$/.test(reference)) {
+      return res.status(200).json({ received: true });
+    }
+    const orderId = Number(reference);
+    if (!Number.isSafeInteger(orderId)) {
       return res.status(200).json({ received: true });
     }
 
     if (checkout.status === "PAID") {
+      // A PAID response alone is not enough: validate the exact checkout,
+      // amount, currency and recipient merchant against the original order.
+      const [expected] = await db.select({
+        paymentMethodId: orders.paymentMethodId,
+        totalAmount: orders.totalAmount,
+      }).from(orders).where(eq(orders.id, orderId)).limit(1);
+      const totalCents = expected ? Math.round(Number(expected.totalAmount) * 100) : NaN;
+      const sumupCents = Math.round(Number(checkout.amount) * 100);
+      if (!expected || expected.paymentMethodId !== checkoutId ||
+          checkout.currency !== "EUR" ||
+          checkout.merchant_code !== process.env.SUMUP_MERCHANT_CODE ||
+          !Number.isSafeInteger(sumupCents) || sumupCents !== totalCents) {
+        console.error("Rejected mismatched paid SumUp checkout for order:", orderId);
+        return res.status(200).json({ received: true });
+      }
       try {
         await db.transaction(async (tx) => {
           // Claim order once; concurrent webhook deliveries cannot decrement twice.
           const [claimedOrder] = await tx
             .update(orders)
             .set({ status: "payment_confirming", paymentMethodId: checkoutId, updatedAt: new Date() })
-            .where(and(eq(orders.id, orderId), eq(orders.status, "pending")))
+            .where(and(eq(orders.id, orderId), eq(orders.status, "pending"),
+              eq(orders.paymentMethodId, checkoutId)))
             .returning({ id: orders.id });
 
           if (!claimedOrder) return;
@@ -386,7 +410,8 @@ checkoutRouter.post("/webhook", async (req, res, next) => {
         await db.transaction(async (tx) => {
           const [flagged] = await tx.update(orders)
             .set({ status: "payment_review", paymentMethodId: checkoutId, updatedAt: new Date() })
-            .where(and(eq(orders.id, orderId), eq(orders.status, "pending")))
+            .where(and(eq(orders.id, orderId), eq(orders.status, "pending"),
+              eq(orders.paymentMethodId, checkoutId)))
             .returning({ id: orders.id });
           if (flagged) await queuePaidWorkshopOrder(tx, orderId, "payment_review");
         });
