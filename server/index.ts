@@ -10,6 +10,7 @@ import { errorHandler, notFoundHandler } from "./middleware/errorHandler";
 import { globalRateLimiter } from "./middleware/rateLimiter";
 import { createServer } from "http";
 import path from "path";
+import { startTelegramWorkshop } from "./lib/telegramWorkshop";
 
 const app = express();
 const httpServer = createServer(app);
@@ -121,6 +122,7 @@ async function startServer() {
     httpServer.listen(PORT, () => {
       console.log("Server running on port " + PORT + " in " + NODE_ENV + " mode");
       console.log("API: http://localhost:" + PORT + "/api");
+      startTelegramWorkshop();
     });
   } catch (error) {
     console.error("Failed to start server:", error);
