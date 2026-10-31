@@ -585,7 +585,7 @@ export const translations: Translations = {
   "checkout.shipping.city": { en: "City", lv: "Pilsēta", ru: "Город", pl: "Miasto", uk: "Місто" },
   "checkout.shipping.postal": { en: "Postal Code", lv: "Pasta indekss", ru: "Почтовый индекс", pl: "Kod Pocztowy", uk: "Поштовий Індекс" },
   "checkout.shipping.country": { en: "Country", lv: "Valsts", ru: "Страна", pl: "Kraj", uk: "Країна" },
-  "checkout.payment.secure": { en: "Secure encrypted payment via Stripe", lv: "Drošs šifrēts maksājums caur Stripe", ru: "Безопасный зашифрованный платеж через Stripe", pl: "Bezpieczna płatność przez Stripe", uk: "Безпечний платіж через Stripe" },
+  "checkout.payment.secure": { en: "Secure card payment via SumUp", lv: "Drošs maksājums ar karti, izmantojot SumUp", ru: "Безопасная оплата картой через SumUp", pl: "Bezpieczna płatność kartą przez SumUp", uk: "Безпечна оплата карткою через SumUp" },
   "checkout.summary.title": { en: "Order Summary", lv: "Pasūtījuma kopsavilkums", ru: "Сводка заказа", pl: "Podsumowanie Zamówienia", uk: "Підсумок Замовлення" },
   "checkout.summary.qty": { en: "Qty", lv: "Skaits", ru: "Кол-во", pl: "Ilość", uk: "К-сть" },
   "checkout.summary.subtotal": { en: "Subtotal", lv: "Starpsumma", ru: "Подытог", pl: "Suma Częściowa", uk: "Підсумок" },
