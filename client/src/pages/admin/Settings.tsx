@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { useCurrentUser } from '@/hooks/useApi';
 import { adminT as t } from "@/lib/adminI18n";
 import { apiClient } from '@/lib/apiClient';
+import { TelegramOrdersSettings } from '@/components/admin/TelegramOrdersSettings';
 import { Loader2, Mail, Phone, MapPin, Facebook, Instagram, Youtube, Send, Twitter, Clock } from 'lucide-react';
 
 interface SiteConfig {
@@ -134,6 +135,8 @@ export default function Settings() {
             Управляйте контактами, социальными сетями и основными параметрами сайта.
           </p>
         </header>
+
+        <TelegramOrdersSettings />
 
         {/* Contact Information */}
         <Card className="overflow-hidden border-border bg-card shadow-sm">
