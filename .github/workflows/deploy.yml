@@ -1,28 +1,17 @@
-name: Deploy
+# Trosheen runs on a Raspberry Pi behind Cloudflare Tunnel.
+# Deliberately no push-to-main deployment: production updates are made manually
+# on the Pi using ./deploy.sh (build -> SQL migrations -> app -> health check).
+name: Production deployment — manual instructions
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  manual-deployment:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
-          script: |
-            cd /var/www/trosheencrafts
-            git pull origin main
-            docker-compose down
-            docker-compose build
-            docker-compose up -d
-            sleep 10
-            docker-compose exec -T app npm run db:push
+      - name: Explain the production deployment procedure
+        run: |
+          echo "No remote deployment is executed by GitHub Actions."
+          echo "On the Raspberry Pi, back up the PostgreSQL volume and run ./deploy.sh"
+          echo "The script runs additive SQL migrations before restarting the app."
