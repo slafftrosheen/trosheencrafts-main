@@ -6,6 +6,7 @@ import { constructorOptions, orders, orderItems, products } from "../db/schema";
 import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { validateRequest } from "../middleware/validation";
 import { createSumupCheckout, verifySumupCheckout } from "../lib/sumup";
+import { queuePaidWorkshopOrder } from "../lib/telegramWorkshop";
 
 export const checkoutRouter = Router();
 
@@ -56,6 +57,7 @@ interface CartItem {
 
 interface ShippingAddress {
   name: string;
+  phone: string;
   street: string;
   city: string;
   postalCode: string;
@@ -89,6 +91,7 @@ const createCheckoutSchema = z.object({
       .max(50),
     shippingAddress: z.object({
       name: z.string().trim().min(1).max(150),
+      phone: z.string().trim().regex(/^\+?[0-9\s().-]{7,25}$/),
       street: z.string().trim().min(1).max(200),
       city: z.string().trim().min(1).max(100),
       postalCode: z.string().trim().min(1).max(40),
@@ -374,14 +377,19 @@ checkoutRouter.post("/webhook", async (req, res, next) => {
           await tx.update(orders)
             .set({ status: "processing", updatedAt: new Date() })
             .where(eq(orders.id, orderId));
+          await queuePaidWorkshopOrder(tx, orderId, "paid");
         });
       } catch (error: any) {
         if (error?.message !== "PAID_STOCK_CONFLICT") throw error;
         // Paid already: retain order for staff rather than oversell or lose payment.
         console.error("Paid order needs manual stock resolution:", orderId, checkoutId);
-        await db.update(orders)
-          .set({ status: "payment_review", paymentMethodId: checkoutId, updatedAt: new Date() })
-          .where(and(eq(orders.id, orderId), eq(orders.status, "pending")));
+        await db.transaction(async (tx) => {
+          const [flagged] = await tx.update(orders)
+            .set({ status: "payment_review", paymentMethodId: checkoutId, updatedAt: new Date() })
+            .where(and(eq(orders.id, orderId), eq(orders.status, "pending")))
+            .returning({ id: orders.id });
+          if (flagged) await queuePaidWorkshopOrder(tx, orderId, "payment_review");
+        });
       }
     }
 
