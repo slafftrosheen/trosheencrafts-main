@@ -578,6 +578,8 @@ export const translations: Translations = {
   "checkout.shipping.title": { en: "Shipping Details", lv: "Piegādes detaļas", ru: "Детали доставки", pl: "Szczegóły Dostawy", uk: "Деталі Доставки" },
   "checkout.shipping.desc": { en: "Where should we deliver your handcrafted artefacts?", lv: "Kur mums vajadzētu piegādāt jūsu roku darbus?", ru: "Куда нам доставить ваши изделия ручной работы?", pl: "Gdzie mamy dostarczyć Twoje rękodzieło?", uk: "Куди нам доставити ваші вироби ручної роботи?" },
   "checkout.shipping.email": { en: "Email Address", lv: "E-pasta adrese", ru: "Электронная почта", pl: "Adres Email", uk: "Електронна Пошта" },
+  "checkout.shipping.phone": { en: "Phone number", lv: "Tālruņa numurs", ru: "Номер телефона", pl: "Numer telefonu", uk: "Номер телефону" },
+  "checkout.shipping.phone_invalid": { en: "Enter a valid phone number", lv: "Ievadiet derīgu tālruņa numuru", ru: "Укажите корректный номер телефона", pl: "Wpisz prawidłowy numer telefonu", uk: "Вкажіть правильний номер телефону" },
   "checkout.shipping.name": { en: "Full Name", lv: "Vārds, Uzvārds", ru: "Имя и Фамилия", pl: "Imię i Nazwisko", uk: "Повне Ім'я" },
   "checkout.shipping.street": { en: "Street Address", lv: "Ielas adrese", ru: "Улица и дом", pl: "Ulica i Numer", uk: "Вулиця та Номер" },
   "checkout.shipping.city": { en: "City", lv: "Pilsēta", ru: "Город", pl: "Miasto", uk: "Місто" },
