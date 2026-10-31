@@ -377,7 +377,12 @@ async function poll() {
       try { await onUpdate(token, update); }
       catch (error) {
         // Never acknowledge a failed update: retry on the next poll, preserving invite/callback actions.
-        console.error("Telegram update", update.update_id, error instanceof Error ? error.message : error);
+        const message = error instanceof Error ? error.message.slice(0, 500) : "Telegram update error";
+        console.error("Telegram update", update.update_id, message);
+        await client.query(
+          "UPDATE telegram_workshop_config SET last_error = $1 WHERE id = 1 AND bot_id = $2",
+          [message, config.bot_id]
+        );
         break;
       }
       await client.query(
