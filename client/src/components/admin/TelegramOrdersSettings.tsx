@@ -21,6 +21,7 @@ type BotSettings = {
   username: string | null;
   lastError: string | null;
   recipients: Recipient[];
+  delivery: { pending: number; retrying: number; lastSentAt: string | null };
 };
 type Invitation = { link: string; expiresInMinutes: number };
 
@@ -90,7 +91,7 @@ export function TelegramOrdersSettings() {
             Telegram · Trosheen Workshop
           </CardTitle>
           <Badge variant={data?.enabled ? "default" : "secondary"}>
-            {data?.enabled ? "Бот работает" : "Бот выключен"}
+            {data?.enabled ? "Бот включён" : "Бот выключен"}
           </Badge>
         </div>
         <CardDescription className="text-base leading-relaxed">
@@ -225,9 +226,28 @@ export function TelegramOrdersSettings() {
               ))}
             </div>
           )}
+          <div className="rounded-xl border border-border bg-muted/30 p-4" aria-live="polite">
+            <h4 className="text-base font-semibold">Состояние уведомлений</h4>
+            <p className="mt-2 text-sm leading-relaxed">
+              В очереди: <strong>{data?.delivery?.pending ?? 0}</strong>
+              {" · "}Повторные попытки: <strong>{data?.delivery?.retrying ?? 0}</strong>
+            </p>
+            {data?.delivery?.lastSentAt && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                Последнее доставленное сообщение: {new Date(data.delivery.lastSentAt).toLocaleString("ru-RU")}
+              </p>
+            )}
+            {(data?.delivery?.retrying ?? 0) > 0 && (
+              <p className="mt-2 text-sm text-destructive" role="status">
+                Часть сообщений не доставлена. Бот повторяет отправку автоматически.
+                Проверьте, что сотрудники не заблокировали бота.
+              </p>
+            )}
+          </div>
           <p className="text-xs leading-relaxed text-muted-foreground">
             В сообщения попадают имя, сумма и номер заказа. Состав, телефон и адрес доступны
             только подключённым сотрудникам по кнопкам внутри личного чата с ботом.
+            Если бот выключен, оплаченные заказы остаются в очереди до включения.
           </p>
         </section>
       </CardContent>
