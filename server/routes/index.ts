@@ -17,6 +17,7 @@ import siteConfigRouter from './siteConfig';
 import newsletterRouter from './newsletter';
 import promotionsRouter from './promotions';
 import { constructorRouter } from './constructor';
+import { telegramWorkshopRouter } from './telegramWorkshop';
 
 export const createApiRouter = (): Router => {
   const router = Router();
@@ -37,6 +38,7 @@ export const createApiRouter = (): Router => {
 
   // Admin routes
   router.use('/admin', adminRouter);
+  router.use('/admin/telegram-workshop', telegramWorkshopRouter);
   router.use('/analytics', analyticsRouter);
   router.use('/settings', settingsRouter);
   router.use('/inventory', inventoryRouter);
