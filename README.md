@@ -212,6 +212,7 @@ For detailed information on deployment, operations, and setup, please refer to t
 - [Raspberry Pi Deployment](./docs/RASPBERRY_PI_DEPLOYMENT.md)
 - [Domain & Cloudflare Setup](./docs/DOMAIN_SETUP_INSTRUCTIONS.md)
 - [Operations Manual](./docs/OPERATIONS_MANUAL.md)
+- [Telegram Workshop Bot — setup, security and testing](./docs/TELEGRAM_WORKSHOP.md)
 
 ---
 
