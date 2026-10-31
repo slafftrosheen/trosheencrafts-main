@@ -17,6 +17,7 @@ function checkoutSchema(t: (key: string) => string) {
   return z.object({
     email: z.string().trim().email(t("forms.invalid_email")),
     name: z.string().trim().min(2, t("forms.min_2")).max(100, t("forms.too_long")),
+    phone: z.string().trim().regex(/^\+?[0-9\s().-]{7,25}$/, t("checkout.shipping.phone_invalid")),
     street: z.string().trim().min(5, t("forms.min_5")).max(200, t("forms.too_long")),
     city: z.string().trim().min(2, t("forms.min_2")).max(100, t("forms.too_long")),
     postalCode: z.string().trim().min(3, t("forms.min_3")).max(24, t("forms.too_long")),
@@ -107,6 +108,16 @@ export default function CheckoutPage() {
                 <Label htmlFor="checkout-name">{t("checkout.shipping.name")}</Label>
                 <Input id="checkout-name" aria-invalid={!!errors.name} aria-describedby={errors.name ? "checkout-name-error" : undefined} required {...register("name")} className={fieldClass} disabled={loading} autoComplete="name" />
                 {errors.name && <p id="checkout-name-error" role="alert" className="text-xs text-destructive">{errors.name.message}</p>}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="checkout-phone">{t("checkout.shipping.phone")}</Label>
+                <Input id="checkout-phone" type="tel" autoComplete="tel" required
+                  aria-invalid={!!errors.phone}
+                  aria-describedby={errors.phone ? "checkout-phone-error" : undefined}
+                  {...register("phone")} className={fieldClass} disabled={loading} />
+                {errors.phone && <p id="checkout-phone-error" role="alert"
+                  className="text-xs text-destructive">{errors.phone.message}</p>}
               </div>
 
               <div className="space-y-2">
