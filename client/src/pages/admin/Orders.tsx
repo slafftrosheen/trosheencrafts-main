@@ -7,6 +7,7 @@ import {
   Loader2,
   Mail,
   MapPin,
+  Phone,
   Search,
   ShoppingBag,
 } from "lucide-react";
@@ -56,6 +57,7 @@ interface AdminOrder {
   shippingAddress?: {
     name?: string;
     email?: string;
+    phone?: string;
     street?: string;
     city?: string;
     postalCode?: string;
@@ -355,6 +357,14 @@ export default function AdminOrders() {
                                       <Clipboard className="mr-2 h-3.5 w-3.5" />
                                       Скопировать адрес
                                     </Button>
+                                  )}
+                                  {order.shippingAddress?.phone && (
+                                    <a href={"tel:" + order.shippingAddress.phone}>
+                                      <Button size="sm" variant="outline">
+                                        <Phone className="mr-2 h-3.5 w-3.5" />
+                                        Позвонить
+                                      </Button>
+                                    </a>
                                   )}
                                   {order.shippingAddress?.email && (
                                     <a href={`mailto:${order.shippingAddress.email}?subject=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%20%23${order.id}%20%E2%80%94%20Trosheen.Crafts`}>
