@@ -12,6 +12,7 @@ import { apiClient } from "@/lib/apiClient";
 import { toast } from "sonner";
 import { useLanguage } from "@/lib/LanguageContext";
 import { LazyImage } from "@/components/shared/LazyImage";
+import { SumupAvailabilityNotice, useSumupAvailability } from "@/components/checkout/SumupAvailability";
 
 function checkoutSchema(t: (key: string) => string) {
   return z.object({
@@ -31,6 +32,7 @@ export default function CheckoutPage() {
   const { items, getTotalPrice } = useCartStore();
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
+  const payment = useSumupAvailability();
   const totalPrice = getTotalPrice();
   const hasStockIssue = items.some(item => item.maxStock !== undefined && item.quantity > item.maxStock);
 
@@ -49,6 +51,7 @@ export default function CheckoutPage() {
   });
 
   const onSubmit = async (data: CheckoutFormData) => {
+    if (!payment.available) { toast.error(payment.copy.unavailable); return; }
     if (hasStockIssue) { toast.error(t("cart.stock_issue")); return; }
     try {
       setLoading(true);
@@ -72,6 +75,7 @@ export default function CheckoutPage() {
       console.error("Checkout error:", error);
       toast.error(t("checkout.payment_error"));
       setLoading(false);
+      void payment.refresh();
     }
   };
 
@@ -98,6 +102,7 @@ export default function CheckoutPage() {
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{t("checkout.shipping.desc")}</p>
 
             <form onSubmit={handleSubmit(onSubmit)} noValidate aria-busy={loading} className="mt-8 space-y-6">
+              <SumupAvailabilityNotice payment={payment} />
               <div className="space-y-2">
                 <Label htmlFor="checkout-email">{t("checkout.shipping.email")}</Label>
                 <Input id="checkout-email" type="email" aria-invalid={!!errors.email} aria-describedby={errors.email ? "checkout-email-error" : undefined} required {...register("email")} className={fieldClass} disabled={loading} autoComplete="email" />
@@ -146,7 +151,7 @@ export default function CheckoutPage() {
               </div>
 
               {hasStockIssue && <p className="text-sm text-destructive" role="alert">{t("cart.stock_issue")}</p>}
-              <Button type="submit" size="lg" className="w-full" disabled={loading || hasStockIssue}>
+              <Button type="submit" size="lg" className="w-full" disabled={loading || hasStockIssue || !payment.available}>
                 {loading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
                 ) : (
@@ -159,7 +164,7 @@ export default function CheckoutPage() {
 
               <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
                 <ShieldCheck className="h-4 w-4 text-primary" />
-                {t("checkout.payment.secure")}
+                {payment.copy.secure}
               </div>
             </form>
           </section>

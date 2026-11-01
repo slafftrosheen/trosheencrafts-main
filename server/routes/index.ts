@@ -18,6 +18,7 @@ import newsletterRouter from './newsletter';
 import promotionsRouter from './promotions';
 import { constructorRouter } from './constructor';
 import { telegramWorkshopRouter } from './telegramWorkshop';
+import { sumupAdminRouter } from './sumup';
 
 export const createApiRouter = (): Router => {
   const router = Router();
@@ -37,6 +38,7 @@ export const createApiRouter = (): Router => {
   router.use('/constructor-options', constructorRouter);
 
   // Admin routes
+  router.use('/admin/sumup', sumupAdminRouter);
   router.use('/admin', adminRouter);
   router.use('/admin/telegram-workshop', telegramWorkshopRouter);
   router.use('/analytics', analyticsRouter);

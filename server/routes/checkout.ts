@@ -5,10 +5,17 @@ import { db } from "../db";
 import { constructorOptions, orders, orderItems, products } from "../db/schema";
 import { and, eq, gte, inArray, sql } from "drizzle-orm";
 import { validateRequest } from "../middleware/validation";
-import { createSumupCheckout, verifySumupCheckout } from "../lib/sumup";
+import { createSumupCheckout, verifySumupCheckout, getSumupCheckoutContext, sumupConfiguration } from "../lib/sumup";
+import { SumupError } from "../../shared/sumup";
 import { queuePaidWorkshopOrder } from "../lib/telegramWorkshop";
 
 export const checkoutRouter = Router();
+
+checkoutRouter.get("/availability", async (_req, res) => {
+  res.setHeader("Cache-Control", "no-store");
+  try { res.json(await sumupConfiguration.availability()); }
+  catch { res.json({ available: false, currency: "EUR" }); }
+});
 
 // Opaque, order-scoped token: status can be checked after the hosted payment redirect,
 // without exposing personal order data or accepting a guessed order ID.
@@ -111,6 +118,7 @@ checkoutRouter.post(
   validateRequest(createCheckoutSchema),
   async (req: AuthenticatedRequest, res, next) => {
     try {
+      const paymentContext = await getSumupCheckoutContext();
       const { items, shippingAddress, email } = req.body as {
         items: CartItem[];
         shippingAddress: ShippingAddress;
@@ -231,10 +239,10 @@ checkoutRouter.post(
         };
       });
 
-      const totalAmount = pricedItems.reduce(
+      const totalAmount = Number(pricedItems.reduce(
         (sum, priced) => sum + priced.unitPrice * priced.item.quantity,
         0
-      );
+      ).toFixed(2));
 
       if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
         return res.status(400).json({ message: "Unable to calculate a valid order total." });
@@ -296,31 +304,17 @@ checkoutRouter.post(
         return createdOrder;
       });
 
-      const publicBaseUrl =
-        (process.env.SITE_URL || process.env.FRONTEND_URL || "https://trosheen.shop").replace(/\/$/, "");
-
-      try {
-        const checkout = await createSumupCheckout({
-          amount: totalAmount,
-          orderId: order.id.toString(),
-          successUrl: publicBaseUrl + "/order-confirmation?order_id=" + order.id + "&token=" + statusToken(order.id),
-          callbackUrl: publicBaseUrl + "/api/checkout/webhook",
-        });
-
-        // Store the issued payment session before sending the buyer to SumUp.
-        await db.update(orders)
-          .set({ paymentMethodId: checkout.id, updatedAt: new Date() })
-          .where(and(eq(orders.id, order.id), eq(orders.status, "pending")));
-
-        return res.json({
-          orderId: order.id,
-          sessionId: checkout.id,
-          sessionUrl: checkout.hosted_checkout_url,
-        });
-      } catch (checkoutError) {
-        await db.delete(orders).where(eq(orders.id, order.id));
-        throw checkoutError;
-      }
+      const publicBaseUrl = paymentContext.siteUrl;
+      // Binding and payment_method_id are persisted atomically before the buyer gets the URL.
+      // Retain the pending order on remote/network errors: SumUp may have accepted the request.
+      const checkout = await createSumupCheckout({
+        context: paymentContext,
+        amount: totalAmount,
+        orderId: order.id.toString(),
+        successUrl: publicBaseUrl + "/order-confirmation?order_id=" + order.id + "&token=" + statusToken(order.id),
+        callbackUrl: publicBaseUrl + "/api/checkout/webhook",
+      });
+      return res.json({ orderId: order.id, sessionId: checkout.id, sessionUrl: checkout.hosted_checkout_url });
     } catch (error: any) {
       if (error?.message === "INVALID_CUSTOM_CONFIGURATION") {
         return res.status(400).json({
@@ -328,46 +322,38 @@ checkoutRouter.post(
         });
       }
 
-      console.error("SumUp create checkout error:", error);
-      next(error);
+      console.error("Checkout creation failed", error instanceof SumupError ? error.code : "INTERNAL_ERROR");
+      return res.status(error instanceof SumupError ? error.statusCode : 500).json({
+        code: "PAYMENT_UNAVAILABLE",
+        message: "Unable to start payment. Please contact the workshop before retrying if a payment was already attempted.",
+      });
     }
   }
 );
 
 checkoutRouter.post("/webhook", async (req, res, next) => {
   try {
+    if (req.body?.event_type && req.body.event_type !== "CHECKOUT_STATUS_CHANGED") return res.status(204).end();
     const checkoutId = req.body?.id || req.body?.checkout_id;
 
     if (!checkoutId || typeof checkoutId !== "string") {
-      return res.status(200).json({ received: true });
+      return res.status(204).end();
     }
 
-    const checkout: any = await verifySumupCheckout(checkoutId);
+    // Looks up the original checkout binding, even if payments are now disabled or the merchant changed.
+    const checkout = await verifySumupCheckout(checkoutId);
+    if (!checkout) return res.status(204).end();
     const reference = String(checkout?.checkout_reference ?? "");
     if (!/^[1-9][0-9]*$/.test(reference)) {
-      return res.status(200).json({ received: true });
+      return res.status(204).end();
     }
     const orderId = Number(reference);
     if (!Number.isSafeInteger(orderId)) {
-      return res.status(200).json({ received: true });
+      return res.status(204).end();
     }
 
     if (checkout.status === "PAID") {
-      // A PAID response alone is not enough: validate the exact checkout,
-      // amount, currency and recipient merchant against the original order.
-      const [expected] = await db.select({
-        paymentMethodId: orders.paymentMethodId,
-        totalAmount: orders.totalAmount,
-      }).from(orders).where(eq(orders.id, orderId)).limit(1);
-      const totalCents = expected ? Math.round(Number(expected.totalAmount) * 100) : NaN;
-      const sumupCents = Math.round(Number(checkout.amount) * 100);
-      if (!expected || expected.paymentMethodId !== checkoutId ||
-          checkout.currency !== "EUR" ||
-          checkout.merchant_code !== process.env.SUMUP_MERCHANT_CODE ||
-          !Number.isSafeInteger(sumupCents) || sumupCents !== totalCents) {
-        console.error("Rejected mismatched paid SumUp checkout for order:", orderId);
-        return res.status(200).json({ received: true });
-      }
+      // Exact ID/reference/merchant/currency/amount were verified by the payment service.
       try {
         await db.transaction(async (tx) => {
           // Claim order once; concurrent webhook deliveries cannot decrement twice.
@@ -375,7 +361,8 @@ checkoutRouter.post("/webhook", async (req, res, next) => {
             .update(orders)
             .set({ status: "payment_confirming", paymentMethodId: checkoutId, updatedAt: new Date() })
             .where(and(eq(orders.id, orderId), eq(orders.status, "pending"),
-              eq(orders.paymentMethodId, checkoutId)))
+              eq(orders.paymentMethodId, checkoutId),
+              eq(orders.totalAmount, Number(checkout.amount).toFixed(2))))
             .returning({ id: orders.id });
 
           if (!claimedOrder) return;
@@ -411,16 +398,18 @@ checkoutRouter.post("/webhook", async (req, res, next) => {
           const [flagged] = await tx.update(orders)
             .set({ status: "payment_review", paymentMethodId: checkoutId, updatedAt: new Date() })
             .where(and(eq(orders.id, orderId), eq(orders.status, "pending"),
-              eq(orders.paymentMethodId, checkoutId)))
+              eq(orders.paymentMethodId, checkoutId),
+              eq(orders.totalAmount, Number(checkout.amount).toFixed(2))))
             .returning({ id: orders.id });
           if (flagged) await queuePaidWorkshopOrder(tx, orderId, "payment_review");
         });
       }
     }
 
-    res.status(200).json({ received: true });
+    res.status(204).end();
   } catch (error) {
-    console.error("SumUp webhook processing error:", error);
-    next(error);
+    console.error("SumUp webhook verification failed", error instanceof SumupError ? error.code : "INTERNAL_ERROR");
+    // Non-2xx asks SumUp to retry; never acknowledge an unverified transient failure as successful.
+    res.status(503).end();
   }
 });

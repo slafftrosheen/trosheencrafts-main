@@ -10,6 +10,7 @@ import { useCurrentUser } from '@/hooks/useApi';
 import { adminT as t } from "@/lib/adminI18n";
 import { apiClient } from '@/lib/apiClient';
 import { TelegramOrdersSettings } from '@/components/admin/TelegramOrdersSettings';
+import { SumupSettings } from '@/components/admin/SumupSettings';
 import { Loader2, Mail, Phone, MapPin, Facebook, Instagram, Youtube, Send, Twitter, Clock } from 'lucide-react';
 
 interface SiteConfig {
@@ -136,6 +137,7 @@ export default function Settings() {
           </p>
         </header>
 
+        <SumupSettings />
         <TelegramOrdersSettings />
 
         {/* Contact Information */}
