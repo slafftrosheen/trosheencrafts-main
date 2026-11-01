@@ -308,10 +308,21 @@ async function onUpdate(token: string, update: Update) {
     const code = /^\/start(?:@\w+)?\s+([A-Za-z0-9_-]{16,80})\s*$/.exec(m.text || "");
     if (code) return register(token, m.chat, m.from, code[1]);
     if (!(await isRecipient(m.from.id))) return;
-    if (/^\/orders(?:@\w+)?\b/.test(m.text || "")) return listOrders(token, m.chat.id);
+    if (/^\/orders(?:@\w+)?(?:\s|$)/i.test(m.text || "")) return listOrders(token, m.chat.id);
+    if (/^\/(?:start|help)(?:@\w+)?(?:\s|$)/i.test(m.text || "")) {
+      return show(token, m.chat.id,
+        "🌿 <b>Trosheen · Мастерская</b>\n\n" +
+        "Здесь появляются новые оплаченные заказы.\n\n" +
+        "1. Нажмите «Заказы», чтобы увидеть список.\n" +
+        "2. Выберите номер заказа.\n" +
+        "3. Откройте «Состав» или «Контакты».\n\n" +
+        "Команда /orders всегда открывает список.\n" +
+        "Если уведомления не приходят, сообщите владельцу магазина.",
+        [[{ text: "📦 Открыть заказы", callback_data: "orders" }]]);
+    }
     return show(token, m.chat.id,
-      "🌿 <b>Trosheen Workshop</b>\n\nНовые оплаченные заказы придут сюда автоматически.",
-      [[{ text: "📦 Посмотреть заказы", callback_data: "orders" }]]);
+      "🌿 <b>Trosheen · Мастерская</b>\n\nВыберите действие ниже. Для помощи отправьте /help.",
+      [[{ text: "📦 Открыть заказы", callback_data: "orders" }]]);
   }
   const cb = update.callback_query;
   if (!cb) return;
