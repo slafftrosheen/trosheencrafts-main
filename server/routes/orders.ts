@@ -2,7 +2,7 @@ import { Router } from "express";
 import { z } from "zod";
 import { db } from "../db";
 import { orderItems, orders, products } from "../db/schema";
-import { desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { validateRequest } from "../middleware/validation";
 import { adminAuthMiddleware, authMiddleware } from "../middleware/auth";
 
@@ -76,14 +76,35 @@ ordersRouter.patch(
       const id = Number(req.params.id);
       const { status } = req.body;
 
+      // Payment state belongs to the verified SumUp webhook, never the admin UI.
+      // Do not let a manual status change turn an unpaid/review order into a paid order.
+      const transitions: Record<string, string[]> = {
+        processing: ["shipped", "cancelled"],
+        shipped: ["delivered", "processing", "cancelled"],
+        delivered: [],
+        cancelled: [],
+      };
+      const allowedFrom = Object.entries(transitions)
+        .filter(([, targets]) => targets.includes(status))
+        .map(([source]) => source);
+      if (!allowedFrom.length) {
+        return res.status(409).json({
+          message: "Payment status cannot be changed manually. Verify payment in SumUp.",
+        });
+      }
       const [updated] = await db
         .update(orders)
         .set({ status, updatedAt: new Date() })
-        .where(eq(orders.id, id))
+        .where(and(eq(orders.id, id), inArray(orders.status, allowedFrom as any)))
         .returning();
-
       if (!updated) {
-        return res.status(404).json({ message: "Order not found" });
+        const [existing] = await db.select({ id: orders.id }).from(orders)
+          .where(eq(orders.id, id)).limit(1);
+        return res.status(existing ? 409 : 404).json({
+          message: existing
+            ? "Status transition is not permitted. Payment must be verified first."
+            : "Order not found",
+        });
       }
 
       res.json(updated);
