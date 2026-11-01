@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { z } from "zod";
 import { adminAuthMiddleware } from "../middleware/auth";
+import { pool } from "../db";
+import { createWorkshopProduction } from "../lib/workshopProduction";
+import { productionActions, WorkshopError } from "../../shared/workshopProduction";
 import {
   workshopSettings, saveWorkshopSettings, inviteWorkshopRecipient,
   workshopRecipientEnabled, testWorkshopRecipient,
@@ -8,11 +11,46 @@ import {
 
 export const telegramWorkshopRouter = Router();
 telegramWorkshopRouter.use(adminAuthMiddleware);
+telegramWorkshopRouter.use((_req, res, next) => {
+  res.setHeader("Cache-Control", "no-store");
+  next();
+});
+const production = createWorkshopProduction(pool);
+const productionId = z.coerce.number().int().positive().max(2147483647);
+const historyPage = z.coerce.number().int().min(0).max(100000).default(0);
+const changeSchema = z.object({
+  action: z.enum(productionActions),
+  expectedVersion: z.number().int().min(0).max(2147483646),
+}).strict();
+
+telegramWorkshopRouter.get("/orders/:id/production", async (req, res, next) => {
+  const id = productionId.safeParse(req.params.id);
+  const page = historyPage.safeParse(req.query.page);
+  if (!id.success || !page.success) return res.status(400).json({ message: "Некорректный заказ или страница." });
+  try { res.json(await production.get(id.data, page.data)); }
+  catch (error) {
+    if (error instanceof WorkshopError) return res.status(error.statusCode).json({ message: error.message });
+    next(error);
+  }
+});
+telegramWorkshopRouter.patch("/orders/:id/production", async (req, res, next) => {
+  const id = productionId.safeParse(req.params.id);
+  const body = changeSchema.safeParse(req.body);
+  if (!id.success || !body.success) return res.status(400).json({ message: "Проверьте действие и версию заказа." });
+  try {
+    // Actor identity is server-side only, never supplied by the request body.
+    await production.change(id.data, body.data.action, body.data.expectedVersion,
+      { kind: "admin", id: String(req.user?.id ?? "") });
+    res.json(await production.get(id.data));
+  } catch (error) {
+    if (error instanceof WorkshopError) return res.status(error.statusCode).json({ message: error.message });
+    next(error);
+  }
+});
 
 // Never return the encrypted or plaintext bot token to the browser.
 telegramWorkshopRouter.get("/", async (_req, res, next) => {
   try {
-    res.setHeader("Cache-Control", "no-store");
     res.json(await workshopSettings());
   } catch (error) { next(error); }
 });
@@ -41,7 +79,6 @@ telegramWorkshopRouter.post("/invites", async (req, res, next) => {
   const parsed = z.object({ displayName: z.string().trim().min(1).max(80) }).strict().safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: "Введите имя сотрудника." });
   try {
-    res.setHeader("Cache-Control", "no-store");
     res.status(201).json(await inviteWorkshopRecipient(parsed.data.displayName));
   } catch (error) { next(error); }
 });

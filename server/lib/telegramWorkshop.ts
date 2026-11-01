@@ -4,10 +4,15 @@
  * No webhook or public inbound port is required on Raspberry Pi.
  */
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
+import type { PoolClient } from "pg";
 import { db, pool } from "../db";
 import { orderItems, orders, products } from "../db/schema";
 import { eq, sql } from "drizzle-orm";
+import { createWorkshopProduction } from "./workshopProduction";
+import { handleProductionCommand } from "./workshopTelegram";
+import { productionLabels, type ProductionStatus } from "../../shared/workshopProduction";
 
+const production = createWorkshopProduction(pool);
 type Bot = { bot_token_ciphertext: string; bot_id: string; bot_username: string;
   enabled: boolean; update_offset: string; last_error: string | null };
 type Recipient = { id: number; chat_id: string; display_name: string;
@@ -105,6 +110,8 @@ export async function saveWorkshopSettings(input: { token?: string; enabled?: bo
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    // Same lock order as manufacturing actions: configuration, then recipients.
+    await client.query("SELECT id FROM telegram_workshop_config WHERE id = 1 FOR UPDATE");
     if (old && old.bot_id !== botId) {
       // A different bot has a different set of Telegram chats and subscribers.
       await client.query("DELETE FROM telegram_workshop_pairings");
@@ -168,7 +175,7 @@ async function loadOrder(id: number): Promise<Order | null> {
     .where(eq(orderItems.orderId, id));
   return { ...record, items };
 }
-function summary(order: Order, event: EventType = "paid") {
+function summary(order: Order) {
   const warning = order.status === "payment_review";
   return [
     warning ? "⚠️ <b>ОПЛАЧЕНО — ТРЕБУЕТ ПРОВЕРКИ</b>" :
@@ -181,13 +188,14 @@ function summary(order: Order, event: EventType = "paid") {
     "💶 Итого: <b>" + eur(order.totalAmount) + "</b>",
     "📌 Состояние: " + (warning ? "Проверить остатки" :
       order.status === "delivered" ? "Доставлен" :
-      order.status === "shipped" ? "Отправлен" : "В работе"),
+      order.status === "shipped" ? "Отправлен" : "Оплачен, принят магазином"),
     ...(warning ? ["", "❗ Проблема с остатками: не начинайте изготовление до проверки."] : []),
   ].join("\n");
 }
 function orderButtons(id: number): Button[][] {
   return [
     [{ text: "📋 Состав заказа", callback_data: "order:" + id + ":items:0" }],
+    [{ text: "🛠 Изготовление и готовность", callback_data: "wp:" + id + ":view" }],
     [{ text: "☎️ Контакты покупателя", callback_data: "order:" + id + ":contact" }],
     [{ text: "📦 Другие заказы", callback_data: "orders" }],
   ];
@@ -219,6 +227,7 @@ function details(order: Order, page: number) {
   });
   const buttons: Button[][] = [];
   if (navigation.length) buttons.push(navigation);
+  buttons.push([{ text: "🛠 Изготовление", callback_data: "wp:" + order.id + ":view" }]);
   buttons.push([{ text: "☎️ Контакты", callback_data: "order:" + order.id + ":contact" }]);
   buttons.push([{ text: "🏠 К заказу", callback_data: "order:" + order.id + ":summary" }]);
   return { text: lines.join("\n"), buttons };
@@ -256,19 +265,26 @@ async function showOrder(token: string, chat: number, id: number, section: strin
   ], messageId);
   return show(token, chat, summary(order), orderButtons(id), messageId);
 }
-async function listOrders(token: string, chat: number, messageId?: number) {
-  const { rows } = await pool.query<{ id: number; total_amount: string; status: string }>(
-    "SELECT id, total_amount, status FROM orders WHERE " +
-    "status IN ('processing','payment_review','shipped') ORDER BY created_at DESC LIMIT 12"
+async function listOrders(token: string, chat: number, messageId?: number, page = 0) {
+  const activePage = Number.isInteger(page) ? Math.max(0, Math.min(page, 100000)) : 0;
+  const { rows } = await pool.query<{ id: number; total_amount: string; status: string; production_status: ProductionStatus }>(
+    "SELECT o.id, o.total_amount, o.status, COALESCE(p.status, 'not_started') AS production_status " +
+    "FROM orders o LEFT JOIN order_production p ON p.order_id = o.id " +
+    "WHERE o.status IN ('processing','payment_review','shipped') " +
+    "ORDER BY o.created_at ASC, o.id ASC LIMIT 9 OFFSET $1", [activePage * 8]
   );
-  const buttons: Button[][] = rows.map((o) => [{
-    text: (o.status === "payment_review" ? "⚠️ " : "📦 ") + "№" + o.id + " · " + eur(o.total_amount),
+  const buttons: Button[][] = rows.slice(0, 8).map((o) => [{
+    text: "№" + o.id + " · " + eur(o.total_amount) + " · " +
+      (o.status === "payment_review" ? "⚠ Проверить" : o.status === "shipped" ? "Отправлен" : productionLabels[o.production_status]),
     callback_data: "order:" + o.id + ":summary",
   }]);
-  buttons.push([{ text: "🔄 Обновить", callback_data: "orders" }]);
-  return show(token, chat, rows.length ?
-    "📦 <b>Последние оплаченные заказы</b>\n\nНажмите на заказ:" :
-    "Нет оплаченных заказов в работе.", buttons, messageId);
+  if (activePage > 0) buttons.push([{ text: "⬅️ Предыдущие заказы", callback_data: "orders:" + (activePage - 1) }]);
+  if (rows.length > 8) buttons.push([{ text: "Следующие заказы ➡️", callback_data: "orders:" + (activePage + 1) }]);
+  buttons.push([{ text: "🔄 Обновить список", callback_data: "orders:" + activePage }]);
+  if (activePage > 0) buttons.push([{ text: "🏠 К началу списка", callback_data: "orders" }]);
+  return show(token, chat,
+    "📦 <b>Оплаченные заказы · страница " + (activePage + 1) + "</b>\n\n" +
+    (rows.length ? "Сначала более ранние заказы. Нажмите на нужный номер:" : "На этой странице заказов нет."), buttons, messageId);
 }
 async function isRecipient(userId: number) {
   const result = await pool.query("SELECT 1 FROM telegram_workshop_recipients " +
@@ -308,7 +324,12 @@ async function register(token: string, chat: Chat, from: { id: number; username?
     }]] } : undefined,
   });
 }
-async function onUpdate(token: string, update: Update) {
+// A spinner acknowledgement must never determine whether a manufacturing write succeeds.
+async function answerCallback(token: string, id: string, text?: string) {
+  try { await telegram(token, "answerCallbackQuery", { callback_query_id: id, text, show_alert: Boolean(text) }); }
+  catch { /* Old callback IDs expire; still open the current state or process a version-checked action. */ }
+}
+async function onUpdate(token: string, update: Update, botId: string) {
   const m = update.message;
   if (m?.from && m.chat.type === "private" && m.chat.id === m.from.id) {
     const code = /^\/start(?:@\w+)?\s+([A-Za-z0-9_-]{16,80})\s*$/.exec(m.text || "");
@@ -319,11 +340,11 @@ async function onUpdate(token: string, update: Update) {
       return show(token, m.chat.id,
         "🌿 <b>Trosheen · Мастерская</b>\n\n" +
         "Здесь появляются новые оплаченные заказы.\n\n" +
-        "1. Нажмите «Заказы», чтобы увидеть список.\n" +
-        "2. Выберите номер заказа.\n" +
-        "3. Откройте «Состав» или «Контакты».\n\n" +
-        "Команда /orders всегда открывает список.\n" +
-        "Если уведомления не приходят, сообщите владельцу магазина.",
+        "1. Нажмите «Заказы» и выберите номер.\n" +
+        "2. Откройте «Состав» или «Контакты».\n" +
+        "3. В разделе «Изготовление» отметьте начало работы, готовность изделий и упаковки.\n\n" +
+        "Каждый шаг требует подтверждения. Ошибочную готовность можно вернуть в работу.\n" +
+        "Команда /orders всегда открывает список.",
         [[{ text: "📦 Открыть заказы", callback_data: "orders" }]]);
     }
     return show(token, m.chat.id,
@@ -334,24 +355,27 @@ async function onUpdate(token: string, update: Update) {
   if (!cb) return;
   const chat = cb.message?.chat;
   if (!chat || chat.type !== "private" || chat.id !== cb.from.id || !(await isRecipient(cb.from.id))) {
-    await telegram(token, "answerCallbackQuery", { callback_query_id: cb.id, text: "Доступ закрыт.", show_alert: true });
+    await answerCallback(token, cb.id, "Доступ закрыт.");
     return;
   }
+  await answerCallback(token, cb.id);
   try {
-    if (cb.data === "orders") {
-      await listOrders(token, chat.id, cb.message?.message_id);
+    const queuePage = /^orders(?::([0-9]{1,6}))?$/.exec(cb.data || "");
+    if (queuePage) {
+      await listOrders(token, chat.id, cb.message?.message_id, Number(queuePage[1] || 0));
+    } else if (cb.data?.startsWith("wp:")) {
+      const screen = await handleProductionCommand(production, cb.data, { kind: "telegram", id: String(cb.from.id), botId });
+      await show(token, chat.id, screen.text, screen.buttons, cb.message?.message_id);
     } else {
       const x = /^order:([1-9][0-9]*):(summary|items|contact)(?::([0-9]+))?$/.exec(cb.data || "");
       if (!x || !Number.isSafeInteger(Number(x[1]))) throw new Error("Кнопка устарела.");
-      await showOrder(token, chat.id, Number(x[1]), x[2], Math.min(Number(x[3] || 0), 10000),
-        cb.message?.message_id);
+      await showOrder(token, chat.id, Number(x[1]), x[2], Math.min(Number(x[3] || 0), 10000), cb.message?.message_id);
     }
-    await telegram(token, "answerCallbackQuery", { callback_query_id: cb.id });
   } catch (error) {
     console.error("Telegram button:", error instanceof Error ? error.message : error);
-    await telegram(token, "answerCallbackQuery", {
-      callback_query_id: cb.id, text: "Не удалось открыть заказ. Попробуйте /orders.", show_alert: true,
-    });
+    await show(token, chat.id,
+      "Не удалось выполнить действие. Откройте заказ заново и проверьте его состояние перед повторным подтверждением.",
+      [[{ text: "📦 Открыть заказы", callback_data: "orders" }]], cb.message?.message_id);
   }
 }
 
@@ -360,8 +384,6 @@ export async function queuePaidWorkshopOrder(tx: any, orderId: number, event: Ev
   if (!Number.isSafeInteger(orderId) || orderId < 1 || !["paid", "payment_review"].includes(event)) {
     throw new Error("Invalid workshop event");
   }
-  // Queue on confirmed payment even if the bot is temporarily disabled.
-  // Deliveries resume automatically once enabled; SQL values are parameterized.
   await tx.execute(sql`
     INSERT INTO telegram_workshop_outbox (order_id, recipient_id, event_type)
     SELECT ${orderId}, r.id, ${event}
@@ -375,9 +397,11 @@ let polling = false;
 async function poll() {
   if (polling) return;
   polling = true;
-  const client = await pool.connect();
+  let client: PoolClient | undefined;
   let lock = false;
   try {
+    // Acquisition belongs inside try/finally: a DB outage must not latch polling forever.
+    client = await pool.connect();
     const r = await client.query<{ acquired: boolean }>(
       "SELECT pg_try_advisory_lock($1) AS acquired", [920261031]
     );
@@ -391,9 +415,8 @@ async function poll() {
       allowed_updates: ["message", "callback_query"],
     });
     for (const update of updates) {
-      try { await onUpdate(token, update); }
+      try { await onUpdate(token, update, config.bot_id); }
       catch (error) {
-        // Never acknowledge a failed update: retry on the next poll, preserving invite/callback actions.
         const message = error instanceof Error ? error.message.slice(0, 500) : "Telegram update error";
         console.error("Telegram update", update.update_id, message);
         await client.query(
@@ -410,12 +433,14 @@ async function poll() {
   } catch (error) {
     const message = error instanceof Error ? error.message.slice(0, 500) : "Telegram polling error";
     console.error("Telegram polling:", message);
-    try { await client.query("UPDATE telegram_workshop_config SET last_error = $1 WHERE id = 1", [message]); }
+    try { if (client) await client.query("UPDATE telegram_workshop_config SET last_error = $1 WHERE id = 1", [message]); }
     catch { /* database may be temporarily offline */ }
   } finally {
-    if (lock) await client.query("SELECT pg_advisory_unlock($1)", [920261031]).catch(() => {});
-    client.release();
-    polling = false;
+    try {
+      if (lock && client) await client.query("SELECT pg_advisory_unlock($1)", [920261031]);
+    } catch { /* connection lost; destroy it rather than retaining an advisory lock */
+      client?.release(true); client = undefined;
+    } finally { client?.release(); polling = false; }
   }
 }
 let delivering = false;
@@ -444,7 +469,7 @@ async function deliver() {
         const order = await loadOrder(job.order_id);
         if (!order || !paid(order.status)) throw new Error("Order is not paid");
         const sent = await telegram<{ message_id: number }>(token, "sendMessage", {
-          chat_id: job.chat_id, text: summary(order, job.event_type),
+          chat_id: job.chat_id, text: summary(order),
           parse_mode: "HTML", reply_markup: { inline_keyboard: orderButtons(order.id) },
         });
         await pool.query(

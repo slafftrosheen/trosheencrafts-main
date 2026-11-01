@@ -34,6 +34,7 @@ import { apiClient } from "@/lib/apiClient";
 import { Spinner } from "@/components/shared/LoadingStates";
 import { toast } from "sonner";
 import { adminT as t } from "@/lib/adminI18n";
+import { OrderProduction } from "@/components/admin/OrderProduction";
 
 type OrderStatus = "pending" | "payment_review" | "processing" | "shipped" | "delivered" | "cancelled";
 
@@ -108,6 +109,7 @@ export default function AdminOrders() {
       queryClient.invalidateQueries({ queryKey: ["admin-dashboard-overview"] });
       queryClient.invalidateQueries({ queryKey: ["admin-analytics-dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["admin-analytics-sales"] });
+      queryClient.invalidateQueries({ queryKey: ["order-production"] });
       toast.success("Статус заказа обновлён");
     },
     onError: (mutationError: any) => {
@@ -126,6 +128,7 @@ export default function AdminOrders() {
         String(order.id),
         order.shippingAddress?.name,
         order.shippingAddress?.email,
+        order.shippingAddress?.phone,
         order.shippingAddress?.city,
         order.shippingAddress?.country,
         ...(order.items || []).map((item) => item.productName || ""),
@@ -156,8 +159,12 @@ export default function AdminOrders() {
   const copyAddress = async (order: AdminOrder) => {
     const value = formatAddress(order);
     if (!value) return;
-    await navigator.clipboard.writeText(value);
-    toast.success("Адрес доставки скопирован");
+    try {
+      await navigator.clipboard.writeText(value);
+      toast.success("Адрес доставки скопирован");
+    } catch {
+      toast.error("Не удалось скопировать адрес. Выделите и скопируйте его вручную.");
+    }
   };
 
   return (
@@ -195,7 +202,7 @@ export default function AdminOrders() {
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Поиск по заказу, клиенту, эл. почте, адресу или товару"
+            placeholder="Поиск по заказу, клиенту, телефону, адресу или товару"
             className="pl-9"
           />
         </div>
@@ -315,6 +322,7 @@ export default function AdminOrders() {
                     {expanded && (
                       <TableRow className="bg-muted/20">
                         <TableCell colSpan={6} className="px-6 py-5">
+                          <OrderProduction orderId={order.id} />
                           <div className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
                             <div>
                               <h3 className="text-sm font-semibold">Состав заказа</h3>
