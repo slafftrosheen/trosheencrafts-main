@@ -169,13 +169,19 @@ async function loadOrder(id: number): Promise<Order | null> {
   return { ...record, items };
 }
 function summary(order: Order, event: EventType = "paid") {
-  const warning = event === "payment_review" || order.status === "payment_review";
+  const warning = order.status === "payment_review";
   return [
-    warning ? "⚠️ <b>ОПЛАЧЕНО — ТРЕБУЕТ ПРОВЕРКИ</b>" : "✅ <b>НОВЫЙ ОПЛАЧЕННЫЙ ЗАКАЗ</b>",
+    warning ? "⚠️ <b>ОПЛАЧЕНО — ТРЕБУЕТ ПРОВЕРКИ</b>" :
+      order.status === "delivered" ? "✅ <b>ЗАКАЗ ДОСТАВЛЕН</b>" :
+      order.status === "shipped" ? "🚚 <b>ЗАКАЗ ОТПРАВЛЕН</b>" :
+      "✅ <b>ОПЛАЧЕННЫЙ ЗАКАЗ</b>",
     "", "📦 <b>Trosheen · № " + order.id + "</b>",
     "👤 " + safe(order.shippingAddress.name),
     "🕯 Изделий: " + order.items.reduce((n, item) => n + item.quantity, 0),
     "💶 Итого: <b>" + eur(order.totalAmount) + "</b>",
+    "📌 Состояние: " + (warning ? "Проверить остатки" :
+      order.status === "delivered" ? "Доставлен" :
+      order.status === "shipped" ? "Отправлен" : "В работе"),
     ...(warning ? ["", "❗ Проблема с остатками: не начинайте изготовление до проверки."] : []),
   ].join("\n");
 }
