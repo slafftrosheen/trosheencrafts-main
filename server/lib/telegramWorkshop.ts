@@ -5,6 +5,8 @@
  */
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import type { PoolClient } from "pg";
+import { telegramRequest as telegram } from "./workshopTransport";
+import { createWorkshopDelivery } from "./workshopDelivery";
 import { db, pool } from "../db";
 import { orderItems, orders, products } from "../db/schema";
 import { eq, sql } from "drizzle-orm";
@@ -13,6 +15,7 @@ import { handleProductionCommand } from "./workshopTelegram";
 import { productionLabels, type ProductionStatus } from "../../shared/workshopProduction";
 
 const production = createWorkshopProduction(pool);
+const delivery = createWorkshopDelivery(pool);
 type Bot = { bot_token_ciphertext: string; bot_id: string; bot_username: string;
   enabled: boolean; update_offset: string; last_error: string | null };
 type Recipient = { id: number; chat_id: string; display_name: string;
@@ -54,17 +57,6 @@ function decrypt(ciphertext: string) {
   c.setAuthTag(Buffer.from(tag, "base64"));
   return Buffer.concat([c.update(Buffer.from(payload, "base64")), c.final()]).toString("utf8");
 }
-async function telegram<T>(token: string, method: string, params: Record<string, unknown> = {}): Promise<T> {
-  const res = await fetch("https://api.telegram.org/bot" + token + "/" + method, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(params), signal: AbortSignal.timeout(10000),
-  });
-  const json = await res.json() as { ok?: boolean; result?: T; description?: string };
-  if (!res.ok || !json.ok || json.result === undefined) {
-    throw new Error("Telegram " + method + ": " + (json.description || res.status));
-  }
-  return json.result;
-}
 async function bot(): Promise<Bot | null> {
   const r = await pool.query<Bot>("SELECT * FROM telegram_workshop_config WHERE id = 1");
   return r.rows[0] || null;
@@ -75,18 +67,8 @@ export async function workshopSettings() {
     "SELECT id, chat_id, display_name, telegram_username, enabled " +
     "FROM telegram_workshop_recipients ORDER BY id"
   );
-  const delivery = await pool.query<{
-    pending: string; retrying: string; last_sent_at: Date | null;
-  }>(
-    "SELECT COUNT(*) FILTER (WHERE o.sent_at IS NULL) AS pending, " +
-    "COUNT(*) FILTER (WHERE o.sent_at IS NULL AND o.attempts > 0) AS retrying, " +
-    "MAX(o.sent_at) AS last_sent_at FROM telegram_workshop_outbox o " +
-    "JOIN telegram_workshop_recipients r ON r.id = o.recipient_id AND r.enabled = TRUE"
-  );
-  const stats = delivery.rows[0];
   return { configured: Boolean(config), enabled: config?.enabled ?? false,
-    delivery: { pending: Number(stats?.pending ?? 0), retrying: Number(stats?.retrying ?? 0),
-      lastSentAt: stats?.last_sent_at?.toISOString() ?? null },
+    delivery: await delivery.summary(),
     username: config?.bot_username || null, lastError: config?.last_error || null,
     recipients: recipients.rows.map((r) => ({ id: r.id, displayName: r.display_name,
       telegramUsername: r.telegram_username, enabled: r.enabled })) };
@@ -124,7 +106,9 @@ export async function saveWorkshopSettings(input: { token?: string; enabled?: bo
       "bot_token_ciphertext = EXCLUDED.bot_token_ciphertext, bot_id = EXCLUDED.bot_id, " +
       "bot_username = EXCLUDED.bot_username, enabled = EXCLUDED.enabled, " +
       "update_offset = CASE WHEN telegram_workshop_config.bot_id = EXCLUDED.bot_id " +
-      "THEN telegram_workshop_config.update_offset ELSE 0 END, last_error = NULL, updated_at = NOW()",
+      "THEN telegram_workshop_config.update_offset ELSE 0 END, " +
+      "delivery_retry_at = CASE WHEN telegram_workshop_config.bot_id = EXCLUDED.bot_id " +
+      "THEN telegram_workshop_config.delivery_retry_at ELSE NULL END, last_error = NULL, updated_at = NOW()",
       [cipher, botId, username, enabled]
     );
     await client.query("COMMIT");
@@ -443,50 +427,15 @@ async function poll() {
     } finally { client?.release(); polling = false; }
   }
 }
-let delivering = false;
 async function deliver() {
-  if (delivering) return;
-  delivering = true;
-  try {
-    const config = await bot();
-    if (!config?.enabled) return;
-    const token = decrypt(config.bot_token_ciphertext);
-    for (let i = 0; i < 10; i++) {
-      const result = await pool.query<{ id: string; order_id: number; chat_id: string; event_type: EventType }>(
-        "WITH job AS (SELECT o.id FROM telegram_workshop_outbox o " +
-        "JOIN telegram_workshop_recipients r ON r.id = o.recipient_id AND r.enabled = TRUE " +
-        "WHERE o.sent_at IS NULL AND o.available_at <= NOW() " +
-        "AND (o.locked_until IS NULL OR o.locked_until < NOW()) " +
-        "ORDER BY o.id FOR UPDATE OF o SKIP LOCKED LIMIT 1) " +
-        "UPDATE telegram_workshop_outbox o SET attempts = attempts + 1, " +
-        "locked_until = NOW() + INTERVAL '45 seconds' FROM job, telegram_workshop_recipients r " +
-        "WHERE o.id = job.id AND r.id = o.recipient_id " +
-        "RETURNING o.id, o.order_id, o.event_type, r.chat_id"
-      );
-      const job = result.rows[0];
-      if (!job) break;
-      try {
-        const order = await loadOrder(job.order_id);
-        if (!order || !paid(order.status)) throw new Error("Order is not paid");
-        const sent = await telegram<{ message_id: number }>(token, "sendMessage", {
-          chat_id: job.chat_id, text: summary(order),
-          parse_mode: "HTML", reply_markup: { inline_keyboard: orderButtons(order.id) },
-        });
-        await pool.query(
-          "UPDATE telegram_workshop_outbox SET sent_at = NOW(), locked_until = NULL, " +
-          "telegram_message_id = $2, last_error = NULL WHERE id = $1", [job.id, sent.message_id]
-        );
-      } catch (error) {
-        const message = error instanceof Error ? error.message.slice(0, 500) : "Telegram delivery error";
-        console.error("Telegram order", job.order_id, message);
-        await pool.query(
-          "UPDATE telegram_workshop_outbox SET locked_until = NULL, last_error = $2, " +
-          "available_at = NOW() + LEAST(3600, 20 * POWER(2, LEAST(attempts, 8))) * INTERVAL '1 second' " +
-          "WHERE id = $1", [job.id, message]
-        );
-      }
-    }
-  } finally { delivering = false; }
+  await delivery.deliver({
+    decrypt,
+    render: async (orderId) => {
+      const order = await loadOrder(orderId);
+      if (!order || !paid(order.status)) return null;
+      return { text: summary(order), reply_markup: { inline_keyboard: orderButtons(order.id) } };
+    },
+  });
 }
 export function startTelegramWorkshop() {
   const tick = () => {

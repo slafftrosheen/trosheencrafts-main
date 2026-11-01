@@ -241,7 +241,7 @@ function loadBotInternals(pool) {
     if (name === './workshopProduction') return require('../server/lib/workshopProduction.ts');
     if (name === './workshopTelegram') return require('../server/lib/workshopTelegram.ts');
     if (name === '../../shared/workshopProduction') return domain;
-    return require(name);
+    return require('node:module').createRequire(filename)(name);
   };
   new Function('require','module','exports','console', code + '\nexports.internals = {poll, listOrders};')(
     requireBot,module,module.exports,{log(){},error(){}}

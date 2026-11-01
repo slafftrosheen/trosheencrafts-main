@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { TelegramDeliveryStatus } from "./TelegramDeliveryStatus";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Check, Copy, Loader2, Send, ShieldCheck, UserPlus } from "lucide-react";
 import { toast } from "sonner";
@@ -37,7 +38,10 @@ export function TelegramOrdersSettings() {
     queryFn: () => apiClient.get<BotSettings>(url),
     refetchInterval: 8000,
   });
-  const refresh = () => client.invalidateQueries({ queryKey: ["telegram-workshop"] });
+  const refresh = () => {
+    void client.invalidateQueries({ queryKey: ["telegram-workshop"] });
+    void client.invalidateQueries({ queryKey: ["telegram-deliveries"] });
+  };
   const save = useMutation({
     mutationFn: (body: { token?: string; enabled: boolean }) =>
       apiClient.put<BotSettings>(url, body),
@@ -226,30 +230,13 @@ export function TelegramOrdersSettings() {
               ))}
             </div>
           )}
-          <div className="rounded-xl border border-border bg-muted/30 p-4" aria-live="polite">
-            <h4 className="text-base font-semibold">Состояние уведомлений</h4>
-            <p className="mt-2 text-sm leading-relaxed">
-              В очереди: <strong>{data?.delivery?.pending ?? 0}</strong>
-              {" · "}Повторные попытки: <strong>{data?.delivery?.retrying ?? 0}</strong>
-            </p>
-            {data?.delivery?.lastSentAt && (
-              <p className="mt-1 text-sm text-muted-foreground">
-                Последнее доставленное сообщение: {new Date(data.delivery.lastSentAt).toLocaleString("ru-RU")}
-              </p>
-            )}
-            {(data?.delivery?.retrying ?? 0) > 0 && (
-              <p className="mt-2 text-sm text-destructive" role="status">
-                Часть сообщений не доставлена. Бот повторяет отправку автоматически.
-                Проверьте, что сотрудники не заблокировали бота.
-              </p>
-            )}
-          </div>
           <p className="text-xs leading-relaxed text-muted-foreground">
             В сообщения попадают имя, сумма и номер заказа. Состав, телефон и адрес доступны
             только подключённым сотрудникам по кнопкам внутри личного чата с ботом.
             Если бот выключен, оплаченные заказы остаются в очереди до включения.
           </p>
         </section>
+        <TelegramDeliveryStatus />
       </CardContent>
     </Card>
   );

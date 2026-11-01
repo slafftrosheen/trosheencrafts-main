@@ -2,6 +2,8 @@ import { Router } from "express";
 import { z } from "zod";
 import { adminAuthMiddleware } from "../middleware/auth";
 import { pool } from "../db";
+import { createWorkshopDelivery, DeliveryError } from "../lib/workshopDelivery";
+import { deliveryFilters, isDeliveryId } from "../../shared/workshopDelivery";
 import { createWorkshopProduction } from "../lib/workshopProduction";
 import { productionActions, WorkshopError } from "../../shared/workshopProduction";
 import {
@@ -16,6 +18,7 @@ telegramWorkshopRouter.use((_req, res, next) => {
   next();
 });
 const production = createWorkshopProduction(pool);
+const delivery = createWorkshopDelivery(pool);
 const productionId = z.coerce.number().int().positive().max(2147483647);
 const historyPage = z.coerce.number().int().min(0).max(100000).default(0);
 const changeSchema = z.object({
@@ -44,6 +47,30 @@ telegramWorkshopRouter.patch("/orders/:id/production", async (req, res, next) =>
     res.json(await production.get(id.data));
   } catch (error) {
     if (error instanceof WorkshopError) return res.status(error.statusCode).json({ message: error.message });
+    next(error);
+  }
+});
+
+const deliveryQuery = z.object({
+  page: z.coerce.number().int().min(0).max(100000).default(0),
+  filter: z.enum(deliveryFilters).default("attention"),
+}).strict();
+telegramWorkshopRouter.get("/deliveries", async (req, res, next) => {
+  const query = deliveryQuery.safeParse(req.query);
+  if (!query.success) return res.status(400).json({ message: "Проверьте фильтр и страницу уведомлений." });
+  try { res.json(await delivery.list(query.data.page, query.data.filter)); }
+  catch (error) {
+    if (error instanceof DeliveryError) return res.status(error.statusCode).json({ message: error.message });
+    next(error);
+  }
+});
+telegramWorkshopRouter.post("/deliveries/:id/retry", async (req, res, next) => {
+  const id = req.params.id;
+  const body = z.object({ confirm: z.literal(true) }).strict().safeParse(req.body);
+  if (!isDeliveryId(id) || !body.success) return res.status(400).json({ message: "Подтвердите повторную отправку уведомления." });
+  try { res.json(await delivery.retry(id, Number(req.user?.id))); }
+  catch (error) {
+    if (error instanceof DeliveryError) return res.status(error.statusCode).json({ message: error.message });
     next(error);
   }
 });
